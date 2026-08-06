@@ -1,0 +1,4312 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "ecosystem@atlassian.com"
+    },
+    "description": "Jira Cloud platform REST API documentation",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "termsOfService": "https://developer.atlassian.com/platform/marketplace/atlassian-developer-terms/",
+    "title": "The Jira Cloud platform REST API - fields (part 1 of 3)",
+    "version": "1001.0.0-SNAPSHOT-94e91f6947ecc63395c0d5a54f05005b6eab5a8a"
+  },
+  "externalDocs": {
+    "description": "Find out more about Atlassian products and services.",
+    "url": "http://www.atlassian.com"
+  },
+  "servers": [
+    {
+      "url": "https://your-domain.atlassian.net"
+    }
+  ],
+  "tags": [
+    {
+      "description": "This resource represents field schemes which are replacing field configuration schemes to control field associations. They are currently in beta and only available to customers who have opted-in to the beta program. For more information see [RFC-103: Jira Field Configuration Overhaul: Admin Experience and API Changes](https://community.developer.atlassian.com/t/rfc-103-jira-field-configuration-overhaul-admin-experience-and-api-changes/94205)",
+      "name": "Field schemes"
+    },
+    {
+      "description": "This resource represents custom issue field select list options created in Jira or using the REST API. This resource supports the following field types:\n\n *  Checkboxes.\n *  Radio Buttons.\n *  Select List (single choice).\n *  Select List (multiple choices).\n *  Select List (cascading).\n\nSee [Issue custom field options (apps)](#api-group-Issue-custom-field-options--apps-) to manipulate custom issue field select list options created by a Connect app.\n\nUse it to retrieve, create, update, order, and delete custom field options.",
+      "name": "Issue custom field options"
+    }
+  ],
+  "x-split": {
+    "strategy": "domain",
+    "group": "fields",
+    "part": 1,
+    "of": 3,
+    "tags": [
+      "Field schemes",
+      "Issue custom field options"
+    ]
+  },
+  "paths": {
+    "/rest/api/2/config/fieldschemes": {
+      "get": {
+        "deprecated": false,
+        "description": "REST endpoint for retrieving a paginated list of field association schemes with optional filtering.\n\nThis endpoint allows clients to fetch field association schemes with optional filtering by project IDs and text queries. The response includes scheme details with navigation links and filter metadata when applicable.\n\nFiltering Behavior:\n\n *  When projectId or query parameters are provided, the response includes matchedFilters metadata showing which filters were applied.\n *  When no filters are applied, matchedFilters is omitted from individual scheme objects\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getFieldAssociationSchemes",
+        "parameters": [
+          {
+            "description": "(optional) List of project IDs to filter schemes by. If not provided, schemes from all projects are returned.",
+            "in": "query",
+            "name": "projectId",
+            "schema": {
+              "items": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "description": "(optional) Text filter for scheme name or description matching (case-insensitive). If not provided, no text filtering is applied.",
+            "in": "query",
+            "name": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Zero-based index of the first item to return (default: 0)",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Maximum number of items to return per page (default: 50, max: 100)",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"Field Association Scheme test description\",\"fieldsCount\":5,\"id\":1000,\"isDefault\":false,\"links\":{\"associations\":\"rest/api/3/config/fieldschemes/10000/fields\",\"projects\":\"rest/api/3/config/fieldschemes/10000/projects\"},\"matchedFilters\":{\"projectIds\":[10001,10002],\"query\":\"query\"},\"name\":\"Field Association Scheme test name\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/PageBean2GetFieldAssociationSchemeResponse"
+                }
+              }
+            },
+            "description": "Pagianted list of field association schemes"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the request parameters are invalid (e.g., negative startAt, maxResults exceeding limit)."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the feature flag is disabled."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get field schemes",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field-configuration-scheme:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Endpoint for creating a new field association scheme.\n\nA new scheme is **not** copied from, or based on, any existing field association scheme. Instead, it is initialised with a minimal default set of critical fields sourced from the instance's own *system* and *product* fields (the fields returned by the product's field API), rather than from a scheme you specify.\n\nTo create a scheme that is based on an existing one, use the *Clone field scheme* endpoint instead.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "createFieldAssociationScheme",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "description": "Field association scheme description",
+                "name": "Field association scheme name"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/CreateFieldAssociationSchemeRequest"
+              }
+            }
+          },
+          "description": "The request containing the name and description of the field association scheme",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"Field association scheme description\",\"id\":10000,\"links\":{\"associations\":\"{BASE_API_URL}/rest/api/2/config/fieldschemes/9/fields\",\"projects\":\"{BASE_API_URL}/rest/api/2/config/fieldschemes/9/projects\"},\"name\":\"Field association scheme name\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFieldAssociationSchemeResponse"
+                }
+              }
+            },
+            "description": "Returned if the creation was successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the feature flag is disabled or the scheme ID is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Create field scheme",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration-scheme:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/{id}": {
+      "get": {
+        "deprecated": false,
+        "description": "Endpoint for fetching a field association scheme by its ID\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getFieldAssociationSchemeById",
+        "parameters": [
+          {
+            "description": "The scheme id to fetch",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"This is a field association scheme\",\"fieldsCount\":5,\"id\":\"123\",\"isDefault\":false,\"links\":{\"associations\":\"rest/api/3/config/fieldschemes/10000/fields\",\"projects\":\"rest/api/3/config/fieldschemes/10000/projects\"},\"name\":\"Scheme\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/GetFieldAssociationSchemeByIdResponse"
+                }
+              }
+            },
+            "description": "Returned if a field association scheme matches the given scheme ID"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if provided ID does not match any field association schemes"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get field scheme",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field-configuration-scheme:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Endpoint for updating an existing field association scheme.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "updateFieldAssociationScheme",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "description": "Field association scheme description",
+                "name": "Field association scheme name"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFieldAssociationSchemeRequest"
+              }
+            }
+          },
+          "description": "The request containing the desired updates to the field association scheme",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"Field association scheme description\",\"id\":10000,\"links\":{\"associations\":\"{BASE_API_URL}/rest/api/2/config/fieldschemes/9/fields\",\"projects\":\"{BASE_API_URL}/rest/api/2/config/fieldschemes/9/projects\"},\"name\":\"Field association scheme name\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateFieldAssociationSchemeResponse"
+                }
+              }
+            },
+            "description": "Returned if the update was successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the feature flag is disabled or the scheme ID is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Update field scheme",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration-scheme:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Delete a specified field association scheme\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "deleteFieldAssociationScheme",
+        "parameters": [
+          {
+            "description": "The ID of the field association scheme to delete.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"deleted\":true,\"id\":\"10000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFieldAssociationSchemeResponse"
+                }
+              }
+            },
+            "description": "Returned if the field association scheme deletion was successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the scheme that the user is attempting to delete is a system scheme."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Return if the provided ID does not match any existing field association scheme"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Return if the scheme that the user is attempting to delete is still in use."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Delete a field scheme",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration-scheme:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/{id}/clone": {
+      "post": {
+        "deprecated": false,
+        "description": "Endpoint for cloning an existing field association scheme into a new one.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "cloneFieldAssociationScheme",
+        "parameters": [
+          {
+            "description": "The ID of the source field association scheme to clone from",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "description": "Field association scheme description",
+                "name": "Field association scheme name"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/CreateFieldAssociationSchemeRequest"
+              }
+            }
+          },
+          "description": "The request containing the name and description for the new scheme",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"Field association scheme description\",\"id\":10000,\"links\":{\"associations\":\"{BASE_API_URL}/rest/api/2/config/fieldschemes/9/fields\",\"projects\":\"{BASE_API_URL}/rest/api/2/config/fieldschemes/9/projects\"},\"name\":\"Field association scheme name\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFieldAssociationSchemeResponse"
+                }
+              }
+            },
+            "description": "Returned if the clone was successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the feature flag is disabled or the source scheme ID is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Clone field scheme",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration-scheme:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/{id}/fields": {
+      "get": {
+        "deprecated": false,
+        "description": "Search for fields belonging to a given field association scheme.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "searchFieldAssociationSchemeFields",
+        "parameters": [
+          {
+            "description": "The starting index of the returned fields. Base index: 0.",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of fields to return per page, maximum allowed value is 100.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The field IDs to filter by, if empty then all fields belonging to a field association scheme will be returned",
+            "in": "query",
+            "name": "fieldId",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "The scheme ID to search for child fields",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"allowedOperations\":[\"REMOVE\",\"CHANGE_REQUIRED\",\"CHANGE_DESCRIPTION\"],\"fieldId\":\"customfield_10000\",\"parameters\":{\"description\":\"text\",\"isRequired\":true,\"rendererType\":\"atlassian-wiki-renderer\"},\"restrictedToWorkTypes\":[\"1\",\"2\"],\"workTypeParameters\":[{\"description\":\"text\",\"isRequired\":true,\"rendererType\":\"jira-text-renderer\",\"workTypeId\":\"1\"},{\"description\":\"textarea\",\"isRequired\":false,\"rendererType\":\"atlassian-wiki-renderer\",\"workTypeId\":\"2\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/PageBean2FieldAssociationSchemeFieldSearchResult"
+                }
+              }
+            },
+            "description": "Returns the matching fields, at the specified page of the results."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request parameters are invalid (e.g., negative startAt, maxResults exceeding limit, duplicate fieldIds)."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the feature flag is disabled or the scheme ID is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Search field scheme fields",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/{id}/fields/{fieldId}/parameters": {
+      "get": {
+        "deprecated": false,
+        "description": "Retrieve field association parameters on a field association scheme\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getFieldAssociationSchemeItemParameters",
+        "parameters": [
+          {
+            "description": "the ID of the field association scheme to retrieve parameters for",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "the ID of the field",
+            "in": "path",
+            "name": "fieldId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"fieldId\":\"customfield_10000\",\"parameters\":{\"description\":\"Teams field\",\"isRequired\":true,\"rendererType\":\"atlassian-wiki-renderer\"},\"workTypeParameters\":[{\"description\":\"Teams field\",\"isRequired\":false,\"rendererType\":\"jira-text-renderer\",\"workTypeId\":10010}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/GetFieldAssociationParametersResponse"
+                }
+              }
+            },
+            "description": "Returned if the parameters fetched were successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get field parameters",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/{id}/projects": {
+      "get": {
+        "deprecated": false,
+        "description": "REST Endpoint for searching for projects belonging to a given field association scheme\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "searchFieldAssociationSchemeProjects",
+        "parameters": [
+          {
+            "description": "The starting index of the returned projects. Base index: 0.",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of projects to return per page, maximum allowed value is 100.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The project Ids to filter by, if empty then all projects belonging to a field association scheme will be returned",
+            "in": "query",
+            "name": "projectId",
+            "schema": {
+              "items": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "description": "The scheme id to search for associated projects",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageBean2FieldAssociationSchemeProjectSearchResult"
+                }
+              }
+            },
+            "description": "Returns a paginated list of projects associated with the field association scheme, matching the specified filter criteria."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "400 response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "401 response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "403 response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "404 response"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Search field scheme projects",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/fields": {
+      "put": {
+        "deprecated": false,
+        "description": "Update fields associated with field association schemes.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "updateFieldsAssociatedWithSchemes",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "customfield_10000": [
+                  {
+                    "restrictedToWorkTypes": [
+                      1,
+                      2
+                    ],
+                    "schemeIds": [
+                      10000,
+                      10001
+                    ]
+                  }
+                ],
+                "customfield_10001": [
+                  {
+                    "schemeIds": [
+                      10002
+                    ]
+                  }
+                ]
+              },
+              "schema": {
+                "additionalProperties": {
+                  "items": {
+                    "$ref": "#/components/schemas/UpdateFieldAssociationsRequestItem"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "The request containing the schemes and work types to associate each field with.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"fieldId\":\"customfield_10000\",\"schemeId\":10000,\"success\":true,\"workTypeIds\":[1,2]},{\"fieldId\":\"customfield_10001\",\"schemeId\":10002,\"success\":true,\"workTypeIds\":[]}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/FieldSchemeToFieldsResponse"
+                }
+              }
+            },
+            "description": "Returned if the field association update was successful."
+          },
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The request completed successfully. No additional content will be sent in the response."
+          },
+          "207": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"fieldId\":\"customfield_10000\",\"schemeId\":10000,\"success\":true,\"workTypeIds\":[1]},{\"error\":\"Scheme 10001 doesn't exist\",\"fieldId\":\"customfield_10001\",\"schemeId\":10001,\"success\":false,\"workTypeIds\":[2]}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/FieldSchemeToFieldsResponse"
+                }
+              }
+            },
+            "description": "Returned if the field association update was partially successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"error\":\"Scheme 99999 doesn't exist\",\"fieldId\":\"customfield_10000\",\"schemeId\":99999,\"success\":false,\"workTypeIds\":[]},{\"error\":\"Scheme 10001 doesn't exist\",\"fieldId\":\"invalid_field\",\"schemeId\":10001,\"success\":false,\"workTypeIds\":[]}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/FieldSchemeToFieldsResponse"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors. If request is well-formed but contains invalid scheme or field IDs, returns failure details."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Update fields associated with field schemes",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Remove fields associated with field association schemes.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "removeFieldsAssociatedWithSchemes",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "customfield_10000": {
+                  "schemeIds": [
+                    10000,
+                    10001
+                  ]
+                },
+                "customfield_10001": {
+                  "schemeIds": [
+                    10002
+                  ]
+                }
+              },
+              "schema": {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/RemoveFieldAssociationsRequestItem"
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "The request containing the schemes and fields to be removed.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"fieldId\":\"customfield_10000\",\"schemeId\":10000,\"success\":true},{\"fieldId\":\"customfield_10001\",\"schemeId\":10002,\"success\":true}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/MinimalFieldSchemeToFieldsResponse"
+                }
+              }
+            },
+            "description": "Returned if the field association update was successful."
+          },
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The request completed successfully. No additional content will be sent in the response."
+          },
+          "207": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"fieldId\":\"customfield_10000\",\"schemeId\":10000,\"success\":true},{\"error\":\"Scheme 10001 doesn't exist\",\"fieldId\":\"customfield_10001\",\"schemeId\":10001,\"success\":false}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/MinimalFieldSchemeToFieldsResponse"
+                }
+              }
+            },
+            "description": "Returned if the field association update was partially successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"error\":\"Scheme 99999 doesn't exist\",\"fieldId\":\"customfield_10000\",\"schemeId\":99999,\"success\":false},{\"error\":\"Field invalid_field doesn't exist\",\"fieldId\":\"invalid_field\",\"schemeId\":10001,\"success\":false}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/MinimalFieldSchemeToFieldsResponse"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors. If request is well-formed but contains invalid scheme or field IDs, returns failure details."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Remove fields associated with field schemes",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/fields/parameters": {
+      "put": {
+        "deprecated": false,
+        "description": "Update field association item parameters in field association schemes.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "updateFieldAssociationSchemeItemParameters",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "customfield_10000": [
+                  {
+                    "parameters": {
+                      "description": "Field description",
+                      "isRequired": true,
+                      "rendererType": "atlassian-wiki-renderer"
+                    },
+                    "schemeIds": [
+                      10000,
+                      10001
+                    ],
+                    "workTypeParameters": [
+                      {
+                        "description": "Description for Bug",
+                        "isRequired": false,
+                        "rendererType": "jira-text-renderer",
+                        "workTypeId": 10002
+                      }
+                    ]
+                  }
+                ],
+                "customfield_10001": [
+                  {
+                    "schemeIds": [
+                      10001
+                    ],
+                    "workTypeParameters": [
+                      {
+                        "description": "Description for Bug",
+                        "isRequired": false,
+                        "workTypeId": 10002
+                      },
+                      {
+                        "description": "Description for Task",
+                        "isRequired": true,
+                        "rendererType": "atlassian-wiki-renderer",
+                        "workTypeId": 10003
+                      }
+                    ]
+                  }
+                ]
+              },
+              "schema": {
+                "additionalProperties": {
+                  "items": {
+                    "$ref": "#/components/schemas/UpdateFieldSchemeParametersRequest"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "The request containing the field association scheme id and the parameters to update.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"fieldId\":\"customfield_10000\",\"schemeId\":10000,\"success\":true},{\"fieldId\":\"customfield_10001\",\"schemeId\":10002,\"success\":true,\"workTypeId\":10001}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateFieldSchemeParametersResponse"
+                }
+              }
+            },
+            "description": "Returned if the field parameter update was successful."
+          },
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The request completed successfully. No additional content will be sent in the response."
+          },
+          "207": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"fieldId\":\"customfield_10000\",\"schemeId\":10000,\"success\":true},{\"error\":\"Scheme 10001 doesn't exist\",\"fieldId\":\"customfield_10001\",\"schemeId\":10001,\"success\":false,\"workTypeId\":10001}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateFieldSchemeParametersResponse"
+                }
+              }
+            },
+            "description": "Returned if the field parameter update was partially successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"error\":\"Scheme 99999 doesn't exist\",\"fieldId\":\"customfield_10000\",\"schemeId\":99999,\"success\":false},{\"error\":\"Scheme 10001 doesn't exist\",\"fieldId\":\"invalid_field\",\"schemeId\":10001,\"success\":false}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateFieldSchemeParametersResponse"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors. If request is well-formed but contains invalid scheme or field IDs, returns failure details."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Update field parameters",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Remove field association parameters overrides for work types.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "removeFieldAssociationSchemeItemParameters",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "customfield_10000": [
+                  {
+                    "parameters": [
+                      "description",
+                      "isRequired"
+                    ],
+                    "schemeId": 10000,
+                    "workTypeIds": [
+                      1,
+                      2
+                    ]
+                  }
+                ],
+                "description": [
+                  {
+                    "parameters": [
+                      "description"
+                    ],
+                    "schemeId": 10001,
+                    "workTypeIds": [
+                      3
+                    ]
+                  }
+                ]
+              },
+              "schema": {
+                "additionalProperties": {
+                  "items": {
+                    "$ref": "#/components/schemas/ParameterRemovalDetails"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if the removal was successful."
+          },
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The request completed successfully. No additional content will be sent in the response."
+          },
+          "207": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"error\":{\"code\":\"FIELD_IS_NOT_ASSOCIATED\",\"message\":\"The field 'customfield_10000' is not associated with the scheme '10000'.\"},\"fieldId\":\"customfield_10000\",\"schemeId\":10000,\"success\":false,\"workTypeIds\":[1,2]},{\"fieldId\":\"description\",\"schemeId\":10001,\"success\":true,\"workTypeIds\":[3]}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveFieldParametersResult"
+                }
+              }
+            },
+            "description": "Returned if the removal was partially successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors. If request is well-formed but contains invalid scheme or project IDs, returns failure details."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Remove field parameters",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/config/fieldschemes/projects": {
+      "get": {
+        "deprecated": false,
+        "description": "Get projects with field association schemes. This will be a temporary API but useful when transitioning from the legacy field configuration APIs to the new ones.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getProjectsWithFieldSchemes",
+        "parameters": [
+          {
+            "description": "The starting index of the returned projects. Base index: 0.",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of projects to return per page, maximum allowed value is 100.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "List of project ids to filter the results by.",
+            "in": "query",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "items": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"isLast\":true,\"maxResults\":3,\"startAt\":0,\"total\":3,\"values\":[{\"projectId\":10000,\"schemeId\":1},{\"projectId\":10001,\"schemeId\":1},{\"projectId\":10002,\"schemeId\":2}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/PageBean2GetProjectsWithFieldSchemesResponse"
+                }
+              }
+            },
+            "description": "Returns the list of project with field association schemes."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the feature flag is disabled."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get projects with field schemes",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field-configuration-scheme:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Associate projects to field association schemes.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "associateProjectsToFieldAssociationSchemes",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "10000": {
+                  "projectIds": [
+                    10000,
+                    10001
+                  ]
+                },
+                "10001": {
+                  "projectIds": [
+                    10002
+                  ]
+                }
+              },
+              "schema": {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/FieldSchemeToProjectsRequest"
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"projectId\":10001,\"schemeId\":10000,\"success\":true},{\"projectId\":10002,\"schemeId\":10001,\"success\":true}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/FieldSchemeToProjectsResponse"
+                }
+              }
+            },
+            "description": "Returned if the association was successful."
+          },
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The request completed successfully. No additional content will be sent in the response."
+          },
+          "207": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"projectId\":10001,\"schemeId\":10000,\"success\":true},{\"error\":\"Project #10001 doesn't exist\",\"projectId\":10002,\"schemeId\":10001,\"success\":false}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/FieldSchemeToProjectsResponse"
+                }
+              }
+            },
+            "description": "Returned if the association was partially successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"results\":[{\"error\":\"Field scheme #10000 doesn't exist\",\"projectId\":10001,\"schemeId\":10000,\"success\":false},{\"error\":\"Project #10001 doesn't exist\",\"projectId\":10002,\"schemeId\":10001,\"success\":false}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/FieldSchemeToProjectsResponse"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid. If request is malformed, returns a collection of errors. If request is well-formed but contains invalid scheme or project IDs, returns failure details."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the user does not have the required permissions"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Associate projects to field schemes",
+        "tags": [
+          "Field schemes"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/customFieldOption/{id}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a custom field option. For example, an option in a select list.\n\nNote that this operation **only works for issue field select list options created in Jira or using operations from the [Issue custom field options](#api-group-Issue-custom-field-options) resource**, it cannot be used with issue field select list options created by Connect apps.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** The custom field option is returned as follows:\n\n *  if the user has the *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).\n *  if the user has the *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for at least one project the custom field is used in, and the field is visible in at least one layout the user has permission to view.",
+        "operationId": "getCustomFieldOption",
+        "parameters": [
+          {
+            "description": "The ID of the custom field option.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"self\":\"https://your-domain.atlassian.net/rest/api/2/customFieldOption/10000\",\"value\":\"To Do\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFieldOption"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the custom field option is not found.\n *  the user does not have permission to view the custom field."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get custom field option",
+        "tags": [
+          "Issue custom field options"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field:jira",
+              "read:field.option:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/field/{fieldId}/context/{contextId}/option": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a [paginated](#pagination) list of all custom field option for a context. Options are returned first then cascading options, in the order they display in Jira.\n\nThis operation works for custom field options created in Jira or the operations from this resource. **To work with issue field select list options created for Connect apps use the [Issue custom field options (apps)](#api-group-issue-custom-field-options--apps-) operations.**\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg). *Edit Workflow* [edit workflow permission](https://support.atlassian.com/jira-cloud-administration/docs/permissions-for-company-managed-projects/#Edit-Workflows)",
+        "operationId": "getOptionsForContext",
+        "parameters": [
+          {
+            "description": "The ID of the custom field.",
+            "in": "path",
+            "name": "fieldId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the context.",
+            "in": "path",
+            "name": "contextId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The ID of the option.",
+            "in": "query",
+            "name": "optionId",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Whether only options are returned.",
+            "in": "query",
+            "name": "onlyOptions",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "The index of the first item to return in a page of results (page offset).",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of items to return per page.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 100,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"isLast\":true,\"maxResults\":100,\"startAt\":0,\"total\":4,\"values\":[{\"id\":\"10001\",\"value\":\"New York\"},{\"id\":\"10002\",\"value\":\"Boston\",\"disabled\":true},{\"id\":\"10004\",\"value\":\"Denver\"},{\"id\":\"10003\",\"value\":\"Brooklyn\",\"optionId\":\"10001\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/PageBeanCustomFieldContextOption"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field doesn't support options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the request is not valid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Only Jira administrators can manage custom field options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field was not found.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the custom field is not found or the context doesn't match the custom field."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get custom field options (context)",
+        "tags": [
+          "Issue custom field options"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field.option:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Updates the options of a custom field.\n\nIf any of the options are not found, no options are updated. Options where the values in the request match the current values aren't updated and aren't reported in the response.\n\nNote that this operation **only works for issue field select list options created in Jira or using operations from the [Issue custom field options](#api-group-Issue-custom-field-options) resource**, it cannot be used with issue field select list options created by Connect apps.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "updateCustomFieldOption",
+        "parameters": [
+          {
+            "description": "The ID of the custom field.",
+            "in": "path",
+            "name": "fieldId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the context.",
+            "in": "path",
+            "name": "contextId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "options": [
+                  {
+                    "disabled": false,
+                    "id": "10001",
+                    "value": "Scranton"
+                  },
+                  {
+                    "disabled": true,
+                    "id": "10002",
+                    "value": "Manhattan"
+                  },
+                  {
+                    "disabled": false,
+                    "id": "10003",
+                    "value": "The Electric City"
+                  }
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/BulkCustomFieldOptionUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"options\":[{\"disabled\":false,\"id\":\"10001\",\"value\":\"Scranton\"},{\"disabled\":true,\"id\":\"10002\",\"value\":\"Manhattan\"},{\"disabled\":false,\"id\":\"10003\",\"value\":\"The Electric City\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFieldUpdatedContextOptionsList"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field doesn't support options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the request is not valid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Only Jira administrators can manage custom field options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field was not found.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the field, context, or one or more options is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Update custom field options (context)",
+        "tags": [
+          "Issue custom field options"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field.option:jira",
+              "write:field.option:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Creates options and, where the custom select field is of the type Select List (cascading), cascading options for a custom select field. The options are added to a context of the field.\n\nThe maximum number of options that can be created per request is 1000 and each field can have a maximum of 10000 options.\n\nThis operation works for custom field options created in Jira or the operations from this resource. **To work with issue field select list options created for Connect apps use the [Issue custom field options (apps)](#api-group-issue-custom-field-options--apps-) operations.**\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "createCustomFieldOption",
+        "parameters": [
+          {
+            "description": "The ID of the custom field.",
+            "in": "path",
+            "name": "fieldId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the context.",
+            "in": "path",
+            "name": "contextId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "options": [
+                  {
+                    "disabled": false,
+                    "value": "Scranton"
+                  },
+                  {
+                    "disabled": true,
+                    "optionId": "10000",
+                    "value": "Manhattan"
+                  },
+                  {
+                    "disabled": false,
+                    "value": "The Electric City"
+                  }
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/BulkCustomFieldOptionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"options\":[{\"disabled\":false,\"id\":\"10001\",\"value\":\"Scranton\"},{\"disabled\":true,\"id\":\"10002\",\"optionId\":\"10000\",\"value\":\"Manhattan\"},{\"disabled\":false,\"id\":\"10003\",\"value\":\"The Electric City\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/CustomFieldCreatedContextOptionsList"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field doesn't support options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the request is not valid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Only Jira administrators can manage custom field options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field was not found.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the custom field is not found or the context doesn't match the custom field."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Create custom field options (context)",
+        "tags": [
+          "Issue custom field options"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field.option:jira",
+              "write:field.option:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/field/{fieldId}/context/{contextId}/option/{optionId}": {
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes a custom field option.\n\nOptions with cascading options cannot be deleted without deleting the cascading options first.\n\nThis operation works for custom field options created in Jira or the operations from this resource. **To work with issue field select list options created for Connect apps use the [Issue custom field options (apps)](#api-group-issue-custom-field-options--apps-) operations.**\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "deleteCustomFieldOption",
+        "parameters": [
+          {
+            "description": "The ID of the custom field.",
+            "in": "path",
+            "name": "fieldId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the context from which an option should be deleted.",
+            "in": "path",
+            "name": "contextId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The ID of the option to delete.",
+            "in": "path",
+            "name": "optionId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the option is deleted."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field doesn't support options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the request is not valid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Only Jira administrators can manage custom field options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field was not found.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the field, the context, or the option is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Delete custom field options (context)",
+        "tags": [
+          "Issue custom field options"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:field.option:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/field/{fieldId}/context/{contextId}/option/{optionId}/issue": {
+      "delete": {
+        "deprecated": false,
+        "description": "Replaces the options of a custom field.\n\nNote that this operation **only works for issue field select list options created in Jira or using operations from the [Issue custom field options](#api-group-Issue-custom-field-options) resource**, it cannot be used with issue field select list options created by Connect or Forge apps.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "replaceCustomFieldOption",
+        "parameters": [
+          {
+            "description": "The ID of the option that will replace the currently selected option.",
+            "in": "query",
+            "name": "replaceWith",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "A JQL query that specifies the issues to be updated. For example, *project=10000*.",
+            "in": "query",
+            "name": "jql",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the custom field.",
+            "in": "path",
+            "name": "fieldId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the option to be deselected.",
+            "in": "path",
+            "name": "optionId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The ID of the context.",
+            "in": "path",
+            "name": "contextId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "content": {
+              "application/json": {
+                "example": "{\"self\":\"https://your-domain.atlassian.net/rest/api/2/task/1\",\"id\":\"1\",\"description\":\"Remove option 1 from issues matched by '*', and replace with option 3\",\"status\":\"COMPLETE\",\"result\":{\"errors\":{\"errorMessages\":[\"Option 2 cannot be set on issue MKY-5 as it is not in the correct scope\"],\"errors\":{},\"httpStatusCode\":{\"empty\":false,\"present\":true}},\"modifiedIssues\":[10001,10010],\"unmodifiedIssues\":[10005]},\"elapsedRuntime\":42}",
+                "schema": {
+                  "$ref": "#/components/schemas/TaskProgressBeanRemoveOptionFromIssuesResult"
+                }
+              }
+            },
+            "description": "Returned if the long-running task to deselect the option is started."
+          },
+          "400": {
+            "description": "Returned if the request is not valid."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Connect and Forge app users with Administer Jira global permission can override screen security.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "description": "Returned if the field is not found or does not support options, or the options to be replaced are not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Replace custom field options",
+        "tags": [
+          "Issue custom field options"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field.option:jira",
+              "write:field.option:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/field/{fieldId}/context/{contextId}/option/move": {
+      "put": {
+        "deprecated": false,
+        "description": "Changes the order of custom field options or cascading options in a context.\n\nThis operation works for custom field options created in Jira or the operations from this resource. **To work with issue field select list options created for Connect apps use the [Issue custom field options (apps)](#api-group-issue-custom-field-options--apps-) operations.**\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "reorderCustomFieldOptions",
+        "parameters": [
+          {
+            "description": "The ID of the custom field.",
+            "in": "path",
+            "name": "fieldId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the context.",
+            "in": "path",
+            "name": "contextId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "customFieldOptionIds": [
+                  "10001",
+                  "10002"
+                ],
+                "position": "First"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/OrderOfCustomFieldOptions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if options are reordered."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"'after' and 'position' were provided. Only 'after' or 'position' can be specified.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the request is not valid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Only Jira administrators can manage custom field options.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"The custom field was not found.\"],\"errors\":{}}"
+              }
+            },
+            "description": "Returned if the field, the context, or one or more of the options is not found.."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Reorder custom field options (context)",
+        "tags": [
+          "Issue custom field options"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:field.option:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BulkCustomFieldOptionCreateRequest": {
+        "additionalProperties": false,
+        "description": "Details of the options to create for a custom field.",
+        "properties": {
+          "options": {
+            "description": "Details of options to create.",
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldOptionCreate"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object",
+        "writeOnly": true
+      },
+      "BulkCustomFieldOptionUpdateRequest": {
+        "additionalProperties": false,
+        "description": "Details of the options to update for a custom field.",
+        "properties": {
+          "options": {
+            "description": "Details of the options to update.",
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldOptionUpdate"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object",
+        "writeOnly": true
+      },
+      "CreateFieldAssociationSchemeLinksBean": {
+        "additionalProperties": false,
+        "properties": {
+          "associations": {
+            "type": "string"
+          },
+          "projects": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CreateFieldAssociationSchemeRequest": {
+        "additionalProperties": false,
+        "description": "Request object for creating a new field association scheme.",
+        "properties": {
+          "description": {
+            "description": "Description of the scheme to be created",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the scheme to be created",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "writeOnly": true
+      },
+      "CreateFieldAssociationSchemeResponse": {
+        "additionalProperties": false,
+        "description": "Response object after successfully creating a new field association scheme.",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "links": {
+            "$ref": "#/components/schemas/CreateFieldAssociationSchemeLinksBean"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CustomFieldContextOption": {
+        "additionalProperties": false,
+        "description": "Details of the custom field options for a context.",
+        "properties": {
+          "disabled": {
+            "description": "Whether the option is disabled.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "The ID of the custom field option.",
+            "type": "string"
+          },
+          "optionId": {
+            "description": "For cascading options, the ID of the custom field option containing the cascading option.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the custom field option.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "disabled",
+          "id",
+          "value"
+        ],
+        "type": "object"
+      },
+      "CustomFieldCreatedContextOptionsList": {
+        "additionalProperties": false,
+        "description": "A list of custom field options for a context.",
+        "properties": {
+          "options": {
+            "description": "The created custom field options.",
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldContextOption"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "CustomFieldOption": {
+        "additionalProperties": false,
+        "description": "Details of a custom option for a field.",
+        "properties": {
+          "self": {
+            "description": "The URL of these custom field option details.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the custom field option.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "customFieldOption"
+        }
+      },
+      "CustomFieldOptionCreate": {
+        "additionalProperties": false,
+        "description": "Details of a custom field option to create.",
+        "properties": {
+          "disabled": {
+            "description": "Whether the option is disabled.",
+            "type": "boolean"
+          },
+          "optionId": {
+            "description": "For cascading options, the ID of a parent option.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the custom field option.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "type": "object"
+      },
+      "CustomFieldOptionUpdate": {
+        "additionalProperties": false,
+        "description": "Details of a custom field option for a context.",
+        "properties": {
+          "disabled": {
+            "description": "Whether the option is disabled.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "The ID of the custom field option.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the custom field option.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "CustomFieldUpdatedContextOptionsList": {
+        "additionalProperties": false,
+        "description": "A list of custom field options for a context.",
+        "properties": {
+          "options": {
+            "description": "The updated custom field options.",
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldOptionUpdate"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "DeleteFieldAssociationSchemeResponse": {
+        "additionalProperties": false,
+        "description": "Response object after successfully deleting a field association scheme.",
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ErrorCollections": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "FieldAssociationParameters": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "isRequired": {
+            "type": "boolean"
+          },
+          "rendererType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "isRequired"
+        ],
+        "type": "object"
+      },
+      "FieldAssociationSchemeFieldSearchResult": {
+        "additionalProperties": false,
+        "description": "Field association scheme field search results.",
+        "properties": {
+          "allowedOperations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "fieldId": {
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/SearchResultFieldParameters"
+          },
+          "restrictedToWorkTypes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "workTypeParameters": {
+            "items": {
+              "$ref": "#/components/schemas/SearchResultWorkTypeParameters"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "FieldAssociationSchemeLinks": {
+        "additionalProperties": false,
+        "properties": {
+          "associations": {
+            "type": "string"
+          },
+          "projects": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FieldAssociationSchemeLinksBean": {
+        "additionalProperties": false,
+        "properties": {
+          "associations": {
+            "type": "string"
+          },
+          "projects": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FieldAssociationSchemeMatchedFilters": {
+        "additionalProperties": false,
+        "description": "Matched filters for field association scheme search.",
+        "properties": {
+          "projectIds": {
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FieldAssociationSchemeProjectSearchResult": {
+        "additionalProperties": false,
+        "description": "Project search results for field association scheme.",
+        "properties": {
+          "avatarUrls": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FieldSchemeToFieldsPartialFailure": {
+        "additionalProperties": false,
+        "description": "Partial failure result when updating field scheme to fields associations.",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "fieldId": {
+            "type": "string"
+          },
+          "schemeId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "workTypeIds": {
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "fieldId",
+          "schemeId",
+          "success",
+          "workTypeIds"
+        ],
+        "type": "object"
+      },
+      "FieldSchemeToFieldsResponse": {
+        "additionalProperties": false,
+        "description": "Response for updating field associations.",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/FieldSchemeToFieldsPartialFailure"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "FieldSchemeToProjectsPartialFailure": {
+        "additionalProperties": false,
+        "description": "Partial failure result when updating field scheme to projects associations.",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "projectId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "schemeId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "projectId",
+          "schemeId",
+          "success"
+        ],
+        "type": "object"
+      },
+      "FieldSchemeToProjectsRequest": {
+        "additionalProperties": false,
+        "description": "Request for associating field schemes to projects.",
+        "properties": {
+          "projectIds": {
+            "description": "List of project IDs to associate with field schemes",
+            "items": {
+              "description": "List of project IDs to associate with field schemes",
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "projectIds"
+        ],
+        "type": "object",
+        "writeOnly": true
+      },
+      "FieldSchemeToProjectsResponse": {
+        "additionalProperties": false,
+        "description": "Response for updating field scheme to projects associations.",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/FieldSchemeToProjectsPartialFailure"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "FieldsSchemeItemParameter": {
+        "additionalProperties": false,
+        "description": "The default parameters to apply to the field across all work types in the specified schemes, may be null if only work type-specific updates are needed",
+        "properties": {
+          "description": {
+            "description": "The custom description for the field, null to preserve current description",
+            "type": "string"
+          },
+          "isRequired": {
+            "description": "Whether the field is required, null to preserve current requirement setting",
+            "type": "boolean"
+          },
+          "rendererType": {
+            "description": "The renderer type for the field, null to preserve current renderer type",
+            "enum": [
+              "jira-text-renderer",
+              "atlassian-wiki-renderer"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FieldsSchemeItemWorkTypeParameter": {
+        "additionalProperties": false,
+        "description": "The list of work type-specific parameter overrides, may be empty if only default parameters are being updated",
+        "properties": {
+          "description": {
+            "description": "The custom description for the field for this work type, null to use default or preserve current",
+            "type": "string"
+          },
+          "isRequired": {
+            "description": "Whether the field is required for this work type, null to use default or preserve current",
+            "type": "boolean"
+          },
+          "rendererType": {
+            "description": "The renderer type for the field for this work type, null to use default or preserve current",
+            "enum": [
+              "jira-text-renderer",
+              "atlassian-wiki-renderer"
+            ],
+            "type": "string"
+          },
+          "workTypeId": {
+            "description": "The ID of the work type (issue type) for which these parameters apply",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "GetFieldAssociationParametersResponse": {
+        "additionalProperties": false,
+        "description": "Response object for getting field association parameters.",
+        "properties": {
+          "fieldId": {
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/FieldAssociationParameters"
+          },
+          "workTypeParameters": {
+            "items": {
+              "$ref": "#/components/schemas/WorkTypeParameters"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "fieldId"
+        ],
+        "type": "object"
+      },
+      "GetFieldAssociationSchemeByIdResponse": {
+        "additionalProperties": false,
+        "description": "Response object for getting a field association scheme by ID.",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "fieldsCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "links": {
+            "$ref": "#/components/schemas/FieldAssociationSchemeLinks"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GetFieldAssociationSchemeResponse": {
+        "additionalProperties": false,
+        "description": "Response object for getting a field association scheme.",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "fieldsCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "links": {
+            "$ref": "#/components/schemas/FieldAssociationSchemeLinksBean"
+          },
+          "matchedFilters": {
+            "$ref": "#/components/schemas/FieldAssociationSchemeMatchedFilters"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GetProjectsWithFieldSchemesResponse": {
+        "additionalProperties": false,
+        "description": "Response item returned from get projects with field schemes.",
+        "properties": {
+          "projectId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "schemeId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MinimalFieldSchemeToFieldsPartialFailure": {
+        "additionalProperties": false,
+        "description": "Minimal partial failure result when updating field scheme to fields associations.",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "fieldId": {
+            "type": "string"
+          },
+          "schemeId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "fieldId",
+          "schemeId",
+          "success"
+        ],
+        "type": "object"
+      },
+      "MinimalFieldSchemeToFieldsResponse": {
+        "additionalProperties": false,
+        "description": "Minimal response for updating field scheme to fields associations.",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MinimalFieldSchemeToFieldsPartialFailure"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "OrderOfCustomFieldOptions": {
+        "additionalProperties": false,
+        "description": "An ordered list of custom field option IDs and information on where to move them.",
+        "properties": {
+          "after": {
+            "description": "The ID of the custom field option or cascading option to place the moved options after. Required if `position` isn't provided.",
+            "type": "string",
+            "writeOnly": true
+          },
+          "customFieldOptionIds": {
+            "description": "A list of IDs of custom field options to move. The order of the custom field option IDs in the list is the order they are given after the move. The list must contain custom field options or cascading options, but not both.",
+            "items": {
+              "type": "string",
+              "writeOnly": true
+            },
+            "type": "array",
+            "writeOnly": true
+          },
+          "position": {
+            "description": "The position the custom field options should be moved to. Required if `after` isn't provided.",
+            "enum": [
+              "First",
+              "Last"
+            ],
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "customFieldOptionIds"
+        ],
+        "type": "object"
+      },
+      "PageBean2FieldAssociationSchemeFieldSearchResult": {
+        "additionalProperties": false,
+        "description": "A page of items.",
+        "properties": {
+          "isLast": {
+            "description": "Whether this is the last page.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "maxResults": {
+            "description": "The maximum number of items that could be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "nextPage": {
+            "description": "If there is another page of results, the URL of the next page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startAt": {
+            "description": "The index of the first item returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "The list of items.",
+            "items": {
+              "$ref": "#/components/schemas/FieldAssociationSchemeFieldSearchResult"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "PageBean2FieldAssociationSchemeProjectSearchResult": {
+        "additionalProperties": false,
+        "description": "A page of items.",
+        "properties": {
+          "isLast": {
+            "description": "Whether this is the last page.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "maxResults": {
+            "description": "The maximum number of items that could be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "nextPage": {
+            "description": "If there is another page of results, the URL of the next page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startAt": {
+            "description": "The index of the first item returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "The list of items.",
+            "items": {
+              "$ref": "#/components/schemas/FieldAssociationSchemeProjectSearchResult"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "PageBean2GetFieldAssociationSchemeResponse": {
+        "additionalProperties": false,
+        "description": "A page of items.",
+        "properties": {
+          "isLast": {
+            "description": "Whether this is the last page.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "maxResults": {
+            "description": "The maximum number of items that could be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "nextPage": {
+            "description": "If there is another page of results, the URL of the next page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startAt": {
+            "description": "The index of the first item returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "The list of items.",
+            "items": {
+              "$ref": "#/components/schemas/GetFieldAssociationSchemeResponse"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "PageBean2GetProjectsWithFieldSchemesResponse": {
+        "additionalProperties": false,
+        "description": "A page of items.",
+        "properties": {
+          "isLast": {
+            "description": "Whether this is the last page.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "maxResults": {
+            "description": "The maximum number of items that could be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "nextPage": {
+            "description": "If there is another page of results, the URL of the next page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startAt": {
+            "description": "The index of the first item returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "The list of items.",
+            "items": {
+              "$ref": "#/components/schemas/GetProjectsWithFieldSchemesResponse"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "PageBeanCustomFieldContextOption": {
+        "additionalProperties": false,
+        "description": "A page of items.",
+        "properties": {
+          "isLast": {
+            "description": "Whether this is the last page.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "maxResults": {
+            "description": "The maximum number of items that could be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "nextPage": {
+            "description": "If there is another page of results, the URL of the next page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startAt": {
+            "description": "The index of the first item returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "The list of items.",
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldContextOption"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ParameterRemovalDetails": {
+        "additionalProperties": false,
+        "properties": {
+          "parameters": {
+            "description": "Set of parameter names to remove",
+            "items": {
+              "description": "Set of parameter names to remove",
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "schemeId": {
+            "description": "ID of the field scheme",
+            "format": "int64",
+            "type": "integer"
+          },
+          "workTypeIds": {
+            "description": "Set of work type (issue type) IDs",
+            "items": {
+              "description": "Set of work type (issue type) IDs",
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "type": "object"
+      },
+      "RemoveFieldAssociationsRequestItem": {
+        "additionalProperties": false,
+        "description": "Request item for removing field associations.",
+        "properties": {
+          "schemeIds": {
+            "description": "Set of scheme IDs from which to remove field associations",
+            "items": {
+              "description": "Set of scheme IDs from which to remove field associations",
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "schemeIds"
+        ],
+        "type": "object",
+        "writeOnly": true
+      },
+      "RemoveFieldParametersResult": {
+        "additionalProperties": false,
+        "description": "Result of remove field parameters operation.",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SuccessOrErrorResults"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "RemoveFieldParametersResultError": {
+        "additionalProperties": false,
+        "description": "Error during remove field parameters operation.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RemoveOptionFromIssuesResult": {
+        "additionalProperties": false,
+        "properties": {
+          "errors": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SimpleErrorCollection"
+              }
+            ],
+            "description": "A collection of errors related to unchanged issues. The collection size is limited, which means not all errors may be returned."
+          },
+          "modifiedIssues": {
+            "description": "The IDs of the modified issues.",
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "unmodifiedIssues": {
+            "description": "The IDs of the unchanged issues, those issues where errors prevent modification.",
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "SearchResultFieldParameters": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "isRequired": {
+            "type": "boolean"
+          },
+          "rendererType": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SearchResultWorkTypeParameters": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "isRequired": {
+            "type": "boolean"
+          },
+          "rendererType": {
+            "type": "string"
+          },
+          "workTypeId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SimpleErrorCollection": {
+        "additionalProperties": false,
+        "properties": {
+          "errorMessages": {
+            "description": "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "errors": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The list of errors by parameter returned by the operation. For example,\"projectKey\": \"Project keys must start with an uppercase letter, followed by one or more uppercase alphanumeric characters.\"",
+            "type": "object"
+          },
+          "httpStatusCode": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "SuccessOrErrorResults": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/RemoveFieldParametersResultError"
+          },
+          "fieldId": {
+            "type": "string"
+          },
+          "schemeId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "workTypeIds": {
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "type": "object"
+      },
+      "TaskProgressBeanRemoveOptionFromIssuesResult": {
+        "additionalProperties": false,
+        "description": "Details about a task.",
+        "properties": {
+          "description": {
+            "description": "The description of the task.",
+            "type": "string"
+          },
+          "elapsedRuntime": {
+            "description": "The execution time of the task, in milliseconds.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "finished": {
+            "description": "A timestamp recording when the task was finished.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "description": "The ID of the task.",
+            "type": "string"
+          },
+          "lastUpdate": {
+            "description": "A timestamp recording when the task progress was last updated.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "message": {
+            "description": "Information about the progress of the task.",
+            "type": "string"
+          },
+          "progress": {
+            "description": "The progress of the task, as a percentage complete.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "result": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RemoveOptionFromIssuesResult"
+              }
+            ],
+            "description": "The result of the task execution."
+          },
+          "self": {
+            "description": "The URL of the task.",
+            "format": "uri",
+            "type": "string"
+          },
+          "started": {
+            "description": "A timestamp recording when the task was started.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "status": {
+            "description": "The status of the task.",
+            "enum": [
+              "ENQUEUED",
+              "RUNNING",
+              "COMPLETE",
+              "FAILED",
+              "CANCEL_REQUESTED",
+              "CANCELLED",
+              "DEAD"
+            ],
+            "type": "string"
+          },
+          "submitted": {
+            "description": "A timestamp recording when the task was submitted.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "submittedBy": {
+            "description": "The ID of the user who submitted the task.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "elapsedRuntime",
+          "id",
+          "lastUpdate",
+          "progress",
+          "self",
+          "status",
+          "submitted",
+          "submittedBy"
+        ],
+        "type": "object"
+      },
+      "UpdateFieldAssociationSchemeLinksBean": {
+        "additionalProperties": false,
+        "properties": {
+          "associations": {
+            "type": "string"
+          },
+          "projects": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateFieldAssociationSchemeRequest": {
+        "additionalProperties": false,
+        "description": "Request object for updating an existing field association scheme.",
+        "properties": {
+          "description": {
+            "description": "The description value to update",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name value to update",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "writeOnly": true
+      },
+      "UpdateFieldAssociationSchemeResponse": {
+        "additionalProperties": false,
+        "description": "Response object after successfully updating an existing field association scheme.",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "links": {
+            "$ref": "#/components/schemas/UpdateFieldAssociationSchemeLinksBean"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateFieldAssociationsRequestItem": {
+        "additionalProperties": false,
+        "description": "Represents an association between a field and its operations.",
+        "properties": {
+          "restrictedToWorkTypes": {
+            "description": "(optional) Work types to restrict field to. Replaces any existing work type associations for the field. If not provided, the field is associated to any work types.",
+            "items": {
+              "description": "(optional) Work types to restrict field to. Replaces any existing work type associations for the field. If not provided, the field is associated to any work types.",
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "schemeIds": {
+            "description": "Scheme IDs to associate field with",
+            "items": {
+              "description": "Scheme IDs to associate field with",
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "schemeIds"
+        ],
+        "type": "object",
+        "writeOnly": true
+      },
+      "UpdateFieldSchemeParametersPartialFailure": {
+        "additionalProperties": false,
+        "description": "Result of updating field scheme parameters for a specific field, scheme, and optional work type.",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "fieldId": {
+            "type": "string"
+          },
+          "schemeId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "workTypeId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fieldId",
+          "schemeId",
+          "success"
+        ],
+        "type": "object"
+      },
+      "UpdateFieldSchemeParametersRequest": {
+        "additionalProperties": false,
+        "description": "Request bean for updating field scheme parameters across multiple schemes and work types.",
+        "properties": {
+          "parameters": {
+            "$ref": "#/components/schemas/FieldsSchemeItemParameter"
+          },
+          "schemeIds": {
+            "description": "The list of field scheme IDs to update",
+            "items": {
+              "description": "The list of field scheme IDs to update",
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "workTypeParameters": {
+            "description": "The list of work type-specific parameter overrides, may be empty if only default parameters are being updated",
+            "items": {
+              "$ref": "#/components/schemas/FieldsSchemeItemWorkTypeParameter"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object",
+        "writeOnly": true
+      },
+      "UpdateFieldSchemeParametersResponse": {
+        "additionalProperties": false,
+        "description": "Response bean for field scheme parameter update operations.",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/UpdateFieldSchemeParametersPartialFailure"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "WorkTypeParameters": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "isRequired": {
+            "type": "boolean"
+          },
+          "rendererType": {
+            "type": "string"
+          },
+          "workTypeId": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "isRequired",
+          "workTypeId"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "description": "You can access this resource via basic auth.",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "OAuth2": {
+        "description": "OAuth2 scopes for Jira",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.atlassian.com/authorize",
+            "scopes": {
+              "delete:async-task:jira": "Delete asynchronous task.",
+              "delete:attachment:jira": "Delete issue attachments.",
+              "delete:avatar:jira": "Delete system and custom avatars.",
+              "delete:comment.property:jira": "Delete issue comment properties.",
+              "delete:comment:jira": "Delete issue comments.",
+              "delete:dashboard.property:jira": "Delete dashboard properties.",
+              "delete:dashboard:jira": "Delete dashboards.",
+              "delete:field-configuration-scheme:jira": "Delete field configuration schemes.",
+              "delete:field-configuration:jira": "Delete field configurations.",
+              "delete:field.option:jira": "Delete field options.",
+              "delete:field:jira": "Delete fields.",
+              "delete:filter.column:jira": "Delete filter columns.",
+              "delete:filter:jira": "Delete filters.",
+              "delete:group:jira": "Delete user groups.",
+              "delete:issue-link-type:jira": "Delete issue link types.",
+              "delete:issue-link:jira": "Delete issue links.",
+              "delete:issue-type-scheme:jira": "Delete issue type schemes.",
+              "delete:issue-type-screen-scheme:jira": "Delete issue type screen schemes.",
+              "delete:issue-type.property:jira": "Delete issue type properties.",
+              "delete:issue-type:jira": "Delete issue types.",
+              "delete:issue-worklog.property:jira": "Delete issue worklog properties.",
+              "delete:issue-worklog:jira": "Delete issue worklogs.",
+              "delete:issue.property:jira": "Delete issue properties.",
+              "delete:issue.remote-link:jira": "Delete issue remote links.",
+              "delete:issue:jira": "Delete issues.",
+              "delete:permission-scheme:jira": "Delete permission schemes.",
+              "delete:permission:jira": "Delete permissions.",
+              "delete:project-category:jira": "Delete project categories.",
+              "delete:project-role:jira": "Delete project roles.",
+              "delete:project-version:jira": "Delete project versions.",
+              "delete:project.avatar:jira": "Delete project avatars.",
+              "delete:project.component:jira": "Delete project components.",
+              "delete:project.property:jira": "Delete project properties.",
+              "delete:project:jira": "Delete projects and their details, such as issue types, project lead, and avatars.",
+              "delete:screen-scheme:jira": "Delete screen schemes.",
+              "delete:screen-tab:jira": "Delete screen tabs.",
+              "delete:screen:jira": "Delete screens.",
+              "delete:screenable-field:jira": "Delete screenable fields.",
+              "delete:user-configuration:jira": "Delete user configurations.",
+              "delete:user.property:jira": "Delete user properties.",
+              "delete:webhook:jira": "Delete webhooks.",
+              "delete:workflow-scheme:jira": "Delete workflow schemes.",
+              "delete:workflow.property:jira": "Delete workflow properties.",
+              "delete:workflow:jira": "Delete workflows.",
+              "manage:jira-configuration": "Configure Jira settings that require the Jira administrators permission, for example, create projects and custom fields, view workflows, manage issue link types.",
+              "manage:jira-project": "Create and edit project settings and create new project-level objects, for example, versions, components.",
+              "manage:jira-webhook": "Manage Jira webhooks. Enables an OAuth app to register and unregister dynamic webhooks in Jira. It also provides for fetching of registered webhooks.",
+              "read:app-data:jira": "Read app data.",
+              "read:application-role:jira": "View application roles.",
+              "read:attachment:jira": "View issue attachments.",
+              "read:audit-log:jira": "View audit logs.",
+              "read:avatar:jira": "View system and custom avatars.",
+              "read:comment.property:jira": "View issue comment properties.",
+              "read:comment:jira": "View issue comments.",
+              "read:custom-field-contextual-configuration:jira": "Read custom field contextual configurations.",
+              "read:dashboard.property:jira": "View dashboard properties.",
+              "read:dashboard:jira": "View dashboards.",
+              "read:email-address:jira": "View email addresses of all users regardless of the user's profile visibility settings.",
+              "read:field-configuration-scheme:jira": "View field configuration schemes.",
+              "read:field-configuration:jira": "Read field configurations.",
+              "read:field.default-value:jira": "View field default values.",
+              "read:field.option:jira": "View field options.",
+              "read:field.options:jira": "Read field options.",
+              "read:field:jira": "View fields.",
+              "read:filter.column:jira": "View filter columns.",
+              "read:filter.default-share-scope:jira": "View filter default share scopes.",
+              "read:filter:jira": "View filters.",
+              "read:group:jira": "View user groups.",
+              "read:instance-configuration:jira": "View instance configurations.",
+              "read:issue-details:jira": "View issue details.",
+              "read:issue-event:jira": "Read issue events.",
+              "read:issue-field-values:jira": "View issue field valueses.",
+              "read:issue-link-type:jira": "View issue link types.",
+              "read:issue-link:jira": "View issue links.",
+              "read:issue-meta:jira": "View issue meta.",
+              "read:issue-security-level:jira": "View issue security levels.",
+              "read:issue-security-scheme:jira": "View issue security schemes.",
+              "read:issue-status:jira": "View issue statuses.",
+              "read:issue-type-hierarchy:jira": "Read issue type hierarchies.",
+              "read:issue-type-scheme:jira": "View issue type schemes.",
+              "read:issue-type-screen-scheme:jira": "View issue type screen schemes.",
+              "read:issue-type.property:jira": "View issue type properties.",
+              "read:issue-type:jira": "View issue types.",
+              "read:issue-worklog.property:jira": "View issue worklog properties.",
+              "read:issue-worklog:jira": "View issue worklogs.",
+              "read:issue.changelog:jira": "View issue changelogs.",
+              "read:issue.property:jira": "View issue properties.",
+              "read:issue.remote-link:jira": "View issue remote links.",
+              "read:issue.time-tracking:jira": "View issue time trackings.",
+              "read:issue.transition:jira": "View issue transitions.",
+              "read:issue.vote:jira": "View issue votes.",
+              "read:issue.votes:jira": "View issue voteses.",
+              "read:issue.watcher:jira": "View issue watchers.",
+              "read:issue:jira": "View issues.",
+              "read:jira-expressions:jira": "View jira expressions.",
+              "read:jira-user": "View user information in Jira that you have access to, including usernames, email addresses, and avatars.",
+              "read:jira-work": "Read project and issue data. Search for issues and objects associated with issues (such as attachments and worklogs).",
+              "read:jql:jira": "View JQL.",
+              "read:label:jira": "View labels.",
+              "read:license:jira": "View licenses.",
+              "read:notification-scheme:jira": "View notification schemes.",
+              "read:permission-scheme:jira": "View permission schemes.",
+              "read:permission:jira": "View permissions.",
+              "read:priority:jira": "View priorities.",
+              "read:project-category:jira": "View project categories.",
+              "read:project-role:jira": "View project roles.",
+              "read:project-type:jira": "View project types.",
+              "read:project-version:jira": "View project versions.",
+              "read:project.avatar:jira": "Read project avatars.",
+              "read:project.component:jira": "View project components.",
+              "read:project.email:jira": "View project emails.",
+              "read:project.feature:jira": "Read project features.",
+              "read:project.property:jira": "View project properties.",
+              "read:project:jira": "View projects.",
+              "read:resolution:jira": "View resolutions.",
+              "read:role:jira": "View roles.",
+              "read:screen-field:jira": "View screen fields.",
+              "read:screen-scheme:jira": "View screen schemes.",
+              "read:screen-tab:jira": "View screen tabs.",
+              "read:screen:jira": "View screens.",
+              "read:screenable-field:jira": "View screenable fields.",
+              "read:status:jira": "View statuses.",
+              "read:user-configuration:jira": "View user configurations.",
+              "read:user.columns:jira": "View user columnses.",
+              "read:user.property:jira": "View user properties.",
+              "read:user:jira": "View users.",
+              "read:webhook:jira": "View webhooks.",
+              "read:workflow-scheme:jira": "View workflow schemes.",
+              "read:workflow.property:jira": "View workflow properties.",
+              "read:workflow:jira": "View workflows.",
+              "send:notification:jira": "Send notifications.",
+              "validate:jql:jira": "Validate JQL.",
+              "write:app-data:jira": "Write app data.",
+              "write:attachment:jira": "Create and update issue attachments.",
+              "write:avatar:jira": "Create and update system and custom avatars.",
+              "write:comment.property:jira": "Create and update issue comment properties.",
+              "write:comment:jira": "Create and update issue comments.",
+              "write:custom-field-contextual-configuration:jira": "Save custom field contextual configurations.",
+              "write:dashboard.property:jira": "Create and update dashboard properties.",
+              "write:dashboard:jira": "Create and update dashboards.",
+              "write:field-configuration-scheme:jira": "Create and update field configuration schemes.",
+              "write:field-configuration:jira": "Save field configurations.",
+              "write:field.default-value:jira": "Create and update field default values.",
+              "write:field.option:jira": "Create and update field options.",
+              "write:field:jira": "Create and update fields.",
+              "write:filter.column:jira": "Create and update filter columns.",
+              "write:filter.default-share-scope:jira": "Create and update filter default share scopes.",
+              "write:filter:jira": "Create and update filters.",
+              "write:group:jira": "Create and update user groups.",
+              "write:instance-configuration:jira": "Create and update instance configurations.",
+              "write:issue-link-type:jira": "Create and update issue link types.",
+              "write:issue-link:jira": "Create and update issue links.",
+              "write:issue-type-scheme:jira": "Create and update issue type schemes.",
+              "write:issue-type-screen-scheme:jira": "Create and update issue type screen schemes.",
+              "write:issue-type.property:jira": "Create and update issue type properties.",
+              "write:issue-type:jira": "Create and update issue types.",
+              "write:issue-worklog.property:jira": "Create and update issue worklog properties.",
+              "write:issue-worklog:jira": "Create and update issue worklogs.",
+              "write:issue.property:jira": "Create and update issue properties.",
+              "write:issue.remote-link:jira": "Create and update issue remote links.",
+              "write:issue.time-tracking:jira": "Create and update issue time trackings.",
+              "write:issue.vote:jira": "Create and update issue votes.",
+              "write:issue.watcher:jira": "Create and update issue watchers.",
+              "write:issue:jira": "Create and update issues.",
+              "write:jira-work": "Create and edit issues in Jira, post comments, create worklogs, and delete issues.",
+              "write:permission-scheme:jira": "Create and update permission schemes.",
+              "write:permission:jira": "Create and update permissions.",
+              "write:project-category:jira": "Create and update project categories.",
+              "write:project-role:jira": "Create and update project roles.",
+              "write:project-version:jira": "Create and update project versions.",
+              "write:project.avatar:jira": "Create and update project avatars.",
+              "write:project.component:jira": "Create and update project components.",
+              "write:project.email:jira": "Create and update project emails.",
+              "write:project.feature:jira": "Save project features.",
+              "write:project.property:jira": "Create and update project properties.",
+              "write:project:jira": "Create and update projects.",
+              "write:screen-scheme:jira": "Create and update screen schemes.",
+              "write:screen-tab:jira": "Create and update screen tabs.",
+              "write:screen:jira": "Create and update screens.",
+              "write:screenable-field:jira": "Create and update screenable fields.",
+              "write:user-configuration:jira": "Create and update user configurations.",
+              "write:user.property:jira": "Create and update user properties.",
+              "write:webhook:jira": "Create and update webhooks.",
+              "write:workflow-scheme:jira": "Create and update workflow schemes.",
+              "write:workflow.property:jira": "Create and update workflow properties.",
+              "write:workflow:jira": "Create and update workflows."
+            },
+            "tokenUrl": "https://auth.atlassian.com/oauth/token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  }
+}

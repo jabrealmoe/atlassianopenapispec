@@ -1,0 +1,1513 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "ecosystem@atlassian.com"
+    },
+    "description": "Jira Cloud platform REST API documentation",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "termsOfService": "https://developer.atlassian.com/platform/marketplace/atlassian-developer-terms/",
+    "title": "The Jira Cloud platform REST API - apps (part 2 of 2)",
+    "version": "1001.0.0-SNAPSHOT-94e91f6947ecc63395c0d5a54f05005b6eab5a8a"
+  },
+  "externalDocs": {
+    "description": "Find out more about Atlassian products and services.",
+    "url": "http://www.atlassian.com"
+  },
+  "servers": [
+    {
+      "url": "https://your-domain.atlassian.net"
+    }
+  ],
+  "tags": [
+    {
+      "description": "This resource supports [app migrations](https://developer.atlassian.com/platform/app-migration/). Use it to:\n- [to request migrated workflow rules details](https://developer.atlassian.com/platform/app-migration/tutorials/migration-app-workflow-rules/).\n- [perform bulk updates of entity properties](https://developer.atlassian.com/platform/app-migration/tutorials/entity-properties-bulk-api/).\n- [perform bulk updates of issue custom field values](https://developer.atlassian.com/platform/app-migration/tutorials/migrating-app-custom-fields/).",
+      "name": "App migration"
+    },
+    {
+      "description": "This resource represents [modules registered dynamically](https://developer.atlassian.com/cloud/jira/platform/dynamic-modules/)\nby [Connect apps](https://developer.atlassian.com/cloud/jira/platform/index/#connect-apps).",
+      "name": "Dynamic modules"
+    },
+    {
+      "description": "This resource supports the migration of some Connect modules to their equivalent Forge modules.",
+      "name": "Migration of Connect modules to Forge"
+    },
+    {
+      "description": "This resource represents a service registry. Use it to retrieve attributes related to a [service registry](https://support.atlassian.com/jira-service-management-cloud/docs/what-is-services/) in JSM.",
+      "name": "Service Registry"
+    }
+  ],
+  "x-split": {
+    "strategy": "domain",
+    "group": "apps",
+    "part": 2,
+    "of": 2,
+    "tags": [
+      "Dynamic modules",
+      "App migration",
+      "Migration of Connect modules to Forge",
+      "Service Registry"
+    ]
+  },
+  "paths": {
+    "/rest/atlassian-connect/1/app/module/dynamic": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns all modules registered dynamically by the calling app.\n\n**[Permissions](#permissions) required:** Only Connect apps can make this request.",
+        "operationId": "DynamicModulesResource.getModules_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectModules"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The request is not from a Connect app."
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "description": "Returned if the call is not from a Connect app."
+          }
+        },
+        "summary": "Get modules",
+        "tags": [
+          "Dynamic modules"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Registers a list of modules.\n\n**[Permissions](#permissions) required:** Only Connect apps can make this request.",
+        "operationId": "DynamicModulesResource.registerModules_post",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectModules"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Installation failed. The app com.example.app.key has duplicate module keys: [module-key]. Please contact the app vendor."
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "description": "Returned if:\n* any of the provided modules is invalid. For example, required properties are missing.\n* any of the modules conflict with registered dynamic modules or modules defined in the app descriptor. For example, there are duplicate keys.\n\nDetails of the issues encountered are included in the error message."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The request is not from a Connect app."
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "description": "Returned if the call is not from a Connect app."
+          }
+        },
+        "summary": "Register modules",
+        "tags": [
+          "Dynamic modules"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Remove all or a list of modules registered by the calling app.\n\n**[Permissions](#permissions) required:** Only Connect apps can make this request.",
+        "operationId": "DynamicModulesResource.removeModules_delete",
+        "parameters": [
+          {
+            "description": "The key of the module to remove. To include multiple module keys, provide multiple copies of this parameter.\nFor example, `moduleKey=dynamic-attachment-entity-property&moduleKey=dynamic-select-field`.\nNonexistent keys are ignored.",
+            "in": "query",
+            "name": "moduleKey",
+            "required": false,
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The request is not from a Connect app."
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "description": "Returned if the call is not from a Connect app."
+          }
+        },
+        "summary": "Remove modules",
+        "tags": [
+          "Dynamic modules"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      }
+    },
+    "/rest/atlassian-connect/1/migration/{connectKey}/{jiraIssueFieldsKey}/task": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the details of a Connect issue field's migration to Forge.\n\nWhen migrating a Connect app to Forge, [Issue Field](https://developer.atlassian.com/cloud/jira/software/modules/issue-field/) modules\nmust be converted to [Custom field](https://developer.atlassian.com/platform/forge/manifest-reference/modules/jira-custom-field/). When the\nForge version of the app is installed, Forge creates a\n[background task](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-tasks/#api-group-tasks) to track the\nmigration of field data across. This endpoint returns the status and other details of that background task.\n\nFor more details, see\n[Jira modules > Jira Custom Fields](https://developer.atlassian.com/platform/adopting-forge-from-connect/migrate-jira-custom-fields/).\n\n**[Permissions](#permissions) required:** Only Connect and Forge apps can make this request.",
+        "operationId": "ConnectToForgeMigrationFetchTaskResource.fetchMigrationTask_get",
+        "parameters": [
+          {
+            "description": "The key of the Connect app that contains the Jira issue field being migrated.",
+            "example": "com.example.app",
+            "in": "path",
+            "name": "connectKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The module key of the Connect issue field being migrated.",
+            "example": "my-custom-field",
+            "in": "path",
+            "name": "jiraIssueFieldsKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskProgress"
+                }
+              }
+            },
+            "description": "Returned if the request is successful and a migration task is found."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Access to this resource must be authenticated as an app.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/OperationMessage"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No ongoing migration task for the custom field.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/OperationMessage"
+                }
+              }
+            },
+            "description": "Returned if:\n* no migrated Forge module with the given key is found.\n* no ongoing migration task exists for the custom field."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": []
+          }
+        ],
+        "summary": "Get Connect issue field migration task",
+        "tags": [
+          "Migration of Connect modules to Forge"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Submits a request to trigger migration of connect issue field to its Forge custom field counterpart.\n\nWhen migrating a Connect app to Forge, [Issue Field](https://developer.atlassian.com/cloud/jira/software/modules/issue-field/) modules\nmust be converted to [Custom field](https://developer.atlassian.com/platform/forge/manifest-reference/modules/jira-custom-field/) modules.\nThis endpoint triggers the background migration of field data. Use the GET endpoint to retrieve\nthe status and progress of the task.\n\nFor more details, see\n[Jira modules > Jira Custom Fields](https://developer.atlassian.com/platform/adopting-forge-from-connect/migrate-jira-custom-fields/).\n\n**[Permissions](#permissions) required:** Only Connect and Forge apps can make this request.",
+        "operationId": "ConnectToForgeMigrationTaskSubmissionResource.submitTask_post",
+        "parameters": [
+          {
+            "description": "The key of the Connect app that contains the Jira issue field being migrated.",
+            "example": "com.example.app",
+            "in": "path",
+            "name": "connectKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The module key of the Connect issue field being migrated.",
+            "example": "my-custom-field",
+            "in": "path",
+            "name": "jiraIssueFieldsKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether to retrigger the migration if it has already completed.",
+            "explode": true,
+            "in": "query",
+            "name": "retriggerCompletedMigration",
+            "required": false,
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Returned if the migration task was submitted successfully."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Access to this resource must be authenticated as an app.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/OperationMessage"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No migrated Forge module with given key is found.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/OperationMessage"
+                }
+              }
+            },
+            "description": "Returned if no migrated Forge module with the given key is found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Failed to trigger migration task because of already in progress task for the field.",
+                  "statusCode": 409
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/OperationMessage"
+                }
+              }
+            },
+            "description": "Returned if a migration task is already in progress for the field."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": []
+          }
+        ],
+        "summary": "Submit Connect issue field migration task",
+        "tags": [
+          "Migration of Connect modules to Forge"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      }
+    },
+    "/rest/atlassian-connect/1/migration/field": {
+      "put": {
+        "deprecated": false,
+        "description": "Updates the value of a custom field added by Connect apps on one or more issues.\nThe values of up to 200 custom fields can be updated.\n\n**[Permissions](#permissions) required:** Only Connect apps can make this request",
+        "operationId": "AppIssueFieldValueUpdateResource.updateIssueFields_put",
+        "parameters": [
+          {
+            "description": "The ID of the transfer.",
+            "in": "header",
+            "name": "Atlassian-Transfer-Id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "updateValueList": [
+                  {
+                    "_type": "StringIssueField",
+                    "issueID": 10001,
+                    "fieldID": 10076,
+                    "string": "new string value"
+                  },
+                  {
+                    "_type": "TextIssueField",
+                    "issueID": 10002,
+                    "fieldID": 10077,
+                    "text": "new text value"
+                  },
+                  {
+                    "_type": "SingleSelectIssueField",
+                    "issueID": 10003,
+                    "fieldID": 10078,
+                    "optionID": "1"
+                  },
+                  {
+                    "_type": "MultiSelectIssueField",
+                    "issueID": 10004,
+                    "fieldID": 10079,
+                    "optionID": "2"
+                  },
+                  {
+                    "_type": "RichTextIssueField",
+                    "issueID": 10005,
+                    "fieldID": 10080,
+                    "richText": "new rich text value"
+                  },
+                  {
+                    "_type": "NumberIssueField",
+                    "issueID": 10006,
+                    "fieldID": 10082,
+                    "number": 54
+                  }
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ConnectCustomFieldValues"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "403": {
+            "description": "Returned if:\n* the transfer ID is not found.\n* the authorisation credentials are incorrect or missing."
+          }
+        },
+        "summary": "Bulk update custom field value",
+        "tags": [
+          "App migration"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      }
+    },
+    "/rest/atlassian-connect/1/migration/properties/{entityType}": {
+      "put": {
+        "description": "Updates the values of multiple entity properties for an object, up to 50 updates per request. This operation is for use by Connect apps during app migration.",
+        "operationId": "MigrationResource.updateEntityPropertiesValue_put",
+        "parameters": [
+          {
+            "description": "The app migration transfer ID.",
+            "in": "header",
+            "name": "Atlassian-Transfer-Id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The type indicating the object that contains the entity properties.",
+            "in": "path",
+            "name": "entityType",
+            "required": true,
+            "schema": {
+              "enum": [
+                "IssueProperty",
+                "CommentProperty",
+                "DashboardItemProperty",
+                "IssueTypeProperty",
+                "ProjectProperty",
+                "UserProperty",
+                "WorklogProperty",
+                "BoardProperty",
+                "SprintProperty"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/EntityPropertyDetails"
+                },
+                "maxItems": 50,
+                "minItems": 1,
+                "type": "array"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is not valid."
+          },
+          "403": {
+            "description": "Returned if the authorisation credentials are incorrect or missing."
+          }
+        },
+        "summary": "Bulk update entity properties",
+        "tags": [
+          "App migration"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      }
+    },
+    "/rest/atlassian-connect/1/migration/workflow/rule/search": {
+      "post": {
+        "description": "Returns configurations for workflow transition rules migrated from server to cloud and owned by the calling Connect app.",
+        "operationId": "MigrationResource.workflowRuleSearch_post",
+        "parameters": [
+          {
+            "description": "The app migration transfer ID.",
+            "in": "header",
+            "name": "Atlassian-Transfer-Id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowRulesSearch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "workflowEntityId": "a498d711-685d-428d-8c3e-bc03bb450ea7",
+                  "invalidRules": [
+                    "55d44f1d-c859-42e5-9c27-2c5ec3f340b1"
+                  ],
+                  "validRules": [
+                    {
+                      "workflowId": {
+                        "name": "Workflow name",
+                        "draft": true
+                      },
+                      "postFunctions": [
+                        {
+                          "id": "123",
+                          "key": "WorkflowKey",
+                          "configuration": {
+                            "value": "WorkflowValidator"
+                          },
+                          "transition": {
+                            "name": "transition",
+                            "id": 123
+                          }
+                        }
+                      ],
+                      "conditions": [
+                        {
+                          "id": "123",
+                          "key": "WorkflowKey",
+                          "configuration": {
+                            "value": "WorkflowValidator"
+                          },
+                          "transition": {
+                            "name": "transition",
+                            "id": 123
+                          }
+                        }
+                      ],
+                      "validators": [
+                        {
+                          "id": "123",
+                          "key": "WorkflowKey",
+                          "configuration": {
+                            "value": "WorkflowValidator"
+                          },
+                          "transition": {
+                            "name": "transition",
+                            "id": 123
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRulesSearchDetails"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is not valid."
+          },
+          "403": {
+            "description": "Returned if the authorisation credentials are incorrect or missing."
+          }
+        },
+        "summary": "Get workflow transition rule configurations",
+        "tags": [
+          "App migration"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      }
+    },
+    "/rest/atlassian-connect/1/service-registry": {
+      "get": {
+        "deprecated": false,
+        "description": "Retrieve the attributes of given service registries.\n\n**[Permissions](#permissions) required:** Only Connect apps can make this request and the servicesIds belong to the tenant you are requesting",
+        "operationId": "ServiceRegistryResource.services_get",
+        "parameters": [
+          {
+            "description": "The ID of the services (the strings starting with \"b:\" need to be decoded in Base64).",
+            "example": "[\"ari:cloud:graph::service/ca075ed7-6ea7-4563-acb3-000000000000/f51d7252-61e0-11ee-b94d-000000000000\", \"ari:cloud:graph::service/ca075ed7-6ea7-4563-acb3-000000000000/f51d7252-61e0-11ee-b94d-000000000001\"]",
+            "explode": true,
+            "in": "query",
+            "name": "serviceIds",
+            "required": true,
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 20,
+              "minItems": 1,
+              "type": "array"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceRegistry"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "The request needs to be authenticated."
+          },
+          "403": {
+            "description": "The request isn't authorized."
+          },
+          "500": {
+            "description": "The endpoint failed internally."
+          },
+          "501": {
+            "description": "The endpoint isn't ready for receiving requests."
+          },
+          "504": {
+            "description": "The upstream service is busy."
+          }
+        },
+        "summary": "Retrieve the attributes of service registries",
+        "tags": [
+          "Service Registry"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppWorkflowTransitionRule": {
+        "additionalProperties": false,
+        "description": "A workflow transition rule.",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/RuleConfiguration"
+          },
+          "id": {
+            "description": "The ID of the transition rule.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The key of the rule, as defined in the Connect or the Forge app descriptor.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "transition": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WorkflowTransition"
+              }
+            ],
+            "readOnly": true
+          }
+        },
+        "required": [
+          "configuration",
+          "id",
+          "key"
+        ],
+        "type": "object"
+      },
+      "ConnectCustomFieldValue": {
+        "description": "A list of custom field details.",
+        "properties": {
+          "_type": {
+            "description": "The type of custom field.",
+            "enum": [
+              "StringIssueField",
+              "NumberIssueField",
+              "RichTextIssueField",
+              "SingleSelectIssueField",
+              "MultiSelectIssueField",
+              "TextIssueField"
+            ],
+            "type": "string",
+            "writeOnly": true
+          },
+          "fieldID": {
+            "description": "The custom field ID.",
+            "type": "integer",
+            "writeOnly": true
+          },
+          "issueID": {
+            "description": "The issue ID.",
+            "type": "integer",
+            "writeOnly": true
+          },
+          "number": {
+            "description": "The value of number type custom field when `_type` is `NumberIssueField`.",
+            "type": "number"
+          },
+          "optionID": {
+            "description": "The value of single select and multiselect custom field type when `_type` is `SingleSelectIssueField` or `MultiSelectIssueField`.",
+            "type": "string"
+          },
+          "richText": {
+            "description": "The value of richText type custom field when `_type` is `RichTextIssueField`.",
+            "type": "string"
+          },
+          "string": {
+            "description": "The value of string type custom field when `_type` is `StringIssueField`.",
+            "type": "string"
+          },
+          "text": {
+            "description": "The value of of text custom field type when `_type` is `TextIssueField`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "_type",
+          "fieldID",
+          "issueID"
+        ],
+        "type": "object",
+        "writeOnly": true
+      },
+      "ConnectCustomFieldValues": {
+        "additionalProperties": false,
+        "description": "Details of updates for a custom field.",
+        "properties": {
+          "updateValueList": {
+            "description": "The list of custom field update details.",
+            "items": {
+              "$ref": "#/components/schemas/ConnectCustomFieldValue"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object",
+        "writeOnly": true
+      },
+      "ConnectModule": {
+        "description": "A [Connect module](https://developer.atlassian.com/cloud/jira/platform/about-jira-modules/) in the same format as in the\n[app descriptor](https://developer.atlassian.com/cloud/jira/platform/app-descriptor/).",
+        "example": {
+          "description": {
+            "value": "field with team"
+          },
+          "type": "single_select",
+          "extractions": [
+            {
+              "path": "category",
+              "type": "text",
+              "name": "categoryName"
+            }
+          ],
+          "name": {
+            "value": "Team"
+          },
+          "key": "team-field"
+        },
+        "type": "object"
+      },
+      "ConnectModules": {
+        "example": {
+          "jiraEntityProperties": [
+            {
+              "keyConfigurations": [
+                {
+                  "extractions": [
+                    {
+                      "objectName": "extension",
+                      "type": "text",
+                      "alias": "attachmentExtension"
+                    }
+                  ],
+                  "propertyKey": "attachment"
+                }
+              ],
+              "entityType": "issue",
+              "name": {
+                "value": "Attachment Index Document"
+              },
+              "key": "dynamic-attachment-entity-property"
+            }
+          ],
+          "jiraIssueFields": [
+            {
+              "description": {
+                "value": "A dynamically added single-select field"
+              },
+              "type": "single_select",
+              "extractions": [
+                {
+                  "path": "category",
+                  "type": "text",
+                  "name": "categoryName"
+                }
+              ],
+              "name": {
+                "value": "Dynamic single select"
+              },
+              "key": "dynamic-select-field"
+            }
+          ]
+        },
+        "properties": {
+          "modules": {
+            "description": "A list of app modules in the same format as the `modules` property in the\n[app descriptor](https://developer.atlassian.com/cloud/jira/platform/app-descriptor/).",
+            "items": {
+              "$ref": "#/components/schemas/ConnectModule"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "modules"
+        ],
+        "type": "object"
+      },
+      "EntityPropertyDetails": {
+        "properties": {
+          "entityId": {
+            "description": "The entity property ID.",
+            "example": 123,
+            "type": "number"
+          },
+          "key": {
+            "description": "The entity property key.",
+            "example": "mykey",
+            "type": "string"
+          },
+          "value": {
+            "description": "The new value of the entity property.",
+            "example": "newValue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entityId",
+          "key",
+          "value"
+        ],
+        "type": "object"
+      },
+      "ErrorMessage": {
+        "additionalProperties": false,
+        "example": {
+          "message": "The request is not from a Connect app."
+        },
+        "properties": {
+          "message": {
+            "description": "The error message.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "OperationMessage": {
+        "additionalProperties": false,
+        "example": {
+          "message": "An example message.",
+          "statusCode": 200
+        },
+        "properties": {
+          "message": {
+            "description": "The human-readable message that describes the result.",
+            "type": "string"
+          },
+          "statusCode": {
+            "description": "The status code of the response.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "message",
+          "statusCode"
+        ],
+        "type": "object"
+      },
+      "RuleConfiguration": {
+        "additionalProperties": false,
+        "description": "A rule configuration.",
+        "properties": {
+          "disabled": {
+            "default": false,
+            "description": "Whether the rule is disabled.",
+            "type": "boolean"
+          },
+          "tag": {
+            "description": "A tag used to filter rules in [Get workflow transition rule configurations](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-workflow-transition-rules/#api-rest-api-3-workflow-rule-config-get).",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "value": {
+            "description": "Configuration of the rule, as it is stored by the Connect or the Forge app on the rule configuration page.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "type": "object"
+      },
+      "ServiceRegistry": {
+        "properties": {
+          "description": {
+            "description": "service description",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "service ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "description": "service name",
+            "type": "string"
+          },
+          "organizationId": {
+            "description": "organization ID",
+            "type": "string"
+          },
+          "revision": {
+            "description": "service revision",
+            "type": "string"
+          },
+          "serviceTier": {
+            "$ref": "#/components/schemas/ServiceRegistryTier"
+          }
+        },
+        "type": "object"
+      },
+      "ServiceRegistryTier": {
+        "properties": {
+          "description": {
+            "description": "tier description",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "tier ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "level": {
+            "description": "tier level",
+            "type": "integer"
+          },
+          "name": {
+            "description": "tier name",
+            "nullable": true,
+            "type": "string"
+          },
+          "nameKey": {
+            "description": "name key of the tier",
+            "example": "service-registry.tier1.name",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TaskProgress": {
+        "description": "Details about a task.",
+        "properties": {
+          "description": {
+            "description": "The description of the task.",
+            "type": "string"
+          },
+          "elapsedRuntime": {
+            "description": "The execution time of the task, in milliseconds.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "finished": {
+            "description": "A timestamp recording when the task was finished.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the task.",
+            "type": "string"
+          },
+          "lastUpdate": {
+            "description": "A timestamp recording when the task progress was last updated.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "message": {
+            "description": "Information about the progress of the task.",
+            "type": "string"
+          },
+          "progress": {
+            "description": "The progress of the task, as a percentage complete.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "result": {
+            "description": "The result of the task execution."
+          },
+          "self": {
+            "description": "The URL of the task.",
+            "format": "uri",
+            "type": "string"
+          },
+          "started": {
+            "description": "A timestamp recording when the task was started.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "description": "The status of the task.",
+            "enum": [
+              "ENQUEUED",
+              "RUNNING",
+              "COMPLETE",
+              "FAILED",
+              "CANCEL_REQUESTED",
+              "CANCELLED",
+              "DEAD"
+            ],
+            "type": "string"
+          },
+          "submitted": {
+            "description": "A timestamp recording when the task was submitted.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "submittedBy": {
+            "description": "The ID of the user who submitted the task.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "elapsedRuntime",
+          "id",
+          "lastUpdate",
+          "progress",
+          "self",
+          "status",
+          "submittedBy"
+        ],
+        "type": "object"
+      },
+      "WorkflowId": {
+        "additionalProperties": false,
+        "description": "Properties that identify a workflow.",
+        "properties": {
+          "draft": {
+            "description": "**Deprecated:** Whether the workflow is in the draft state. The 'draft' parameter will be removed from this API on [November 2, 2026](https://developer.atlassian.com/cloud/jira/platform/changelog/#CHANGE-3147).",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "The name of the workflow.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "WorkflowRulesSearch": {
+        "description": "Details of the workflow and its transition rules.",
+        "properties": {
+          "expand": {
+            "description": "Use expand to include additional information in the response. This parameter accepts `transition` which, for each rule, returns information about the transition the rule is assigned to.",
+            "example": "transition",
+            "type": "string"
+          },
+          "ruleIds": {
+            "description": "The list of workflow rule IDs.",
+            "items": {
+              "description": "Workflow rule ID.",
+              "example": "55d44f1d-c859-42e5-9c27-2c5ec3f340b1",
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          },
+          "workflowEntityId": {
+            "description": "The workflow ID.",
+            "example": "a498d711-685d-428d-8c3e-bc03bb450ea7",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ruleIds",
+          "workflowEntityId"
+        ],
+        "type": "object"
+      },
+      "WorkflowRulesSearchDetails": {
+        "description": "Details of workflow transition rules.",
+        "properties": {
+          "invalidRules": {
+            "description": "List of workflow rule IDs that do not belong to the workflow or can not be found.",
+            "items": {
+              "description": "Workflow rule ID.",
+              "example": "55d44f1d-c859-42e5-9c27-2c5ec3f340b1",
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "validRules": {
+            "description": "List of valid workflow transition rules.",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowTransitionRules"
+            },
+            "type": "array"
+          },
+          "workflowEntityId": {
+            "description": "The workflow ID.",
+            "example": "a498d711-685d-428d-8c3e-bc03bb450ea7",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "WorkflowTransition": {
+        "additionalProperties": false,
+        "description": "A workflow transition.",
+        "properties": {
+          "id": {
+            "description": "The transition ID.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "name": {
+            "description": "The transition name.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "WorkflowTransitionRules": {
+        "additionalProperties": false,
+        "description": "A workflow with transition rules.",
+        "properties": {
+          "conditions": {
+            "description": "The list of conditions within the workflow.",
+            "items": {
+              "$ref": "#/components/schemas/AppWorkflowTransitionRule"
+            },
+            "type": "array"
+          },
+          "postFunctions": {
+            "description": "The list of post functions within the workflow.",
+            "items": {
+              "$ref": "#/components/schemas/AppWorkflowTransitionRule"
+            },
+            "type": "array"
+          },
+          "validators": {
+            "description": "The list of validators within the workflow.",
+            "items": {
+              "$ref": "#/components/schemas/AppWorkflowTransitionRule"
+            },
+            "type": "array"
+          },
+          "workflowId": {
+            "$ref": "#/components/schemas/WorkflowId"
+          }
+        },
+        "required": [
+          "workflowId"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "description": "You can access this resource via basic auth.",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "OAuth2": {
+        "description": "OAuth2 scopes for Jira",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.atlassian.com/authorize",
+            "scopes": {
+              "delete:async-task:jira": "Delete asynchronous task.",
+              "delete:attachment:jira": "Delete issue attachments.",
+              "delete:avatar:jira": "Delete system and custom avatars.",
+              "delete:comment.property:jira": "Delete issue comment properties.",
+              "delete:comment:jira": "Delete issue comments.",
+              "delete:dashboard.property:jira": "Delete dashboard properties.",
+              "delete:dashboard:jira": "Delete dashboards.",
+              "delete:field-configuration-scheme:jira": "Delete field configuration schemes.",
+              "delete:field-configuration:jira": "Delete field configurations.",
+              "delete:field.option:jira": "Delete field options.",
+              "delete:field:jira": "Delete fields.",
+              "delete:filter.column:jira": "Delete filter columns.",
+              "delete:filter:jira": "Delete filters.",
+              "delete:group:jira": "Delete user groups.",
+              "delete:issue-link-type:jira": "Delete issue link types.",
+              "delete:issue-link:jira": "Delete issue links.",
+              "delete:issue-type-scheme:jira": "Delete issue type schemes.",
+              "delete:issue-type-screen-scheme:jira": "Delete issue type screen schemes.",
+              "delete:issue-type.property:jira": "Delete issue type properties.",
+              "delete:issue-type:jira": "Delete issue types.",
+              "delete:issue-worklog.property:jira": "Delete issue worklog properties.",
+              "delete:issue-worklog:jira": "Delete issue worklogs.",
+              "delete:issue.property:jira": "Delete issue properties.",
+              "delete:issue.remote-link:jira": "Delete issue remote links.",
+              "delete:issue:jira": "Delete issues.",
+              "delete:permission-scheme:jira": "Delete permission schemes.",
+              "delete:permission:jira": "Delete permissions.",
+              "delete:project-category:jira": "Delete project categories.",
+              "delete:project-role:jira": "Delete project roles.",
+              "delete:project-version:jira": "Delete project versions.",
+              "delete:project.avatar:jira": "Delete project avatars.",
+              "delete:project.component:jira": "Delete project components.",
+              "delete:project.property:jira": "Delete project properties.",
+              "delete:project:jira": "Delete projects and their details, such as issue types, project lead, and avatars.",
+              "delete:screen-scheme:jira": "Delete screen schemes.",
+              "delete:screen-tab:jira": "Delete screen tabs.",
+              "delete:screen:jira": "Delete screens.",
+              "delete:screenable-field:jira": "Delete screenable fields.",
+              "delete:user-configuration:jira": "Delete user configurations.",
+              "delete:user.property:jira": "Delete user properties.",
+              "delete:webhook:jira": "Delete webhooks.",
+              "delete:workflow-scheme:jira": "Delete workflow schemes.",
+              "delete:workflow.property:jira": "Delete workflow properties.",
+              "delete:workflow:jira": "Delete workflows.",
+              "manage:jira-configuration": "Configure Jira settings that require the Jira administrators permission, for example, create projects and custom fields, view workflows, manage issue link types.",
+              "manage:jira-project": "Create and edit project settings and create new project-level objects, for example, versions, components.",
+              "manage:jira-webhook": "Manage Jira webhooks. Enables an OAuth app to register and unregister dynamic webhooks in Jira. It also provides for fetching of registered webhooks.",
+              "read:app-data:jira": "Read app data.",
+              "read:application-role:jira": "View application roles.",
+              "read:attachment:jira": "View issue attachments.",
+              "read:audit-log:jira": "View audit logs.",
+              "read:avatar:jira": "View system and custom avatars.",
+              "read:comment.property:jira": "View issue comment properties.",
+              "read:comment:jira": "View issue comments.",
+              "read:custom-field-contextual-configuration:jira": "Read custom field contextual configurations.",
+              "read:dashboard.property:jira": "View dashboard properties.",
+              "read:dashboard:jira": "View dashboards.",
+              "read:email-address:jira": "View email addresses of all users regardless of the user's profile visibility settings.",
+              "read:field-configuration-scheme:jira": "View field configuration schemes.",
+              "read:field-configuration:jira": "Read field configurations.",
+              "read:field.default-value:jira": "View field default values.",
+              "read:field.option:jira": "View field options.",
+              "read:field.options:jira": "Read field options.",
+              "read:field:jira": "View fields.",
+              "read:filter.column:jira": "View filter columns.",
+              "read:filter.default-share-scope:jira": "View filter default share scopes.",
+              "read:filter:jira": "View filters.",
+              "read:group:jira": "View user groups.",
+              "read:instance-configuration:jira": "View instance configurations.",
+              "read:issue-details:jira": "View issue details.",
+              "read:issue-event:jira": "Read issue events.",
+              "read:issue-field-values:jira": "View issue field valueses.",
+              "read:issue-link-type:jira": "View issue link types.",
+              "read:issue-link:jira": "View issue links.",
+              "read:issue-meta:jira": "View issue meta.",
+              "read:issue-security-level:jira": "View issue security levels.",
+              "read:issue-security-scheme:jira": "View issue security schemes.",
+              "read:issue-status:jira": "View issue statuses.",
+              "read:issue-type-hierarchy:jira": "Read issue type hierarchies.",
+              "read:issue-type-scheme:jira": "View issue type schemes.",
+              "read:issue-type-screen-scheme:jira": "View issue type screen schemes.",
+              "read:issue-type.property:jira": "View issue type properties.",
+              "read:issue-type:jira": "View issue types.",
+              "read:issue-worklog.property:jira": "View issue worklog properties.",
+              "read:issue-worklog:jira": "View issue worklogs.",
+              "read:issue.changelog:jira": "View issue changelogs.",
+              "read:issue.property:jira": "View issue properties.",
+              "read:issue.remote-link:jira": "View issue remote links.",
+              "read:issue.time-tracking:jira": "View issue time trackings.",
+              "read:issue.transition:jira": "View issue transitions.",
+              "read:issue.vote:jira": "View issue votes.",
+              "read:issue.votes:jira": "View issue voteses.",
+              "read:issue.watcher:jira": "View issue watchers.",
+              "read:issue:jira": "View issues.",
+              "read:jira-expressions:jira": "View jira expressions.",
+              "read:jira-user": "View user information in Jira that you have access to, including usernames, email addresses, and avatars.",
+              "read:jira-work": "Read project and issue data. Search for issues and objects associated with issues (such as attachments and worklogs).",
+              "read:jql:jira": "View JQL.",
+              "read:label:jira": "View labels.",
+              "read:license:jira": "View licenses.",
+              "read:notification-scheme:jira": "View notification schemes.",
+              "read:permission-scheme:jira": "View permission schemes.",
+              "read:permission:jira": "View permissions.",
+              "read:priority:jira": "View priorities.",
+              "read:project-category:jira": "View project categories.",
+              "read:project-role:jira": "View project roles.",
+              "read:project-type:jira": "View project types.",
+              "read:project-version:jira": "View project versions.",
+              "read:project.avatar:jira": "Read project avatars.",
+              "read:project.component:jira": "View project components.",
+              "read:project.email:jira": "View project emails.",
+              "read:project.feature:jira": "Read project features.",
+              "read:project.property:jira": "View project properties.",
+              "read:project:jira": "View projects.",
+              "read:resolution:jira": "View resolutions.",
+              "read:role:jira": "View roles.",
+              "read:screen-field:jira": "View screen fields.",
+              "read:screen-scheme:jira": "View screen schemes.",
+              "read:screen-tab:jira": "View screen tabs.",
+              "read:screen:jira": "View screens.",
+              "read:screenable-field:jira": "View screenable fields.",
+              "read:status:jira": "View statuses.",
+              "read:user-configuration:jira": "View user configurations.",
+              "read:user.columns:jira": "View user columnses.",
+              "read:user.property:jira": "View user properties.",
+              "read:user:jira": "View users.",
+              "read:webhook:jira": "View webhooks.",
+              "read:workflow-scheme:jira": "View workflow schemes.",
+              "read:workflow.property:jira": "View workflow properties.",
+              "read:workflow:jira": "View workflows.",
+              "send:notification:jira": "Send notifications.",
+              "validate:jql:jira": "Validate JQL.",
+              "write:app-data:jira": "Write app data.",
+              "write:attachment:jira": "Create and update issue attachments.",
+              "write:avatar:jira": "Create and update system and custom avatars.",
+              "write:comment.property:jira": "Create and update issue comment properties.",
+              "write:comment:jira": "Create and update issue comments.",
+              "write:custom-field-contextual-configuration:jira": "Save custom field contextual configurations.",
+              "write:dashboard.property:jira": "Create and update dashboard properties.",
+              "write:dashboard:jira": "Create and update dashboards.",
+              "write:field-configuration-scheme:jira": "Create and update field configuration schemes.",
+              "write:field-configuration:jira": "Save field configurations.",
+              "write:field.default-value:jira": "Create and update field default values.",
+              "write:field.option:jira": "Create and update field options.",
+              "write:field:jira": "Create and update fields.",
+              "write:filter.column:jira": "Create and update filter columns.",
+              "write:filter.default-share-scope:jira": "Create and update filter default share scopes.",
+              "write:filter:jira": "Create and update filters.",
+              "write:group:jira": "Create and update user groups.",
+              "write:instance-configuration:jira": "Create and update instance configurations.",
+              "write:issue-link-type:jira": "Create and update issue link types.",
+              "write:issue-link:jira": "Create and update issue links.",
+              "write:issue-type-scheme:jira": "Create and update issue type schemes.",
+              "write:issue-type-screen-scheme:jira": "Create and update issue type screen schemes.",
+              "write:issue-type.property:jira": "Create and update issue type properties.",
+              "write:issue-type:jira": "Create and update issue types.",
+              "write:issue-worklog.property:jira": "Create and update issue worklog properties.",
+              "write:issue-worklog:jira": "Create and update issue worklogs.",
+              "write:issue.property:jira": "Create and update issue properties.",
+              "write:issue.remote-link:jira": "Create and update issue remote links.",
+              "write:issue.time-tracking:jira": "Create and update issue time trackings.",
+              "write:issue.vote:jira": "Create and update issue votes.",
+              "write:issue.watcher:jira": "Create and update issue watchers.",
+              "write:issue:jira": "Create and update issues.",
+              "write:jira-work": "Create and edit issues in Jira, post comments, create worklogs, and delete issues.",
+              "write:permission-scheme:jira": "Create and update permission schemes.",
+              "write:permission:jira": "Create and update permissions.",
+              "write:project-category:jira": "Create and update project categories.",
+              "write:project-role:jira": "Create and update project roles.",
+              "write:project-version:jira": "Create and update project versions.",
+              "write:project.avatar:jira": "Create and update project avatars.",
+              "write:project.component:jira": "Create and update project components.",
+              "write:project.email:jira": "Create and update project emails.",
+              "write:project.feature:jira": "Save project features.",
+              "write:project.property:jira": "Create and update project properties.",
+              "write:project:jira": "Create and update projects.",
+              "write:screen-scheme:jira": "Create and update screen schemes.",
+              "write:screen-tab:jira": "Create and update screen tabs.",
+              "write:screen:jira": "Create and update screens.",
+              "write:screenable-field:jira": "Create and update screenable fields.",
+              "write:user-configuration:jira": "Create and update user configurations.",
+              "write:user.property:jira": "Create and update user properties.",
+              "write:webhook:jira": "Create and update webhooks.",
+              "write:workflow-scheme:jira": "Create and update workflow schemes.",
+              "write:workflow.property:jira": "Create and update workflow properties.",
+              "write:workflow:jira": "Create and update workflows."
+            },
+            "tokenUrl": "https://auth.atlassian.com/oauth/token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  }
+}

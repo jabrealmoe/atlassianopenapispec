@@ -1,0 +1,2895 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "ecosystem@atlassian.com"
+    },
+    "description": "Jira Cloud platform REST API documentation",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "termsOfService": "https://developer.atlassian.com/platform/marketplace/atlassian-developer-terms/",
+    "title": "The Jira Cloud platform REST API - projects (part 3 of 3)",
+    "version": "1001.0.0-SNAPSHOT-94e91f6947ecc63395c0d5a54f05005b6eab5a8a"
+  },
+  "externalDocs": {
+    "description": "Find out more about Atlassian products and services.",
+    "url": "http://www.atlassian.com"
+  },
+  "servers": [
+    {
+      "url": "https://your-domain.atlassian.net"
+    }
+  ],
+  "tags": [
+    {
+      "description": "This resource represents project categories. Use it to create, update, and delete project categories as well as obtain a list of all project categories and details of individual categories. For more information on managing project categories, see [Adding, assigning, and deleting project categories](https://confluence.atlassian.com/x/-A5WMg).",
+      "name": "Project categories"
+    },
+    {
+      "description": "This resource represents the email address used to send a project's notifications. Use it to get and set the [project's sender email address](https://confluence.atlassian.com/x/dolKLg).",
+      "name": "Project email"
+    },
+    {
+      "description": "This resource provides validation for project keys and names.",
+      "name": "Project key and name validation"
+    },
+    {
+      "description": "This resource represents project versions. Use it to get, get lists of, create, update, move, merge, and delete project versions. This resource also provides counts of issues by version.",
+      "name": "Project versions"
+    }
+  ],
+  "x-split": {
+    "strategy": "domain",
+    "group": "projects",
+    "part": 3,
+    "of": 3,
+    "tags": [
+      "Project versions",
+      "Project email",
+      "Project categories",
+      "Project key and name validation"
+    ]
+  },
+  "paths": {
+    "/rest/api/2/project/{projectId}/email": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the [project's sender email address](https://confluence.atlassian.com/x/dolKLg).\n\n**[Permissions](#permissions) required:** *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project.",
+        "operationId": "getProjectEmail",
+        "parameters": [
+          {
+            "description": "The project ID.",
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"emailAddress\":\"jira@example.customdomain.com\",\"emailAddressStatus\":[\"Email address or domain not verified.\"]}",
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectEmailAddress"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have permission to read project."
+          },
+          "404": {
+            "description": "Returned if the project or project's sender email address is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          }
+        ],
+        "summary": "Get project's sender email",
+        "tags": [
+          "Project email"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project.email:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Sets the [project's sender email address](https://confluence.atlassian.com/x/dolKLg).\n\nIf `emailAddress` is an empty string, the default email address is restored.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) or *Administer Projects* [project permission.](https://confluence.atlassian.com/x/yodKLg)",
+        "operationId": "updateProjectEmail",
+        "parameters": [
+          {
+            "description": "The project ID.",
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "emailAddress": "jira@example.atlassian.net"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ProjectEmailAddress"
+              }
+            }
+          },
+          "description": "The project's sender email address to be set.",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the project's sender email address is successfully set."
+          },
+          "400": {
+            "description": "Returned if the request is not valid, if the email address is not valid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have permission to administer the project."
+          },
+          "404": {
+            "description": "Returned if the project is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          }
+        ],
+        "summary": "Set project's sender email",
+        "tags": [
+          "Project email"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:project.email:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    },
+    "/rest/api/2/project/{projectIdOrKey}/version": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a [paginated](#pagination) list of all versions in a project. See the [Get project versions](#api-rest-api-2-project-projectIdOrKey-versions-get) resource if you want to get a full list of versions without pagination.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project.",
+        "operationId": "getProjectVersionsPaginated",
+        "parameters": [
+          {
+            "description": "The project ID or project key (case sensitive).",
+            "in": "path",
+            "name": "projectIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The index of the first item to return in a page of results (page offset).",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of items to return per page.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "[Order](#ordering) the results by a field:\n\n *  `description` Sorts by version description.\n *  `name` Sorts by version name.\n *  `releaseDate` Sorts by release date, starting with the oldest date. Versions with no release date are listed last.\n *  `sequence` Sorts by the order of appearance in the user interface.\n *  `startDate` Sorts by start date, starting with the oldest date. Versions with no start date are listed last.",
+            "in": "query",
+            "name": "orderBy",
+            "schema": {
+              "enum": [
+                "description",
+                "-description",
+                "+description",
+                "name",
+                "-name",
+                "+name",
+                "releaseDate",
+                "-releaseDate",
+                "+releaseDate",
+                "sequence",
+                "-sequence",
+                "+sequence",
+                "startDate",
+                "-startDate",
+                "+startDate"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter the results using a literal string. Versions with matching `name` or `description` are returned (case insensitive).",
+            "in": "query",
+            "name": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A list of status values used to filter the results by version status. This parameter accepts a comma-separated list. The status values are `released`, `unreleased`, and `archived`.",
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `issuesstatus` Returns the number of issues in each status category for each version.\n *  `operations` Returns actions that can be performed on the specified version.\n *  `driver` Returns the Atlassian account ID of the version driver.\n *  `approvers` Returns a list containing the approvers for this version.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"isLast\":false,\"maxResults\":2,\"nextPage\":\"https://your-domain.atlassian.net/rest/api/2/project/PR/version?startAt=2&maxResults=2\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/project/PR/version?startAt=0&maxResults=2\",\"startAt\":0,\"total\":7,\"values\":[{\"archived\":false,\"description\":\"An excellent version\",\"id\":\"10000\",\"name\":\"New Version 1\",\"overdue\":true,\"projectId\":10000,\"releaseDate\":\"2010-07-06\",\"released\":true,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\",\"userReleaseDate\":\"6/Jul/2010\"},{\"archived\":false,\"description\":\"Minor Bugfix version\",\"id\":\"10010\",\"issuesStatusForFixVersion\":{\"done\":100,\"inProgress\":20,\"toDo\":10,\"unmapped\":0},\"name\":\"Next Version\",\"overdue\":false,\"projectId\":10000,\"released\":false,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10010\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/PageBeanVersion"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "404": {
+            "description": "Returned if the project is not found or the user does not have permission to view it."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get project versions paginated",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/project/{projectIdOrKey}/versions": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns all versions in a project. The response is not paginated. Use [Get project versions paginated](#api-rest-api-2-project-projectIdOrKey-version-get) if you want to get the versions in a project with pagination.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project.",
+        "operationId": "getProjectVersions",
+        "parameters": [
+          {
+            "description": "The project ID or project key (case sensitive).",
+            "in": "path",
+            "name": "projectIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information in the response. This parameter accepts `operations`, which returns actions that can be performed on the version.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"archived\":false,\"description\":\"An excellent version\",\"id\":\"10000\",\"name\":\"New Version 1\",\"overdue\":true,\"projectId\":10000,\"releaseDate\":1278385482288,\"releaseDateSet\":true,\"released\":true,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\",\"startDateSet\":false,\"userReleaseDate\":\"6/Jul/2010\"},{\"archived\":false,\"description\":\"Minor Bugfix version\",\"id\":\"10010\",\"issuesStatusForFixVersion\":{\"done\":100,\"inProgress\":20,\"toDo\":10,\"unmapped\":0},\"name\":\"Next Version\",\"overdue\":false,\"projectId\":10000,\"releaseDateSet\":false,\"released\":false,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10010\",\"startDateSet\":false}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Version"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "404": {
+            "description": "Returned if the project is not found or the user does not have permission to view it."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get project versions",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/projectCategory": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns all project categories.\n\n**[Permissions](#permissions) required:** Permission to access Jira.",
+        "operationId": "getAllProjectCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"description\":\"First Project Category\",\"id\":\"10000\",\"name\":\"FIRST\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/projectCategory/10000\"},{\"description\":\"Second Project Category\",\"id\":\"10001\",\"name\":\"SECOND\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/projectCategory/10001\"}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectCategory"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get all project categories",
+        "tags": [
+          "Project categories"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-category:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Creates a project category.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "createProjectCategory",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "description": "Created Project Category",
+                "name": "CREATED"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCategory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"Created Project Category\",\"id\":\"10100\",\"name\":\"CREATED\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/projectCategory/10100\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectCategory"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  `name` is not provided or exceeds 255 characters.\n *  `description` exceeds 1000 characters."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "409": {
+            "description": "Returned if the project category name is in use."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          }
+        ],
+        "summary": "Create project category",
+        "tags": [
+          "Project categories"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:project-category:jira",
+              "read:project-category:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/projectCategory/{id}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a project category.\n\n**[Permissions](#permissions) required:** Permission to access Jira.",
+        "operationId": "getProjectCategoryById",
+        "parameters": [
+          {
+            "description": "The ID of the project category.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"First Project Category\",\"id\":\"10000\",\"name\":\"FIRST\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/projectCategory/10000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectCategory"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if the project category is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get project category by ID",
+        "tags": [
+          "Project categories"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-category:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Updates a project category.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "updateProjectCategory",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "description": "Updated Project Category",
+                "name": "UPDATED"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCategory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"description\":\"Updated Project Category\",\"id\":\"10100\",\"name\":\"UPDATED\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/projectCategory/10100\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/UpdatedProjectCategory"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  `name` has been modified and exceeds 255 characters.\n *  `description` has been modified and exceeds 1000 characters."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "description": "Returned if the project category is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          }
+        ],
+        "summary": "Update project category",
+        "tags": [
+          "Project categories"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-category:jira",
+              "write:project-category:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes a project category.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "removeProjectCategory",
+        "parameters": [
+          {
+            "description": "ID of the project category to delete.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "description": "Returned if the project category is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          }
+        ],
+        "summary": "Delete project category",
+        "tags": [
+          "Project categories"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:project-category:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/projectvalidate/key": {
+      "get": {
+        "deprecated": false,
+        "description": "Validates a project key by confirming the key is a valid string and not in use.\n\n**[Permissions](#permissions) required:** None.",
+        "operationId": "validateProjectKey",
+        "parameters": [
+          {
+            "description": "The project key.",
+            "in": "query",
+            "name": "key",
+            "schema": {
+              "example": "HSP",
+              "type": "string"
+            },
+            "x-showInExample": "true"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[],\"errors\":{\"projectKey\":\"A project with that project key already exists.\"}}",
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Validate project key",
+        "tags": [
+          "Project key and name validation"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/projectvalidate/validProjectKey": {
+      "get": {
+        "deprecated": false,
+        "description": "Validates a project key and, if the key is invalid or in use, generates a valid random string for the project key.\n\n**[Permissions](#permissions) required:** None.",
+        "operationId": "getValidProjectKey",
+        "parameters": [
+          {
+            "description": "The project key.",
+            "in": "query",
+            "name": "key",
+            "schema": {
+              "example": "HSP",
+              "type": "string"
+            },
+            "x-showInExample": "true"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "\"VPNE\"",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get valid project key",
+        "tags": [
+          "Project key and name validation"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/projectvalidate/validProjectName": {
+      "get": {
+        "deprecated": false,
+        "description": "Checks that a project name isn't in use. If the name isn't in use, the passed string is returned. If the name is in use, this operation attempts to generate a valid project name based on the one supplied, usually by adding a sequence number. If a valid project name cannot be generated, a 404 response is returned.\n\n**[Permissions](#permissions) required:** None.",
+        "operationId": "getValidProjectName",
+        "parameters": [
+          {
+            "description": "The project name.",
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "\"Valid Project Name Example\"",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if a valid project name cannot be generated."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get valid project name",
+        "tags": [
+          "Project key and name validation"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/version": {
+      "post": {
+        "deprecated": false,
+        "description": "Creates a project version.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) or *Administer Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project the version is added to.",
+        "operationId": "createVersion",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "archived": false,
+                "description": "An excellent version",
+                "name": "New Version 1",
+                "projectId": 10000,
+                "releaseDate": "2010-07-06",
+                "released": true
+              },
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "example": "{\"archived\":false,\"description\":\"An excellent version\",\"id\":\"10000\",\"name\":\"New Version 1\",\"project\":\"PXA\",\"projectId\":10000,\"releaseDate\":\"2010-07-06\",\"released\":true,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\",\"userReleaseDate\":\"6/Jul/2010\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the project is not found.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          },
+          {}
+        ],
+        "summary": "Create version",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:project-version:jira",
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    },
+    "/rest/api/2/version/{id}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a project version.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project containing the version.",
+        "operationId": "getVersion",
+        "parameters": [
+          {
+            "description": "The ID of the version.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information about version in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `operations` Returns the list of operations available for this version.\n *  `issuesstatus` Returns the count of issues in this version for each of the status categories *to do*, *in progress*, *done*, and *unmapped*. The *unmapped* property represents the number of issues with a status other than *to do*, *in progress*, and *done*.\n *  `driver` Returns the Atlassian account ID of the version driver.\n *  `approvers` Returns a list containing the Atlassian account IDs of approvers for this version.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"archived\":false,\"description\":\"An excellent version\",\"id\":\"10000\",\"name\":\"New Version 1\",\"overdue\":true,\"projectId\":10000,\"releaseDate\":\"2010-07-06\",\"released\":true,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\",\"userReleaseDate\":\"6/Jul/2010\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if the version is not found or the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get version",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Updates a project version.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) or *Administer Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that contains the version.",
+        "operationId": "updateVersion",
+        "parameters": [
+          {
+            "description": "The ID of the version.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "archived": false,
+                "description": "An excellent version",
+                "id": "10000",
+                "name": "New Version 1",
+                "overdue": true,
+                "projectId": 10000,
+                "releaseDate": "2010-07-06",
+                "released": true,
+                "self": "https://your-domain.atlassian.net/rest/api/~ver~/version/10000",
+                "userReleaseDate": "6/Jul/2010"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"archived\":false,\"description\":\"An excellent version\",\"id\":\"10000\",\"name\":\"New Version 1\",\"project\":\"PXA\",\"projectId\":10000,\"releaseDate\":\"2010-07-06\",\"released\":true,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\",\"userReleaseDate\":\"6/Jul/2010\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  the request is invalid.\n *  the user does not have the required permissions."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if the version is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          },
+          {}
+        ],
+        "summary": "Update version",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:project-version:jira",
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      },
+      "delete": {
+        "deprecated": true,
+        "description": "Deletes a project version.\n\nDeprecated, use [ Delete and replace version](#api-rest-api-2-version-id-removeAndSwap-post) that supports swapping version values in custom fields, in addition to the swapping for `fixVersion` and `affectedVersion` provided in this resource.\n\nAlternative versions can be provided to update issues that use the deleted version in `fixVersion` or `affectedVersion`. If alternatives are not provided, occurrences of `fixVersion` and `affectedVersion` that contain the deleted version are cleared.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) or *Administer Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that contains the version.",
+        "operationId": "deleteVersion",
+        "parameters": [
+          {
+            "description": "The ID of the version.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the version to update `fixVersion` to when the field contains the deleted version. The replacement version must be in the same project as the version being deleted and cannot be the version being deleted.",
+            "in": "query",
+            "name": "moveFixIssuesTo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the version to update `affectedVersion` to when the field contains the deleted version. The replacement version must be in the same project as the version being deleted and cannot be the version being deleted.",
+            "in": "query",
+            "name": "moveAffectedIssuesTo",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the version is deleted."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if:\n\n *  the authentication credentials are incorrect.\n *  the user does not have the required permissions."
+          },
+          "404": {
+            "description": "Returned if the version is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete version",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    },
+    "/rest/api/2/version/{id}/mergeto/{moveIssuesTo}": {
+      "put": {
+        "deprecated": false,
+        "description": "Merges two project versions. The merge is completed by deleting the version specified in `id` and replacing any occurrences of its ID in `fixVersion` with the version ID specified in `moveIssuesTo`.\n\nConsider using [ Delete and replace version](#api-rest-api-2-version-id-removeAndSwap-post) instead. This resource supports swapping version values in `fixVersion`, `affectedVersion`, and custom fields.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) or *Administer Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that contains the version.",
+        "operationId": "mergeVersions",
+        "parameters": [
+          {
+            "description": "The ID of the version to delete.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the version to merge into.",
+            "in": "path",
+            "name": "moveIssuesTo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the version is deleted."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if:\n\n *  the authentication credentials are incorrect or missing.\n *  the user does not have the required permissions."
+          },
+          "404": {
+            "description": "Returned if the version to be deleted or the version to merge to are not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          },
+          {}
+        ],
+        "summary": "Merge versions",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:project-version:jira",
+              "write:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    },
+    "/rest/api/2/version/{id}/move": {
+      "post": {
+        "deprecated": false,
+        "description": "Modifies the version's sequence within the project, which affects the display order of the versions in Jira.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* project permission for the project that contains the version.",
+        "operationId": "moveVersion",
+        "parameters": [
+          {
+            "description": "The ID of the version to be moved.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "after": "https://your-domain.atlassian.net/rest/api/~ver~/version/10000"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/VersionMoveBean"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"archived\":false,\"description\":\"An excellent version\",\"id\":\"10000\",\"name\":\"New Version 1\",\"overdue\":true,\"projectId\":10000,\"releaseDate\":\"2010-07-06\",\"released\":true,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\",\"userReleaseDate\":\"6/Jul/2010\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  no body parameters are provided.\n *  `after` and `position` are provided.\n *  `position` is invalid."
+          },
+          "401": {
+            "description": "Returned if:\n\n *  the authentication credentials are incorrect or missing\n *  the user does not have the required commissions."
+          },
+          "404": {
+            "description": "Returned if the version or move after version are not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          },
+          {}
+        ],
+        "summary": "Move version",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:project-version:jira",
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    },
+    "/rest/api/2/version/{id}/relatedIssueCounts": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the following counts for a version:\n\n *  Number of issues where the `fixVersion` is set to the version.\n *  Number of issues where the `affectedVersion` is set to the version.\n *  Number of issues where a version custom field is set to the version.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* project permission for the project that contains the version.",
+        "operationId": "getVersionRelatedIssues",
+        "parameters": [
+          {
+            "description": "The ID of the version.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"customFieldUsage\":[{\"customFieldId\":10000,\"fieldName\":\"Field1\",\"issueCountWithVersionInCustomField\":2},{\"customFieldId\":10010,\"fieldName\":\"Field2\",\"issueCountWithVersionInCustomField\":3}],\"issueCountWithCustomFieldsShowingVersion\":54,\"issuesAffectedCount\":101,\"issuesFixedCount\":23,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/VersionIssueCounts"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the version is not found.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get version's related issues count",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field:jira",
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/version/{id}/relatedwork": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns related work items for the given version id.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project containing the version.",
+        "operationId": "getRelatedWork",
+        "parameters": [
+          {
+            "description": "The ID of the version.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"category\":\"Design\",\"issueId\":10001,\"relatedWorkId\":\"fabcdef6-7878-1234-beaf-43211234abcd\",\"title\":\"Design link\",\"url\":\"https://www.atlassian.com\"},{\"category\":\"Communications\",\"relatedWorkId\":\"fabcdef6-7878-1234-beaf-43211234abce\",\"title\":\"Chat application\",\"url\":\"https://www.atlassian.com\"},{\"category\":\"External Link\",\"issueId\":10003,\"relatedWorkId\":\"fabcdef6-7878-1234-beaf-43211234abcf\",\"url\":\"https://www.atlassian.com\"}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/VersionRelatedWork"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if the version is not found or the user does not have the necessary permission."
+          },
+          "500": {
+            "description": "Returned if reading related work fails"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get related work",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Updates the given related work. You can only update generic link related works via Rest APIs. Any archived version related works can't be edited.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Resolve issues:* and *Edit issues* [Managing project permissions](https://confluence.atlassian.com/adminjiraserver/managing-project-permissions-938847145.html) for the project that contains the version.",
+        "operationId": "updateRelatedWork",
+        "parameters": [
+          {
+            "description": "The ID of the version to update the related work on. For the related work id, pass it to the input JSON.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "category": "Design",
+                "relatedWorkId": "fabcdef6-7878-1234-beaf-43211234abcd",
+                "title": "Design link",
+                "url": "https://www.atlassian.com"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/VersionRelatedWork"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"category\":\"Design\",\"relatedWorkId\":\"fabcdef6-7878-1234-beaf-43211234abcd\",\"title\":\"Design link\",\"url\":\"https://www.atlassian.com\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/VersionRelatedWork"
+                }
+              }
+            },
+            "description": "Returned if the request is successful together with updated related work."
+          },
+          "400": {
+            "description": "Returned if the request data is invalid"
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "403": {
+            "description": "Returned if the user does not have the required permissions."
+          },
+          "404": {
+            "description": "Returned if the version or the related work is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Update related work",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Creates a related work for the given version. You can only create a generic link type of related works via this API. relatedWorkId will be auto-generated UUID, that does not need to be provided.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Resolve issues:* and *Edit issues* [Managing project permissions](https://confluence.atlassian.com/adminjiraserver/managing-project-permissions-938847145.html) for the project that contains the version.",
+        "operationId": "createRelatedWork",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "category": "Design",
+                "title": "Design link",
+                "url": "https://www.atlassian.com"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/VersionRelatedWork"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "example": "{\"category\":\"Design\",\"relatedWorkId\":\"fabcdef6-7878-1234-beaf-43211234abcd\",\"title\":\"Design link\",\"url\":\"https://www.atlassian.com\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/VersionRelatedWork"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the required permissions."
+          },
+          "404": {
+            "description": "Returned if the version is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Create related work",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    },
+    "/rest/api/2/version/{id}/removeAndSwap": {
+      "post": {
+        "deprecated": false,
+        "description": "Deletes a project version.\n\nAlternative versions can be provided to update issues that use the deleted version in `fixVersion`, `affectedVersion`, or any version picker custom fields. If alternatives are not provided, occurrences of `fixVersion`, `affectedVersion`, and any version picker custom field, that contain the deleted version, are cleared. Any replacement version must be in the same project as the version being deleted and cannot be the version being deleted.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) or *Administer Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that contains the version.",
+        "operationId": "deleteAndReplaceVersion",
+        "parameters": [
+          {
+            "description": "The ID of the version.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAndReplaceVersionBean"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the version is deleted."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the version to delete is not found.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-project"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete and replace version",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-project"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:project-version:jira",
+              "write:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    },
+    "/rest/api/2/version/{id}/unresolvedIssueCount": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns counts of the issues and unresolved issues for the project version.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* project permission for the project that contains the version.",
+        "operationId": "getVersionUnresolvedIssues",
+        "parameters": [
+          {
+            "description": "The ID of the version.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"issuesCount\":30,\"issuesUnresolvedCount\":23,\"self\":\"https://your-domain.atlassian.net/rest/api/2/version/10000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/VersionUnresolvedIssuesCount"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the version is not found.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get version's unresolved issues count",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project-version:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/version/{versionId}/relatedwork/{relatedWorkId}": {
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes the given related work for the given version.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Resolve issues:* and *Edit issues* [Managing project permissions](https://confluence.atlassian.com/adminjiraserver/managing-project-permissions-938847145.html) for the project that contains the version.",
+        "operationId": "deleteRelatedWork",
+        "parameters": [
+          {
+            "description": "The ID of the version that the target related work belongs to.",
+            "in": "path",
+            "name": "versionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the related work to delete.",
+            "in": "path",
+            "name": "relatedWorkId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the related work is deleted."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if\n\nthe authentication credentials are incorrect."
+          },
+          "403": {
+            "description": "Returned if the user does not have the required permissions."
+          },
+          "404": {
+            "description": "Returned if the version/related work is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete related work",
+        "tags": [
+          "Project versions"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "PROJECT_ADMIN"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomFieldReplacement": {
+        "additionalProperties": false,
+        "description": "Details about the replacement for a deleted version.",
+        "properties": {
+          "customFieldId": {
+            "description": "The ID of the custom field in which to replace the version number.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "moveTo": {
+            "description": "The version number to use as a replacement for the deleted version.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "DeleteAndReplaceVersionBean": {
+        "additionalProperties": false,
+        "properties": {
+          "customFieldReplacementList": {
+            "description": "An array of custom field IDs (`customFieldId`) and version IDs (`moveTo`) to update when the fields contain the deleted version.",
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldReplacement"
+            },
+            "type": "array"
+          },
+          "moveAffectedIssuesTo": {
+            "description": "The ID of the version to update `affectedVersion` to when the field contains the deleted version.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "moveFixIssuesTo": {
+            "description": "The ID of the version to update `fixVersion` to when the field contains the deleted version.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ErrorCollection": {
+        "additionalProperties": false,
+        "description": "Error messages from an operation.",
+        "properties": {
+          "errorMessages": {
+            "description": "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "errors": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The list of errors by parameter returned by the operation. For example,\"projectKey\": \"Project keys must start with an uppercase letter, followed by one or more uppercase alphanumeric characters.\"",
+            "type": "object"
+          },
+          "status": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PageBeanVersion": {
+        "additionalProperties": false,
+        "description": "A page of items.",
+        "properties": {
+          "isLast": {
+            "description": "Whether this is the last page.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "maxResults": {
+            "description": "The maximum number of items that could be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "nextPage": {
+            "description": "If there is another page of results, the URL of the next page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startAt": {
+            "description": "The index of the first item returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "The list of items.",
+            "items": {
+              "$ref": "#/components/schemas/Version"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectCategory": {
+        "additionalProperties": false,
+        "description": "A project category.",
+        "properties": {
+          "description": {
+            "description": "The description of the project category.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the project category. Required on create, optional on update.",
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the project category.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectEmailAddress": {
+        "additionalProperties": false,
+        "description": "A project's sender email address.",
+        "properties": {
+          "emailAddress": {
+            "description": "The email address.",
+            "type": "string"
+          },
+          "emailAddressStatus": {
+            "description": "When using a custom domain, the status of the email address.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "SimpleLink": {
+        "additionalProperties": false,
+        "description": "Details about the operations available in this version.",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "iconClass": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "styleClass": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "weight": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "link"
+        }
+      },
+      "UpdatedProjectCategory": {
+        "additionalProperties": false,
+        "description": "A project category.",
+        "properties": {
+          "description": {
+            "description": "The name of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The description of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the project category.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Version": {
+        "additionalProperties": false,
+        "description": "Details about a project version.",
+        "properties": {
+          "approvers": {
+            "description": "If the expand option `approvers` is used, returns a list containing the approvers for this version.",
+            "items": {
+              "$ref": "#/components/schemas/VersionApprover"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "archived": {
+            "description": "Indicates that the version is archived. Optional when creating or updating a version.",
+            "type": "boolean"
+          },
+          "description": {
+            "description": "The description of the version. Optional when creating or updating a version. The maximum size is 16,384 bytes.",
+            "type": "string"
+          },
+          "driver": {
+            "description": "The Atlassian account ID of the version driver. Optional when creating or updating a version. If the expand option `driver` is used, returns the Atlassian account ID of the driver.",
+            "type": "string"
+          },
+          "expand": {
+            "description": "Use [expand](em>#expansion) to include additional information about version in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `operations` Returns the list of operations available for this version.\n *  `issuesstatus` Returns the count of issues in this version for each of the status categories *to do*, *in progress*, *done*, and *unmapped*. The *unmapped* property contains a count of issues with a status other than *to do*, *in progress*, and *done*.\n *  `driver` Returns the Atlassian account ID of the version driver.\n *  `approvers` Returns a list containing approvers for this version.\n\nOptional for create and update.",
+            "type": "string",
+            "xml": {
+              "attribute": true
+            }
+          },
+          "id": {
+            "description": "The ID of the version.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "issuesStatusForFixVersion": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionIssuesStatus"
+              }
+            ],
+            "description": "If the expand option `issuesstatus` is used, returns the count of issues in this version for each of the status categories *to do*, *in progress*, *done*, and *unmapped*. The *unmapped* property contains a count of issues with a status other than *to do*, *in progress*, and *done*.",
+            "readOnly": true
+          },
+          "moveUnfixedIssuesTo": {
+            "description": "The URL of the self link to the version to which all unfixed issues are moved when a version is released. Not applicable when creating a version. Optional when updating a version.",
+            "format": "uri",
+            "type": "string"
+          },
+          "name": {
+            "description": "The unique name of the version. Required when creating a version. Optional when updating a version. The maximum length is 255 characters.",
+            "type": "string"
+          },
+          "operations": {
+            "description": "If the expand option `operations` is used, returns the list of operations available for this version.",
+            "items": {
+              "$ref": "#/components/schemas/SimpleLink"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "overdue": {
+            "description": "Indicates that the version is overdue.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "project": {
+            "description": "Deprecated. Use `projectId`.",
+            "type": "string"
+          },
+          "projectId": {
+            "description": "The ID of the project to which this version is attached. Required when creating a version. Not applicable when updating a version.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "releaseDate": {
+            "description": "The release date of the version. Expressed in ISO 8601 format (yyyy-mm-dd). Optional when creating or updating a version.",
+            "format": "date",
+            "type": "string"
+          },
+          "released": {
+            "description": "Indicates that the version is released. If the version is released a request to release again is ignored. Not applicable when creating a version. Optional when updating a version.",
+            "type": "boolean"
+          },
+          "self": {
+            "description": "The URL of the version.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startDate": {
+            "description": "The start date of the version. Expressed in ISO 8601 format (yyyy-mm-dd). Optional when creating or updating a version.",
+            "format": "date",
+            "type": "string"
+          },
+          "userReleaseDate": {
+            "description": "The date on which work on this version is expected to finish, expressed in the instance's *Day/Month/Year Format* date format.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "userStartDate": {
+            "description": "The date on which work on this version is expected to start, expressed in the instance's *Day/Month/Year Format* date format.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "version"
+        }
+      },
+      "VersionApprover": {
+        "additionalProperties": true,
+        "description": "Contains details about a version approver.",
+        "properties": {
+          "accountId": {
+            "description": "The Atlassian account ID of the approver.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "declineReason": {
+            "description": "A description of why the user is declining the approval.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "description": {
+            "description": "A description of what the user is approving within the specified version.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "The status of the approval, which can be *PENDING*, *APPROVED*, or *DECLINED*",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "VersionIssueCounts": {
+        "additionalProperties": false,
+        "description": "Various counts of issues within a version.",
+        "properties": {
+          "customFieldUsage": {
+            "description": "List of custom fields using the version.",
+            "items": {
+              "$ref": "#/components/schemas/VersionUsageInCustomField"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "issueCountWithCustomFieldsShowingVersion": {
+            "description": "Count of issues where a version custom field is set to the version.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "issuesAffectedCount": {
+            "description": "Count of issues where the `affectedVersion` is set to the version.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "issuesFixedCount": {
+            "description": "Count of issues where the `fixVersion` is set to the version.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "self": {
+            "description": "The URL of these count details.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "version"
+        }
+      },
+      "VersionIssuesStatus": {
+        "additionalProperties": true,
+        "description": "Counts of the number of issues in various statuses.",
+        "properties": {
+          "done": {
+            "description": "Count of issues with status *done*.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "inProgress": {
+            "description": "Count of issues with status *in progress*.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "toDo": {
+            "description": "Count of issues with status *to do*.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "unmapped": {
+            "description": "Count of issues with a status other than *to do*, *in progress*, and *done*.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "VersionMoveBean": {
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "The URL (self link) of the version after which to place the moved version. Cannot be used with `position`.",
+            "format": "uri",
+            "type": "string"
+          },
+          "position": {
+            "description": "An absolute position in which to place the moved version. Cannot be used with `after`.",
+            "enum": [
+              "Earlier",
+              "Later",
+              "First",
+              "Last"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "version"
+        }
+      },
+      "VersionRelatedWork": {
+        "additionalProperties": false,
+        "description": "Associated related work to a version",
+        "properties": {
+          "category": {
+            "description": "The category of the related work",
+            "type": "string"
+          },
+          "issueId": {
+            "description": "The ID of the issue associated with the related work (if there is one). Cannot be updated via the Rest API.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "relatedWorkId": {
+            "description": "The id of the related work. For the native release note related work item, this will be null, and Rest API does not support updating it.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "title": {
+            "description": "The title of the related work",
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL of the related work. Will be null for the native release note related work item, but is otherwise required.",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category"
+        ],
+        "type": "object"
+      },
+      "VersionUnresolvedIssuesCount": {
+        "additionalProperties": false,
+        "description": "Count of a version's unresolved issues.",
+        "properties": {
+          "issuesCount": {
+            "description": "Count of issues.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "issuesUnresolvedCount": {
+            "description": "Count of unresolved issues.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "self": {
+            "description": "The URL of these count details.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "version"
+        }
+      },
+      "VersionUsageInCustomField": {
+        "additionalProperties": false,
+        "description": "List of custom fields using the version.",
+        "properties": {
+          "customFieldId": {
+            "description": "The ID of the custom field.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "fieldName": {
+            "description": "The name of the custom field.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "issueCountWithVersionInCustomField": {
+            "description": "Count of the issues where the custom field contains the version.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "description": "You can access this resource via basic auth.",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "OAuth2": {
+        "description": "OAuth2 scopes for Jira",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.atlassian.com/authorize",
+            "scopes": {
+              "delete:async-task:jira": "Delete asynchronous task.",
+              "delete:attachment:jira": "Delete issue attachments.",
+              "delete:avatar:jira": "Delete system and custom avatars.",
+              "delete:comment.property:jira": "Delete issue comment properties.",
+              "delete:comment:jira": "Delete issue comments.",
+              "delete:dashboard.property:jira": "Delete dashboard properties.",
+              "delete:dashboard:jira": "Delete dashboards.",
+              "delete:field-configuration-scheme:jira": "Delete field configuration schemes.",
+              "delete:field-configuration:jira": "Delete field configurations.",
+              "delete:field.option:jira": "Delete field options.",
+              "delete:field:jira": "Delete fields.",
+              "delete:filter.column:jira": "Delete filter columns.",
+              "delete:filter:jira": "Delete filters.",
+              "delete:group:jira": "Delete user groups.",
+              "delete:issue-link-type:jira": "Delete issue link types.",
+              "delete:issue-link:jira": "Delete issue links.",
+              "delete:issue-type-scheme:jira": "Delete issue type schemes.",
+              "delete:issue-type-screen-scheme:jira": "Delete issue type screen schemes.",
+              "delete:issue-type.property:jira": "Delete issue type properties.",
+              "delete:issue-type:jira": "Delete issue types.",
+              "delete:issue-worklog.property:jira": "Delete issue worklog properties.",
+              "delete:issue-worklog:jira": "Delete issue worklogs.",
+              "delete:issue.property:jira": "Delete issue properties.",
+              "delete:issue.remote-link:jira": "Delete issue remote links.",
+              "delete:issue:jira": "Delete issues.",
+              "delete:permission-scheme:jira": "Delete permission schemes.",
+              "delete:permission:jira": "Delete permissions.",
+              "delete:project-category:jira": "Delete project categories.",
+              "delete:project-role:jira": "Delete project roles.",
+              "delete:project-version:jira": "Delete project versions.",
+              "delete:project.avatar:jira": "Delete project avatars.",
+              "delete:project.component:jira": "Delete project components.",
+              "delete:project.property:jira": "Delete project properties.",
+              "delete:project:jira": "Delete projects and their details, such as issue types, project lead, and avatars.",
+              "delete:screen-scheme:jira": "Delete screen schemes.",
+              "delete:screen-tab:jira": "Delete screen tabs.",
+              "delete:screen:jira": "Delete screens.",
+              "delete:screenable-field:jira": "Delete screenable fields.",
+              "delete:user-configuration:jira": "Delete user configurations.",
+              "delete:user.property:jira": "Delete user properties.",
+              "delete:webhook:jira": "Delete webhooks.",
+              "delete:workflow-scheme:jira": "Delete workflow schemes.",
+              "delete:workflow.property:jira": "Delete workflow properties.",
+              "delete:workflow:jira": "Delete workflows.",
+              "manage:jira-configuration": "Configure Jira settings that require the Jira administrators permission, for example, create projects and custom fields, view workflows, manage issue link types.",
+              "manage:jira-project": "Create and edit project settings and create new project-level objects, for example, versions, components.",
+              "manage:jira-webhook": "Manage Jira webhooks. Enables an OAuth app to register and unregister dynamic webhooks in Jira. It also provides for fetching of registered webhooks.",
+              "read:app-data:jira": "Read app data.",
+              "read:application-role:jira": "View application roles.",
+              "read:attachment:jira": "View issue attachments.",
+              "read:audit-log:jira": "View audit logs.",
+              "read:avatar:jira": "View system and custom avatars.",
+              "read:comment.property:jira": "View issue comment properties.",
+              "read:comment:jira": "View issue comments.",
+              "read:custom-field-contextual-configuration:jira": "Read custom field contextual configurations.",
+              "read:dashboard.property:jira": "View dashboard properties.",
+              "read:dashboard:jira": "View dashboards.",
+              "read:email-address:jira": "View email addresses of all users regardless of the user's profile visibility settings.",
+              "read:field-configuration-scheme:jira": "View field configuration schemes.",
+              "read:field-configuration:jira": "Read field configurations.",
+              "read:field.default-value:jira": "View field default values.",
+              "read:field.option:jira": "View field options.",
+              "read:field.options:jira": "Read field options.",
+              "read:field:jira": "View fields.",
+              "read:filter.column:jira": "View filter columns.",
+              "read:filter.default-share-scope:jira": "View filter default share scopes.",
+              "read:filter:jira": "View filters.",
+              "read:group:jira": "View user groups.",
+              "read:instance-configuration:jira": "View instance configurations.",
+              "read:issue-details:jira": "View issue details.",
+              "read:issue-event:jira": "Read issue events.",
+              "read:issue-field-values:jira": "View issue field valueses.",
+              "read:issue-link-type:jira": "View issue link types.",
+              "read:issue-link:jira": "View issue links.",
+              "read:issue-meta:jira": "View issue meta.",
+              "read:issue-security-level:jira": "View issue security levels.",
+              "read:issue-security-scheme:jira": "View issue security schemes.",
+              "read:issue-status:jira": "View issue statuses.",
+              "read:issue-type-hierarchy:jira": "Read issue type hierarchies.",
+              "read:issue-type-scheme:jira": "View issue type schemes.",
+              "read:issue-type-screen-scheme:jira": "View issue type screen schemes.",
+              "read:issue-type.property:jira": "View issue type properties.",
+              "read:issue-type:jira": "View issue types.",
+              "read:issue-worklog.property:jira": "View issue worklog properties.",
+              "read:issue-worklog:jira": "View issue worklogs.",
+              "read:issue.changelog:jira": "View issue changelogs.",
+              "read:issue.property:jira": "View issue properties.",
+              "read:issue.remote-link:jira": "View issue remote links.",
+              "read:issue.time-tracking:jira": "View issue time trackings.",
+              "read:issue.transition:jira": "View issue transitions.",
+              "read:issue.vote:jira": "View issue votes.",
+              "read:issue.votes:jira": "View issue voteses.",
+              "read:issue.watcher:jira": "View issue watchers.",
+              "read:issue:jira": "View issues.",
+              "read:jira-expressions:jira": "View jira expressions.",
+              "read:jira-user": "View user information in Jira that you have access to, including usernames, email addresses, and avatars.",
+              "read:jira-work": "Read project and issue data. Search for issues and objects associated with issues (such as attachments and worklogs).",
+              "read:jql:jira": "View JQL.",
+              "read:label:jira": "View labels.",
+              "read:license:jira": "View licenses.",
+              "read:notification-scheme:jira": "View notification schemes.",
+              "read:permission-scheme:jira": "View permission schemes.",
+              "read:permission:jira": "View permissions.",
+              "read:priority:jira": "View priorities.",
+              "read:project-category:jira": "View project categories.",
+              "read:project-role:jira": "View project roles.",
+              "read:project-type:jira": "View project types.",
+              "read:project-version:jira": "View project versions.",
+              "read:project.avatar:jira": "Read project avatars.",
+              "read:project.component:jira": "View project components.",
+              "read:project.email:jira": "View project emails.",
+              "read:project.feature:jira": "Read project features.",
+              "read:project.property:jira": "View project properties.",
+              "read:project:jira": "View projects.",
+              "read:resolution:jira": "View resolutions.",
+              "read:role:jira": "View roles.",
+              "read:screen-field:jira": "View screen fields.",
+              "read:screen-scheme:jira": "View screen schemes.",
+              "read:screen-tab:jira": "View screen tabs.",
+              "read:screen:jira": "View screens.",
+              "read:screenable-field:jira": "View screenable fields.",
+              "read:status:jira": "View statuses.",
+              "read:user-configuration:jira": "View user configurations.",
+              "read:user.columns:jira": "View user columnses.",
+              "read:user.property:jira": "View user properties.",
+              "read:user:jira": "View users.",
+              "read:webhook:jira": "View webhooks.",
+              "read:workflow-scheme:jira": "View workflow schemes.",
+              "read:workflow.property:jira": "View workflow properties.",
+              "read:workflow:jira": "View workflows.",
+              "send:notification:jira": "Send notifications.",
+              "validate:jql:jira": "Validate JQL.",
+              "write:app-data:jira": "Write app data.",
+              "write:attachment:jira": "Create and update issue attachments.",
+              "write:avatar:jira": "Create and update system and custom avatars.",
+              "write:comment.property:jira": "Create and update issue comment properties.",
+              "write:comment:jira": "Create and update issue comments.",
+              "write:custom-field-contextual-configuration:jira": "Save custom field contextual configurations.",
+              "write:dashboard.property:jira": "Create and update dashboard properties.",
+              "write:dashboard:jira": "Create and update dashboards.",
+              "write:field-configuration-scheme:jira": "Create and update field configuration schemes.",
+              "write:field-configuration:jira": "Save field configurations.",
+              "write:field.default-value:jira": "Create and update field default values.",
+              "write:field.option:jira": "Create and update field options.",
+              "write:field:jira": "Create and update fields.",
+              "write:filter.column:jira": "Create and update filter columns.",
+              "write:filter.default-share-scope:jira": "Create and update filter default share scopes.",
+              "write:filter:jira": "Create and update filters.",
+              "write:group:jira": "Create and update user groups.",
+              "write:instance-configuration:jira": "Create and update instance configurations.",
+              "write:issue-link-type:jira": "Create and update issue link types.",
+              "write:issue-link:jira": "Create and update issue links.",
+              "write:issue-type-scheme:jira": "Create and update issue type schemes.",
+              "write:issue-type-screen-scheme:jira": "Create and update issue type screen schemes.",
+              "write:issue-type.property:jira": "Create and update issue type properties.",
+              "write:issue-type:jira": "Create and update issue types.",
+              "write:issue-worklog.property:jira": "Create and update issue worklog properties.",
+              "write:issue-worklog:jira": "Create and update issue worklogs.",
+              "write:issue.property:jira": "Create and update issue properties.",
+              "write:issue.remote-link:jira": "Create and update issue remote links.",
+              "write:issue.time-tracking:jira": "Create and update issue time trackings.",
+              "write:issue.vote:jira": "Create and update issue votes.",
+              "write:issue.watcher:jira": "Create and update issue watchers.",
+              "write:issue:jira": "Create and update issues.",
+              "write:jira-work": "Create and edit issues in Jira, post comments, create worklogs, and delete issues.",
+              "write:permission-scheme:jira": "Create and update permission schemes.",
+              "write:permission:jira": "Create and update permissions.",
+              "write:project-category:jira": "Create and update project categories.",
+              "write:project-role:jira": "Create and update project roles.",
+              "write:project-version:jira": "Create and update project versions.",
+              "write:project.avatar:jira": "Create and update project avatars.",
+              "write:project.component:jira": "Create and update project components.",
+              "write:project.email:jira": "Create and update project emails.",
+              "write:project.feature:jira": "Save project features.",
+              "write:project.property:jira": "Create and update project properties.",
+              "write:project:jira": "Create and update projects.",
+              "write:screen-scheme:jira": "Create and update screen schemes.",
+              "write:screen-tab:jira": "Create and update screen tabs.",
+              "write:screen:jira": "Create and update screens.",
+              "write:screenable-field:jira": "Create and update screenable fields.",
+              "write:user-configuration:jira": "Create and update user configurations.",
+              "write:user.property:jira": "Create and update user properties.",
+              "write:webhook:jira": "Create and update webhooks.",
+              "write:workflow-scheme:jira": "Create and update workflow schemes.",
+              "write:workflow.property:jira": "Create and update workflow properties.",
+              "write:workflow:jira": "Create and update workflows."
+            },
+            "tokenUrl": "https://auth.atlassian.com/oauth/token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  }
+}

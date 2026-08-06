@@ -1,0 +1,3993 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "ecosystem@atlassian.com"
+    },
+    "description": "Jira Cloud platform REST API documentation",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "termsOfService": "https://developer.atlassian.com/platform/marketplace/atlassian-developer-terms/",
+    "title": "The Jira Cloud platform REST API - issues (part 4 of 4)",
+    "version": "1001.0.0-SNAPSHOT-94e91f6947ecc63395c0d5a54f05005b6eab5a8a"
+  },
+  "externalDocs": {
+    "description": "Find out more about Atlassian products and services.",
+    "url": "http://www.atlassian.com"
+  },
+  "servers": [
+    {
+      "url": "https://your-domain.atlassian.net"
+    }
+  ],
+  "tags": [
+    {
+      "description": "This resource represents [issue link](#api-group-Issue-links) types. Use it to get, create, update, and delete link issue types as well as get lists of all link issue types.\n\nTo use it, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.",
+      "name": "Issue link types"
+    },
+    {
+      "description": "This resource represents links between issues. Use it to get, create, and delete links between issues.\n\nTo use it, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.",
+      "name": "Issue links"
+    },
+    {
+      "description": "This resource represents issue navigator settings. Use it to get and set issue navigator default columns.",
+      "name": "Issue navigator settings"
+    },
+    {
+      "description": "This resource represents Issue Redaction. Provides APIs to redact issue data.",
+      "name": "Issue redaction"
+    },
+    {
+      "description": "This resource represents [issue worklog](#api-group-Issue-worklogs) properties, which provides for storing custom data against an issue worklog. Use it to get, create, and delete issue worklog properties as well as obtain the keys of all properties on a issue worklog. Issue worklog properties are a type of [entity property](https://developer.atlassian.com/cloud/jira/platform/jira-entity-properties/).",
+      "name": "Issue worklog properties"
+    },
+    {
+      "description": "This resource represents issue worklogs. Use it to:\n\n *  get, create, update, and delete worklogs.\n *  obtain lists of updated or deleted worklogs.",
+      "name": "Issue worklogs"
+    }
+  ],
+  "x-split": {
+    "strategy": "domain",
+    "group": "issues",
+    "part": 4,
+    "of": 4,
+    "tags": [
+      "Issue worklogs",
+      "Issue worklog properties",
+      "Issue links",
+      "Issue link types",
+      "Issue redaction",
+      "Issue navigator settings"
+    ]
+  },
+  "paths": {
+    "/rest/api/2/issue/{issueIdOrKey}/worklog": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns worklogs for an issue (ordered by created time), starting from the oldest worklog or from the worklog started on or after a date and time.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** Workloads are only returned where the user has:\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "getIssueWorklog",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The index of the first item to return in a page of results (page offset).",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of items to return per page.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 5000,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The worklog start date and time, as a UNIX timestamp in milliseconds, after which worklogs are returned.",
+            "in": "query",
+            "name": "startedAfter",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The worklog start date and time, as a UNIX timestamp in milliseconds, before which worklogs are returned.",
+            "in": "query",
+            "name": "startedBefore",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information about worklogs in the response. This parameter accepts`properties`, which returns worklog properties.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "default": "",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"maxResults\":1,\"startAt\":0,\"total\":1,\"worklogs\":[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/PageOfWorklogs"
+                }
+              }
+            },
+            "description": "Returned if the request is successful"
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue is not found or the user does not have permission to view the issue.\n *  `startAt` or `maxResults` has non-numeric values.\n *  time tracking is disabled."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get issue worklogs",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:group:jira",
+              "read:issue-worklog:jira",
+              "read:issue-worklog.property:jira",
+              "read:project-role:jira",
+              "read:user:jira",
+              "read:avatar:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Adds a worklog to an issue.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* and *Work on issues* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
+        "operationId": "addWorklog",
+        "parameters": [
+          {
+            "description": "The ID or key the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether users watching the issue are notified by email.",
+            "in": "query",
+            "name": "notifyUsers",
+            "schema": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Defines how to update the issue's time estimate, the options are:\n\n *  `new` Sets the estimate to a specific value, defined in `newEstimate`.\n *  `leave` Leaves the estimate unchanged.\n *  `manual` Reduces the estimate by amount specified in `reduceBy`.\n *  `auto` Reduces the estimate by the value of `timeSpent` in the worklog.",
+            "in": "query",
+            "name": "adjustEstimate",
+            "schema": {
+              "default": "auto",
+              "enum": [
+                "new",
+                "leave",
+                "manual",
+                "auto"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "The value to set as the issue's remaining time estimate, as days (\\#d), hours (\\#h), or minutes (\\#m or \\#). For example, *2d*. Required when `adjustEstimate` is `new`.",
+            "in": "query",
+            "name": "newEstimate",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The amount to reduce the issue's remaining estimate by, as days (\\#d), hours (\\#h), or minutes (\\#m). For example, *2d*. Required when `adjustEstimate` is `manual`.",
+            "in": "query",
+            "name": "reduceBy",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information about work logs in the response. This parameter accepts `properties`, which returns worklog properties.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "default": "",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether the worklog entry should be added to the issue even if the issue is not editable, because jira.issue.editable set to false or missing. For example, the issue is closed. Connect and Forge app users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) can use this flag.",
+            "in": "query",
+            "name": "overrideEditableFlag",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "comment": "I did some work here.",
+                "started": "2021-01-17T12:34:00.000+0000",
+                "timeSpentSeconds": 12000,
+                "visibility": {
+                  "identifier": "276f955c-63d7-42c8-9520-92d01dca0625",
+                  "type": "group"
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/Worklog"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Worklog"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  `adjustEstimate` is set to `new` but `newEstimate` is not provided or is invalid.\n *  `adjustEstimate` is set to `manual` but `reduceBy` is not provided or is invalid.\n *  the user does not have permission to add the worklog.\n *  the request JSON is malformed."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if the issue is not found or the user does not have permission to view it."
+          },
+          "413": {
+            "description": "Returned if the per-issue limit has been breached for one of the following fields:\n\n *  worklogs\n *  attachments"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Add worklog",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue-worklog:jira",
+              "write:issue-worklog.property:jira",
+              "read:avatar:jira",
+              "read:group:jira",
+              "read:issue-worklog:jira",
+              "read:project-role:jira",
+              "read:user:jira",
+              "read:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "WRITE"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes a list of worklogs from an issue. This is an experimental API with limitations:\n\n *  You can't delete more than 5000 worklogs at once.\n *  No notifications will be sent for deleted worklogs.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project containing the issue.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  *Delete all worklogs*[ project permission](https://confluence.atlassian.com/x/yodKLg) to delete any worklog.\n *  If any worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "bulkDeleteWorklogs",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Defines how to update the issue's time estimate, the options are:\n\n *  `leave` Leaves the estimate unchanged.\n *  `auto` Reduces the estimate by the aggregate value of `timeSpent` across all worklogs being deleted.",
+            "in": "query",
+            "name": "adjustEstimate",
+            "schema": {
+              "default": "auto",
+              "enum": [
+                "leave",
+                "auto"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether the work log entries should be removed to the issue even if the issue is not editable, because jira.issue.editable set to false or missing. For example, the issue is closed. Connect and Forge app users with admin permission can use this flag.",
+            "in": "query",
+            "name": "overrideEditableFlag",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  5,
+                  10
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/WorklogIdsRequestBean"
+              }
+            }
+          },
+          "description": "A JSON object containing a list of worklog IDs.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if the bulk deletion request was partially successful, with a message indicating partial success."
+          },
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  `request` is not provided or is invalid\n *  the user does not have permission to delete the worklogs\n *  the number of worklogs being deleted exceeds the limit"
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue is not found or user does not have permission to view the issue\n *  at least one of the worklogs is not associated with the provided issue\n *  time tracking is disabled"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Bulk delete worklogs",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:issue-worklog:jira",
+              "delete:issue-worklog.property:jira",
+              "write:issue.time-tracking:jira",
+              "read:group:jira",
+              "read:issue-worklog:jira",
+              "read:project-role:jira",
+              "read:user:jira",
+              "read:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "DELETE"
+      }
+    },
+    "/rest/api/2/issue/{issueIdOrKey}/worklog/{id}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a worklog.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "getWorklog",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the worklog.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information about work logs in the response. This parameter accepts\n\n`properties`, which returns worklog properties.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "default": "",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}",
+                "schema": {
+                  "$ref": "#/components/schemas/Worklog"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue is not found or the user does not have permission to view it.\n *  the worklog is not found or the user does not have permission to view it.\n *  time tracking is disabled.\n\n."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get worklog",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:comment:jira",
+              "read:group:jira",
+              "read:issue-worklog:jira",
+              "read:issue-worklog.property:jira",
+              "read:project-role:jira",
+              "read:user:jira",
+              "read:avatar:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Updates a worklog.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  *Edit all worklogs*[ project permission](https://confluence.atlassian.com/x/yodKLg) to update any worklog or *Edit own worklogs* to update worklogs created by the user.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "updateWorklog",
+        "parameters": [
+          {
+            "description": "The ID or key the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the worklog.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether users watching the issue are notified by email.",
+            "in": "query",
+            "name": "notifyUsers",
+            "schema": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Defines how to update the issue's time estimate, the options are:\n\n *  `new` Sets the estimate to a specific value, defined in `newEstimate`.\n *  `leave` Leaves the estimate unchanged.\n *  `auto` Updates the estimate by the difference between the original and updated value of `timeSpent` or `timeSpentSeconds`.",
+            "in": "query",
+            "name": "adjustEstimate",
+            "schema": {
+              "default": "auto",
+              "enum": [
+                "new",
+                "leave",
+                "manual",
+                "auto"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "The value to set as the issue's remaining time estimate, as days (\\#d), hours (\\#h), or minutes (\\#m or \\#). For example, *2d*. Required when `adjustEstimate` is `new`.",
+            "in": "query",
+            "name": "newEstimate",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information about worklogs in the response. This parameter accepts `properties`, which returns worklog properties.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "default": "",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether the worklog should be added to the issue even if the issue is not editable. For example, because the issue is closed. Connect and Forge app users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) can use this flag.",
+            "in": "query",
+            "name": "overrideEditableFlag",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "comment": "I did some work here.",
+                "started": "2021-01-17T12:34:00.000+0000",
+                "timeSpentSeconds": 12000,
+                "visibility": {
+                  "identifier": "276f955c-63d7-42c8-9520-92d01dca0625",
+                  "type": "group"
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/Worklog"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}",
+                "schema": {
+                  "$ref": "#/components/schemas/Worklog"
+                }
+              }
+            },
+            "description": "Returned if the request is successful"
+          },
+          "400": {
+            "description": "Returned if:\n\n *  `adjustEstimate` is set to `new` but `newEstimate` is not provided or is invalid.\n *  the user does not have permission to update the worklog.\n *  the request JSON is malformed."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue is not found or user does not have permission to view the issue.\n *  the worklog is not found or the user does not have permission to view it.\n *  time tracking is disabled."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Update worklog",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:comment:jira",
+              "read:group:jira",
+              "read:issue-worklog:jira",
+              "read:issue-worklog.property:jira",
+              "read:project-role:jira",
+              "read:user:jira",
+              "write:comment:jira",
+              "write:issue-worklog:jira",
+              "write:issue-worklog.property:jira",
+              "read:avatar:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "WRITE"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes a worklog from an issue.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  *Delete all worklogs*[ project permission](https://confluence.atlassian.com/x/yodKLg) to delete any worklog or *Delete own worklogs* to delete worklogs created by the user,\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "deleteWorklog",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the worklog.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether users watching the issue are notified by email.",
+            "in": "query",
+            "name": "notifyUsers",
+            "schema": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Defines how to update the issue's time estimate, the options are:\n\n *  `new` Sets the estimate to a specific value, defined in `newEstimate`.\n *  `leave` Leaves the estimate unchanged.\n *  `manual` Increases the estimate by amount specified in `increaseBy`.\n *  `auto` Reduces the estimate by the value of `timeSpent` in the worklog.",
+            "in": "query",
+            "name": "adjustEstimate",
+            "schema": {
+              "default": "auto",
+              "enum": [
+                "new",
+                "leave",
+                "manual",
+                "auto"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "The value to set as the issue's remaining time estimate, as days (\\#d), hours (\\#h), or minutes (\\#m or \\#). For example, *2d*. Required when `adjustEstimate` is `new`.",
+            "in": "query",
+            "name": "newEstimate",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The amount to increase the issue's remaining estimate by, as days (\\#d), hours (\\#h), or minutes (\\#m or \\#). For example, *2d*. Required when `adjustEstimate` is `manual`.",
+            "in": "query",
+            "name": "increaseBy",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether the work log entry should be added to the issue even if the issue is not editable, because jira.issue.editable set to false or missing. For example, the issue is closed. Connect and Forge app users with admin permission can use this flag.",
+            "in": "query",
+            "name": "overrideEditableFlag",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  `adjustEstimate` is set to `new` but `newEstimate` is not provided or is invalid.\n *  `adjustEstimate` is set to `manual` but `reduceBy` is not provided or is invalid.\n *  the user does not have permission to delete the worklog."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue is not found or user does not have permission to view the issue.\n *  the worklog is not found or the user does not have permission to view it.\n *  time tracking is disabled."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete worklog",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:issue-worklog:jira",
+              "delete:issue-worklog.property:jira",
+              "write:issue.time-tracking:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "DELETE"
+      }
+    },
+    "/rest/api/2/issue/{issueIdOrKey}/worklog/{worklogId}/properties": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the keys of all properties for a worklog.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "getWorklogPropertyKeys",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the worklog.",
+            "in": "path",
+            "name": "worklogId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"keys\":[{\"key\":\"issue.support\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/EX-2/properties/issue.support\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyKeys"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the worklog ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue or worklog is not found.\n *  the user does not have permission to view the issue or worklog."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get worklog property keys",
+        "tags": [
+          "Issue worklog properties"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/issue/{issueIdOrKey}/worklog/{worklogId}/properties/{propertyKey}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the value of a worklog property.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "getWorklogProperty",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the worklog.",
+            "in": "path",
+            "name": "worklogId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The key of the property.",
+            "in": "path",
+            "name": "propertyKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"key\":\"issue.support\",\"value\":{\"system.conversation.id\":\"b1bf38be-5e94-4b40-a3b8-9278735ee1e6\",\"system.support.time\":\"1m\"}}",
+                "schema": {
+                  "$ref": "#/components/schemas/EntityProperty"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the worklog ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue, worklog, or property is not found.\n *  the user does not have permission to view the issue or worklog."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get worklog property",
+        "tags": [
+          "Issue worklog properties"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Sets the value of a worklog property. Use this operation to store custom data against the worklog.\n\nThe value of the request body must be a [valid](http://tools.ietf.org/html/rfc4627), non-empty JSON blob. The maximum length is 32768 characters.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  *Edit all worklogs*[ project permission](https://confluence.atlassian.com/x/yodKLg) to update any worklog or *Edit own worklogs* to update worklogs created by the user.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "setWorklogProperty",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the worklog.",
+            "in": "path",
+            "name": "worklogId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The key of the issue property. The maximum length is 255 characters.",
+            "in": "path",
+            "name": "propertyKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "description": "The value of the property. The value has to be a valid, non-empty [JSON](https://tools.ietf.org/html/rfc4627) value. The maximum length of the property value is 32768 bytes.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the worklog property is updated."
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the worklog property is created."
+          },
+          "400": {
+            "description": "Returned if the worklog ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have permission to edit the worklog."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue or worklog is not found.\n *  the user does not have permission to view the issue or worklog."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Set worklog property",
+        "tags": [
+          "Issue worklog properties"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "WRITE"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes a worklog property.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "deleteWorklogProperty",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The ID of the worklog.",
+            "in": "path",
+            "name": "worklogId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The key of the property.",
+            "in": "path",
+            "name": "propertyKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the worklog property is removed."
+          },
+          "400": {
+            "description": "Returned if the worklog key or id is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have permission to edit the worklog."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the issue, worklog, or property is not found.\n *  the user does not have permission to view the issue or worklog."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete worklog property",
+        "tags": [
+          "Issue worklog properties"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "DELETE"
+      }
+    },
+    "/rest/api/2/issue/{issueIdOrKey}/worklog/move": {
+      "post": {
+        "deprecated": false,
+        "description": "Moves a list of worklogs from one issue to another. This is an experimental API with several limitations:\n\n *  You can't move more than 5000 worklogs at once.\n *  You can't move worklogs containing an attachment.\n *  You can't move worklogs restricted by project roles.\n *  No notifications will be sent for moved worklogs.\n *  No webhooks or events will be sent for moved worklogs.\n *  No issue history will be recorded for moved worklogs.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the projects containing the source and destination issues.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  *Delete all worklogs* [project permission](https://confluence.atlassian.com/x/yodKLg)\n *  *Work on issues* [project permission](https://confluence.atlassian.com/x/yodKLg) to log work on an issue, that is to create a worklog entry, if time tracking is enabled. This permission is required as a prerequisite for applying the other time-tracking permissions\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "bulkMoveWorklogs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Defines how to update the issues' time estimate, the options are:\n\n *  `leave` Leaves the estimate unchanged.\n *  `auto` Reduces the estimate by the aggregate value of `timeSpent` across all worklogs being moved in the source issue, and increases it in the destination issue.",
+            "in": "query",
+            "name": "adjustEstimate",
+            "schema": {
+              "default": "auto",
+              "enum": [
+                "leave",
+                "auto"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Whether the work log entry should be moved to and from the issues even if the issues are not editable, because jira.issue.editable set to false or missing. For example, the issue is closed. Connect and Forge app users with admin permission can use this flag.",
+            "in": "query",
+            "name": "overrideEditableFlag",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  5,
+                  10
+                ],
+                "issueIdOrKey": "ABC-1234"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/WorklogsMoveRequestBean"
+              }
+            }
+          },
+          "description": "A JSON object containing a list of worklog IDs and the ID or key of the destination issue.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if the request is partially successful."
+          },
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if:\n\n *  `request` is not provided or is invalid\n *  the user does not have permission to move the worklogs\n *  the number of worklogs being moved exceeds the limit\n *  the total size of worklogs being moved is too large\n *  any worklog contains attachments"
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  the source or destination issue is not found or the user does not have permission to view the issues\n *  at least one of the worklogs is not associated with the provided issue\n *  time tracking is disabled"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Bulk move worklogs",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-worklog:jira",
+              "write:issue-worklog:jira",
+              "delete:issue-worklog:jira",
+              "read:issue-worklog.property:jira",
+              "write:issue-worklog.property:jira",
+              "delete:issue-worklog.property:jira",
+              "write:issue.time-tracking:jira",
+              "read:group:jira",
+              "read:project-role:jira",
+              "read:user:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "WRITE"
+      }
+    },
+    "/rest/api/2/issueLink": {
+      "post": {
+        "deprecated": false,
+        "description": "Creates a link between two issues. Use this operation to indicate a relationship between two issues and optionally add a comment to the from (outward) issue. To use this resource the site must have [Issue Linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\nThis resource returns nothing on the creation of an issue link. To obtain the ID of the issue link, use `https://your-domain.atlassian.net/rest/api/2/issue/[linked issue key]?fields=issuelinks`.\n\nIf the link request duplicates a link, the response indicates that the issue link was created. If the request included a comment, the comment is added.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse project* [project permission](https://confluence.atlassian.com/x/yodKLg) for all the projects containing the issues to be linked,\n *  *Link issues* [project permission](https://confluence.atlassian.com/x/yodKLg) on the project containing the from (outward) issue,\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the comment has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "linkIssues",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "comment": {
+                  "body": "Linked related issue!",
+                  "visibility": {
+                    "identifier": "276f955c-63d7-42c8-9520-92d01dca0625",
+                    "type": "group",
+                    "value": "jira-software-users"
+                  }
+                },
+                "inwardIssue": {
+                  "key": "HSP-1"
+                },
+                "outwardIssue": {
+                  "key": "MKY-1"
+                },
+                "type": {
+                  "name": "Duplicate"
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/LinkIssueRequestJsonBean"
+              }
+            }
+          },
+          "description": "The issue link request.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the comment is not created. The response contains an error message indicating why the comment wasn't created. The issue link is also not created."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the user cannot view one or both of the issues. For example, the user doesn't have *Browse project* project permission for a project containing one of the issues.\n *  the user does not have *link issues* project permission.\n *  either of the link issues are not found.\n *  the issue link type is not found."
+          },
+          "413": {
+            "description": "Returned if the per-issue limit for issue links has been breached."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Create issue link",
+        "tags": [
+          "Issue links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:comment:jira",
+              "write:issue:jira",
+              "write:issue-link:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "WRITE"
+      }
+    },
+    "/rest/api/2/issueLink/{linkId}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns an issue link.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse project* [project permission](https://confluence.atlassian.com/x/yodKLg) for all the projects containing the linked issues.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, permission to view both of the issues.",
+        "operationId": "getIssueLink",
+        "parameters": [
+          {
+            "description": "The ID of the issue link.",
+            "in": "path",
+            "name": "linkId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"id\":\"10001\",\"inwardIssue\":{\"fields\":{\"issuetype\":{\"avatarId\":10002,\"description\":\"A problem with the software.\",\"entityId\":\"9d7dd6f7-e8b6-4247-954b-7b2c9b2a5ba2\",\"hierarchyLevel\":0,\"iconUrl\":\"https://your-domain.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype\\\",\",\"id\":\"1\",\"name\":\"Bug\",\"scope\":{\"project\":{\"id\":\"10000\"},\"type\":\"PROJECT\"},\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueType/1\",\"subtask\":false},\"priority\":{\"description\":\"Very little impact.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/priorities/trivial.png\",\"id\":\"2\",\"name\":\"Trivial\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/priority/5\",\"statusColor\":\"#cfcfcf\"},\"status\":{\"description\":\"The issue is closed.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/closed.gif\",\"id\":\"5\",\"name\":\"Closed\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/status/5\",\"statusCategory\":{\"colorName\":\"green\",\"id\":9,\"key\":\"completed\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/statuscategory/9\"}}},\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/PR-3\"},\"outwardIssue\":{\"fields\":{\"issuetype\":{\"avatarId\":1,\"description\":\"A task that needs to be done.\",\"hierarchyLevel\":0,\"iconUrl\":\"https://your-domain.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10299&avatarType=issuetype\\\",\",\"id\":\"3\",\"name\":\"Task\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueType/3\",\"subtask\":false},\"priority\":{\"description\":\"Major loss of function.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/priorities/major.png\",\"id\":\"1\",\"name\":\"Major\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/priority/3\",\"statusColor\":\"#009900\"},\"status\":{\"description\":\"The issue is currently being worked on.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/progress.gif\",\"id\":\"10000\",\"name\":\"In Progress\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/status/10000\",\"statusCategory\":{\"colorName\":\"yellow\",\"id\":1,\"key\":\"in-flight\",\"name\":\"In Progress\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/statuscategory/1\"}}},\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/PR-2\"},\"type\":{\"id\":\"1000\",\"inward\":\"Duplicated by\",\"name\":\"Duplicate\",\"outward\":\"Duplicates\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1000\"}}",
+                "schema": {
+                  "$ref": "#/components/schemas/IssueLink"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the issue link ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link is not found.\n *  the user doesn't have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get issue link",
+        "tags": [
+          "Issue links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field:jira",
+              "read:issue-link-type:jira",
+              "read:issue:jira",
+              "read:issue-type:jira",
+              "read:priority:jira",
+              "read:status:jira",
+              "read:avatar:jira",
+              "read:issue.time-tracking:jira",
+              "read:project-category:jira",
+              "read:project:jira",
+              "read:user:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes an issue link.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  Browse project [project permission](https://confluence.atlassian.com/x/yodKLg) for all the projects containing the issues in the link.\n *  *Link issues* [project permission](https://confluence.atlassian.com/x/yodKLg) for at least one of the projects containing issues in the link.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, permission to view both of the issues.",
+        "operationId": "deleteIssueLink",
+        "parameters": [
+          {
+            "description": "The ID of the issue link.",
+            "in": "path",
+            "name": "linkId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response"
+          },
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the issue link ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link is not found.\n *  the user doesn't have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete issue link",
+        "tags": [
+          "Issue links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:issue-link:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "DELETE"
+      }
+    },
+    "/rest/api/2/issueLinkType": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a list of all issue link types.\n\nTo use this operation, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for a project in the site.",
+        "operationId": "getIssueLinkTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"issueLinkTypes\":[{\"id\":\"1000\",\"inward\":\"Duplicated by\",\"name\":\"Duplicate\",\"outward\":\"Duplicates\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1000\"},{\"id\":\"1010\",\"inward\":\"Blocked by\",\"name\":\"Blocks\",\"outward\":\"Blocks\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1010\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/IssueLinkTypes"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if issue linking is disabled."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get issue link types",
+        "tags": [
+          "Issue link types"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-link-type:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Creates an issue link type. Use this operation to create descriptions of the reasons why issues are linked. The issue link type consists of a name and descriptions for a link's inward and outward relationships.\n\nTo use this operation, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "createIssueLinkType",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "inward": "Duplicated by",
+                "name": "Duplicate",
+                "outward": "Duplicates"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/IssueLinkType"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "example": "{\"id\":\"1000\",\"inward\":\"Duplicated by\",\"name\":\"Duplicate\",\"outward\":\"Duplicates\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/IssueLinkType"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link type name is in use.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          },
+          {}
+        ],
+        "summary": "Create issue link type",
+        "tags": [
+          "Issue link types"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue-link-type:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/issueLinkType/{issueLinkTypeId}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns an issue link type.\n\nTo use this operation, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for a project in the site.",
+        "operationId": "getIssueLinkType",
+        "parameters": [
+          {
+            "description": "The ID of the issue link type.",
+            "in": "path",
+            "name": "issueLinkTypeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"id\":\"1000\",\"inward\":\"Duplicated by\",\"name\":\"Duplicate\",\"outward\":\"Duplicates\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/IssueLinkType"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the issue link type ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link type is not found.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get issue link type",
+        "tags": [
+          "Issue link types"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-link-type:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Updates an issue link type.\n\nTo use this operation, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "updateIssueLinkType",
+        "parameters": [
+          {
+            "description": "The ID of the issue link type.",
+            "in": "path",
+            "name": "issueLinkTypeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "inward": "Duplicated by",
+                "name": "Duplicate",
+                "outward": "Duplicates"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/IssueLinkType"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"id\":\"1000\",\"inward\":\"Duplicated by\",\"name\":\"Duplicate\",\"outward\":\"Duplicates\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/IssueLinkType"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the issue link type ID or the request body are invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link type is not found.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          },
+          {}
+        ],
+        "summary": "Update issue link type",
+        "tags": [
+          "Issue link types"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-link-type:jira",
+              "write:issue-link-type:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes an issue link type.\n\nTo use this operation, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "deleteIssueLinkType",
+        "parameters": [
+          {
+            "description": "The ID of the issue link type.",
+            "in": "path",
+            "name": "issueLinkTypeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the issue link type ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link type is not found.\n *  the user does not have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete issue link type",
+        "tags": [
+          "Issue link types"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:issue-link-type:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/redact": {
+      "post": {
+        "deprecated": false,
+        "description": "Submit a job to redact issue field data. This will trigger the redaction of the data in the specified fields asynchronously.\n\nThe redaction status can be polled using the job id.",
+        "operationId": "redact",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkRedactionRequest"
+              }
+            }
+          },
+          "description": "List of redaction requests",
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Returned if the job submission is successful. The response contains the job id."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the redaction request is invalid."
+          },
+          "401": {
+            "description": "Returned if the user / app is not authorised to redact data"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the AGP subscription is not present."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "summary": "Redact",
+        "tags": [
+          "Issue redaction"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "redact:issue:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/redact/status/{jobId}": {
+      "get": {
+        "deprecated": false,
+        "description": "Retrieves the current status of a redaction job ID.\n\nThe jobStatus will be one of the following:\n\n *  IN\\_PROGRESS - The redaction job is currently in progress\n *  COMPLETED - The redaction job has completed successfully.\n *  PENDING - The redaction job has not started yet",
+        "operationId": "getRedactionStatus",
+        "parameters": [
+          {
+            "description": "Redaction job id",
+            "in": "path",
+            "name": "jobId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedactionJobStatusResponse"
+                }
+              }
+            },
+            "description": "Returned if the job status is successfully retrieved."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the AGP subscription is not present."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the job id is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "summary": "Get redaction status",
+        "tags": [
+          "Issue redaction"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "redact:issue:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/settings/columns": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the default issue navigator columns.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getIssueNavigatorDefaultColumns",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"label\":\"Key\",\"value\":\"issuekey\"},{\"label\":\"Summary\",\"value\":\"summary\"}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ColumnItem"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get issue navigator default columns",
+        "tags": [
+          "Issue navigator settings"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Sets the default issue navigator columns.\n\nThe `columns` parameter accepts a navigable field value and is expressed as HTML form data. To specify multiple columns, pass multiple `columns` parameters. For example, in curl:\n\n`curl -X PUT -d columns=summary -d columns=description https://your-domain.atlassian.net/rest/api/2/settings/columns`\n\nIf no column details are sent, then all default columns are removed.\n\nA navigable field is one that can be used as a column on the issue navigator. Find details of navigable issue columns using [Get fields](#api-rest-api-2-field-get).\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "setIssueNavigatorDefaultColumns",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/ColumnRequestBody"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ColumnRequestBody"
+              }
+            }
+          },
+          "description": "A navigable field value.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if invalid parameters are passed."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "description": "Returned if a navigable field value is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Set issue navigator default columns",
+        "tags": [
+          "Issue navigator settings"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/worklog/deleted": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a list of IDs and delete timestamps for worklogs deleted after a date and time.\n\nThis resource is paginated, with a limit of 1000 worklogs per page. Each page lists worklogs from oldest to youngest. If the number of items in the date range exceeds 1000, `until` indicates the timestamp of the youngest item on the page. Also, `nextPage` provides the URL for the next page of worklogs. The `lastPage` parameter is set to true on the last page of worklogs.\n\nThis resource does not return worklogs deleted during the minute preceding the request.\n\n**[Permissions](#permissions) required:** Permission to access Jira.",
+        "operationId": "getIdsOfWorklogsDeletedSince",
+        "parameters": [
+          {
+            "description": "The date and time, as a UNIX timestamp in milliseconds, after which deleted worklogs are returned.",
+            "in": "query",
+            "name": "since",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"lastPage\":true,\"nextPage\":\"https://your-domain.atlassian.net/api/~ver~/worklog/deleted?since=1438013693136\",\"self\":\"https://your-domain.atlassian.net/api/~ver~/worklog/deleted?since=1438013671562\",\"since\":1438013671562,\"until\":1438013693136,\"values\":[{\"properties\":[],\"updatedTime\":1438013671562,\"worklogId\":103},{\"properties\":[],\"updatedTime\":1438013672165,\"worklogId\":104},{\"properties\":[],\"updatedTime\":1438013693136,\"worklogId\":105}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/ChangedWorklogs"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get IDs of deleted worklogs",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-worklog:jira",
+              "read:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/worklog/list": {
+      "post": {
+        "deprecated": false,
+        "description": "Returns worklog details for a list of worklog IDs.\n\nThe returned list of worklogs is limited to 1000 items.\n\n**[Permissions](#permissions) required:** Permission to access Jira, however, worklogs are only returned where either of the following is true:\n\n *  the worklog is set as *Viewable by All Users*.\n *  the user is a member of a project role or group with permission to view the worklog.",
+        "operationId": "getWorklogsForIds",
+        "parameters": [
+          {
+            "description": "Use [expand](#expansion) to include additional information about worklogs in the response. This parameter accepts `properties` that returns the properties of each worklog.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "default": "",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  5,
+                  10
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/WorklogIdsRequestBean"
+              }
+            }
+          },
+          "description": "A JSON object containing a list of worklog IDs.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"author\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"comment\":\"I did some work here.\",\"id\":\"100028\",\"issueId\":\"10002\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/10010/worklog/10000\",\"started\":\"2021-01-17T12:34:00.000+0000\",\"timeSpent\":\"3h 20m\",\"timeSpentSeconds\":12000,\"updateAuthor\":{\"accountId\":\"5b10a2844c20165700ede21g\",\"active\":false,\"displayName\":\"Mia Krystof\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/user?accountId=5b10a2844c20165700ede21g\"},\"updated\":\"2021-01-18T23:45:00.000+0000\",\"visibility\":{\"identifier\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"type\":\"group\",\"value\":\"jira-developers\"}}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Worklog"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request contains more than 1000 worklog IDs or is empty."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get worklogs",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:comment:jira",
+              "read:group:jira",
+              "read:issue-worklog:jira",
+              "read:issue-worklog.property:jira",
+              "read:project-role:jira",
+              "read:user:jira",
+              "read:avatar:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/worklog/updated": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a list of IDs and update timestamps for worklogs updated after a date and time.\n\nThis resource is paginated, with a limit of 1000 worklogs per page. Each page lists worklogs from oldest to youngest. If the number of items in the date range exceeds 1000, `until` indicates the timestamp of the youngest item on the page. Also, `nextPage` provides the URL for the next page of worklogs. The `lastPage` parameter is set to true on the last page of worklogs.\n\nThis resource does not return worklogs updated during the minute preceding the request.\n\n**[Permissions](#permissions) required:** Permission to access Jira, however, worklogs are only returned where either of the following is true:\n\n *  the worklog is set as *Viewable by All Users*.\n *  the user is a member of a project role or group with permission to view the worklog.",
+        "operationId": "getIdsOfWorklogsModifiedSince",
+        "parameters": [
+          {
+            "description": "The date and time, as a UNIX timestamp in milliseconds, after which updated worklogs are returned.",
+            "in": "query",
+            "name": "since",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Use [expand](#expansion) to include additional information about worklogs in the response. This parameter accepts `properties` that returns the properties of each worklog.",
+            "in": "query",
+            "name": "expand",
+            "schema": {
+              "default": "",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"lastPage\":true,\"nextPage\":\"https://your-domain.atlassian.net/api/~ver~/worklog/updated?since=1438013693136\",\"self\":\"https://your-domain.atlassian.net/api/~ver~/worklog/updated?since=1438013671562\",\"since\":1438013671562,\"until\":1438013693136,\"values\":[{\"properties\":[],\"updatedTime\":1438013671562,\"worklogId\":103},{\"properties\":[],\"updatedTime\":1438013672165,\"worklogId\":104},{\"properties\":[],\"updatedTime\":1438013693136,\"worklogId\":105}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/ChangedWorklogs"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get IDs of updated worklogs",
+        "tags": [
+          "Issue worklogs"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-worklog:jira",
+              "read:issue-worklog.property:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AvatarUrlsBean": {
+        "additionalProperties": false,
+        "properties": {
+          "16x16": {
+            "description": "The URL of the item's 16x16 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          },
+          "24x24": {
+            "description": "The URL of the item's 24x24 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          },
+          "32x32": {
+            "description": "The URL of the item's 32x32 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          },
+          "48x48": {
+            "description": "The URL of the item's 48x48 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "BulkRedactionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "redactions": {
+            "items": {
+              "$ref": "#/components/schemas/SingleRedactionRequest"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "type": "object"
+      },
+      "BulkRedactionResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "description": "Result for requested redactions",
+            "items": {
+              "$ref": "#/components/schemas/SingleRedactionResponse"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "ChangedWorklog": {
+        "additionalProperties": false,
+        "description": "Details of a changed worklog.",
+        "properties": {
+          "properties": {
+            "description": "Details of properties associated with the change.",
+            "items": {
+              "$ref": "#/components/schemas/EntityProperty"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "updatedTime": {
+            "description": "The datetime of the change.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "worklogId": {
+            "description": "The ID of the worklog.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ChangedWorklogs": {
+        "additionalProperties": false,
+        "description": "List of changed worklogs.",
+        "properties": {
+          "lastPage": {
+            "type": "boolean"
+          },
+          "nextPage": {
+            "description": "The URL of the next list of changed worklogs.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of this changed worklogs list.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "since": {
+            "description": "The datetime of the first worklog item in the list.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "until": {
+            "description": "The datetime of the last worklog item in the list.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "Changed worklog list.",
+            "items": {
+              "$ref": "#/components/schemas/ChangedWorklog"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ColumnItem": {
+        "additionalProperties": false,
+        "description": "Details of an issue navigator column item.",
+        "properties": {
+          "label": {
+            "description": "The issue navigator column label.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The issue navigator column value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ColumnRequestBody": {
+        "additionalProperties": false,
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "Comment": {
+        "additionalProperties": true,
+        "description": "A comment.",
+        "properties": {
+          "author": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "The ID of the user who created the comment.",
+            "readOnly": true
+          },
+          "body": {
+            "description": "The comment text.",
+            "type": "string"
+          },
+          "created": {
+            "description": "The date and time at which the comment was created.",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the comment.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "jsdAuthorCanSeeRequest": {
+            "description": "Whether the comment was added from an email sent by a person who is not part of the issue. See [Allow external emails to be added as comments on issues](https://support.atlassian.com/jira-service-management-cloud/docs/allow-external-emails-to-be-added-as-comments-on-issues/)for information on setting up this feature.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "jsdPublic": {
+            "description": "Whether the comment is visible in Jira Service Desk. Defaults to true when comments are created in the Jira Cloud Platform. This includes when the site doesn't use Jira Service Desk or the project isn't a Jira Service Desk project and, therefore, there is no Jira Service Desk for the issue to be visible on. To create a comment with its visibility in Jira Service Desk set to false, use the Jira Service Desk REST API [Create request comment](https://developer.atlassian.com/cloud/jira/service-desk/rest/#api-rest-servicedeskapi-request-issueIdOrKey-comment-post) operation.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "properties": {
+            "description": "A list of comment properties. Optional on create and update.",
+            "items": {
+              "$ref": "#/components/schemas/EntityProperty"
+            },
+            "type": "array"
+          },
+          "renderedBody": {
+            "description": "The rendered version of the comment.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the comment.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "updateAuthor": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "The ID of the user who updated the comment last.",
+            "readOnly": true
+          },
+          "updated": {
+            "description": "The date and time at which the comment was updated last.",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "visibility": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              }
+            ],
+            "description": "The group or role to which this comment is visible. Optional on create and update."
+          }
+        },
+        "type": "object"
+      },
+      "ContentItem": {
+        "additionalProperties": false,
+        "description": "Represents the content to redact",
+        "properties": {
+          "entityId": {
+            "description": "The ID of the content entity.\n\n *  For redacting an issue field, this will be the field ID (e.g., summary, customfield\\_10000).\n *  For redacting a comment, this will be the comment ID.\n *  For redacting a worklog, this will be the worklog ID.",
+            "example": "summary",
+            "type": "string"
+          },
+          "entityType": {
+            "description": "The type of the entity to redact; It will be one of the following:\n\n *  **issuefieldvalue** \\- To redact in issue fields\n *  **issue-comment** \\- To redact in issue comments.\n *  **issue-worklog** \\- To redact in issue worklogs",
+            "enum": [
+              "issuefieldvalue",
+              "issue-comment",
+              "issue-worklog"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "This would be the issue ID",
+            "example": "10000",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entityId",
+          "entityType",
+          "id"
+        ],
+        "type": "object"
+      },
+      "EntityProperty": {
+        "additionalProperties": false,
+        "description": "An entity property, for more information see [Entity properties](https://developer.atlassian.com/cloud/jira/platform/jira-entity-properties/).",
+        "properties": {
+          "key": {
+            "description": "The key of the property. Required on create and update.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the property. Required on create and update."
+          }
+        },
+        "type": "object"
+      },
+      "ErrorCollection": {
+        "additionalProperties": false,
+        "description": "Error messages from an operation.",
+        "properties": {
+          "errorMessages": {
+            "description": "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "errors": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The list of errors by parameter returned by the operation. For example,\"projectKey\": \"Project keys must start with an uppercase letter, followed by one or more uppercase alphanumeric characters.\"",
+            "type": "object"
+          },
+          "status": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ExpandPrioritySchemePage": {
+        "additionalProperties": true,
+        "properties": {
+          "maxResults": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "startAt": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "Fields": {
+        "additionalProperties": false,
+        "description": "Key fields from the linked issue.",
+        "properties": {
+          "assignee": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "The assignee of the linked issue.",
+            "readOnly": true
+          },
+          "issueType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IssueTypeDetails"
+              }
+            ],
+            "description": "The type of the linked issue.",
+            "readOnly": true
+          },
+          "issuetype": {
+            "description": "The type of the linked issue.",
+            "$ref": "#/components/schemas/IssueTypeDetails"
+          },
+          "priority": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Priority"
+              }
+            ],
+            "description": "The priority of the linked issue.",
+            "readOnly": true
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusDetails"
+              }
+            ],
+            "description": "The status of the linked issue.",
+            "readOnly": true
+          },
+          "summary": {
+            "description": "The summary description of the linked issue.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "timetracking": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimeTrackingDetails"
+              }
+            ],
+            "description": "The time tracking of the linked issue.",
+            "readOnly": true
+          }
+        },
+        "type": "object"
+      },
+      "IssueLink": {
+        "additionalProperties": false,
+        "description": "Details of a link between issues.",
+        "properties": {
+          "id": {
+            "description": "The ID of the issue link.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "inwardIssue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LinkedIssue"
+              }
+            ],
+            "description": "Provides details about the linked issue. If presenting this link in a user interface, use the `inward` field of the issue link type to label the link."
+          },
+          "outwardIssue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LinkedIssue"
+              }
+            ],
+            "description": "Provides details about the linked issue. If presenting this link in a user interface, use the `outward` field of the issue link type to label the link."
+          },
+          "self": {
+            "description": "The URL of the issue link.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IssueLinkType"
+              }
+            ],
+            "description": "The type of link between the issues."
+          }
+        },
+        "required": [
+          "inwardIssue",
+          "outwardIssue",
+          "type"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "issueLinks"
+        }
+      },
+      "IssueLinkType": {
+        "additionalProperties": false,
+        "description": "This object is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it defines and reports on the type of link between the issues. Find a list of issue link types with [Get issue link types](#api-rest-api-2-issueLinkType-get).\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it defines and reports on issue link types.",
+        "properties": {
+          "id": {
+            "description": "The ID of the issue link type and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is the type of issue link. Required on create when `name` isn't provided. Otherwise, read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is read only.",
+            "type": "string"
+          },
+          "inward": {
+            "description": "The description of the issue link type inward link and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is required on create and optional on update. Otherwise, read only.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the issue link type and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is the type of issue link. Required on create when `id` isn't provided. Otherwise, read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is required on create and optional on update. Otherwise, read only.",
+            "type": "string"
+          },
+          "outward": {
+            "description": "The description of the issue link type outward link and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is required on create and optional on update. Otherwise, read only.",
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the issue link type. Read only.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "IssueLinkTypes": {
+        "additionalProperties": false,
+        "description": "A list of issue link type beans.",
+        "properties": {
+          "issueLinkTypes": {
+            "description": "The issue link type bean.",
+            "items": {
+              "$ref": "#/components/schemas/IssueLinkType"
+            },
+            "readOnly": true,
+            "type": "array",
+            "xml": {
+              "name": "issueLinkTypes"
+            }
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "issueLinkTypes"
+        }
+      },
+      "IssueTypeDetails": {
+        "additionalProperties": false,
+        "description": "Details about an issue type.",
+        "properties": {
+          "avatarId": {
+            "description": "The ID of the issue type's avatar.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "description": {
+            "description": "The description of the issue type.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "entityId": {
+            "description": "Unique ID for next-gen projects.",
+            "format": "uuid",
+            "readOnly": true,
+            "type": "string"
+          },
+          "hierarchyLevel": {
+            "description": "Hierarchy level of the issue type.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "iconUrl": {
+            "description": "The URL of the issue type's avatar.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the issue type.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the issue type.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Scope"
+              }
+            ],
+            "description": "Details of the next-gen projects the issue type is available in.",
+            "readOnly": true
+          },
+          "self": {
+            "description": "The URL of these issue type details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "subtask": {
+            "description": "Whether this issue type is used to create subtasks.",
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "LinkedIssue": {
+        "additionalProperties": false,
+        "description": "The ID or key of a linked issue.",
+        "properties": {
+          "fields": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Fields"
+              }
+            ],
+            "description": "The fields associated with the issue.",
+            "readOnly": true
+          },
+          "id": {
+            "description": "The ID of an issue. Required if `key` isn't provided.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The key of an issue. Required if `id` isn't provided.",
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the issue.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LinkIssueRequestJsonBean": {
+        "additionalProperties": false,
+        "properties": {
+          "comment": {
+            "$ref": "#/components/schemas/Comment"
+          },
+          "inwardIssue": {
+            "$ref": "#/components/schemas/LinkedIssue"
+          },
+          "outwardIssue": {
+            "$ref": "#/components/schemas/LinkedIssue"
+          },
+          "type": {
+            "$ref": "#/components/schemas/IssueLinkType"
+          }
+        },
+        "required": [
+          "inwardIssue",
+          "outwardIssue",
+          "type"
+        ],
+        "type": "object"
+      },
+      "PageOfWorklogs": {
+        "additionalProperties": true,
+        "description": "Paginated list of worklog details",
+        "properties": {
+          "maxResults": {
+            "description": "The maximum number of results that could be on the page.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "startAt": {
+            "description": "The index of the first item returned on the page.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of results on the page.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "worklogs": {
+            "description": "List of worklogs.",
+            "items": {
+              "$ref": "#/components/schemas/Worklog"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "Priority": {
+        "additionalProperties": true,
+        "description": "An issue priority.",
+        "properties": {
+          "avatarId": {
+            "description": "The avatarId of the avatar for the issue priority. This parameter is nullable and when set, this avatar references the universal avatar APIs.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "description": {
+            "description": "The description of the issue priority.",
+            "type": "string"
+          },
+          "iconUrl": {
+            "description": "The URL of the icon for the issue priority.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the issue priority.",
+            "type": "string"
+          },
+          "isDefault": {
+            "description": "Whether this priority is the default.",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "The name of the issue priority.",
+            "type": "string"
+          },
+          "schemes": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExpandPrioritySchemePage"
+              }
+            ],
+            "description": "Priority schemes associated with the issue priority."
+          },
+          "self": {
+            "description": "The URL of the issue priority.",
+            "type": "string"
+          },
+          "statusColor": {
+            "description": "The color used to indicate the issue priority.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectDetails": {
+        "additionalProperties": false,
+        "description": "Details about a project.",
+        "properties": {
+          "avatarUrls": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AvatarUrlsBean"
+              }
+            ],
+            "description": "The URLs of the project's avatars.",
+            "readOnly": true
+          },
+          "id": {
+            "description": "The ID of the project.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The key of the project.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the project.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "projectCategory": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedProjectCategory"
+              }
+            ],
+            "description": "The category the project belongs to.",
+            "readOnly": true
+          },
+          "projectTypeKey": {
+            "description": "The [project type](https://confluence.atlassian.com/x/GwiiLQ#Jiraapplicationsoverview-Productfeaturesandprojecttypes) of the project.",
+            "enum": [
+              "software",
+              "service_desk",
+              "business"
+            ],
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the project details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "simplified": {
+            "description": "Whether or not the project is simplified.",
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "PropertyKey": {
+        "additionalProperties": false,
+        "description": "Property key details.",
+        "properties": {
+          "key": {
+            "description": "The key of the property.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the property.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PropertyKeys": {
+        "additionalProperties": false,
+        "description": "List of property keys.",
+        "properties": {
+          "keys": {
+            "description": "Property key details.",
+            "items": {
+              "$ref": "#/components/schemas/PropertyKey"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "RedactionJobStatusResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "bulkRedactionResponse": {
+            "$ref": "#/components/schemas/BulkRedactionResponse"
+          },
+          "jobStatus": {
+            "enum": [
+              "PENDING",
+              "IN_PROGRESS",
+              "COMPLETED"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RedactionPosition": {
+        "additionalProperties": false,
+        "description": "Represents the position of the redaction",
+        "properties": {
+          "adfPointer": {
+            "description": "The ADF pointer indicating the position of the text to be redacted. This is only required when redacting from rich text(ADF) fields. For plain text fields, this field can be omitted.",
+            "example": "/content/0/content/0/text",
+            "type": "string"
+          },
+          "expectedText": {
+            "description": "The text which will be redacted, encoded using SHA256 hash and Base64 digest",
+            "example": "ODFiNjM3ZDhmY2QyYzZkYTYzNTllNjk2MzExM2ExMTcwZGU3OTVlNGI3MjViODRkMWUwYjRjZmQ5ZWM1OGNlOQ==",
+            "type": "string"
+          },
+          "from": {
+            "description": "The start index(inclusive) for the redaction in specified content",
+            "example": 14,
+            "format": "int32",
+            "type": "integer"
+          },
+          "to": {
+            "description": "The ending index(exclusive) for the redaction in specified content",
+            "example": 20,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expectedText",
+          "from",
+          "to"
+        ],
+        "type": "object"
+      },
+      "Scope": {
+        "additionalProperties": true,
+        "description": "The projects the item is associated with. Indicated for items associated with [next-gen projects](https://confluence.atlassian.com/x/loMyO).",
+        "properties": {
+          "project": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProjectDetails"
+              }
+            ],
+            "description": "The project the item has scope in.",
+            "readOnly": true
+          },
+          "type": {
+            "description": "The type of scope.",
+            "enum": [
+              "PROJECT",
+              "TEMPLATE"
+            ],
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SingleRedactionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "contentItem": {
+            "$ref": "#/components/schemas/ContentItem"
+          },
+          "externalId": {
+            "description": "Unique id for the redaction request; ID format should be of UUID",
+            "example": "51101de6-d001-429d-a095-b2b96dd57fcb",
+            "format": "uuid",
+            "type": "string"
+          },
+          "reason": {
+            "description": "The reason why the content is being redacted",
+            "example": "PII data",
+            "type": "string"
+          },
+          "redactionPosition": {
+            "$ref": "#/components/schemas/RedactionPosition"
+          }
+        },
+        "required": [
+          "contentItem",
+          "externalId",
+          "reason",
+          "redactionPosition"
+        ],
+        "type": "object"
+      },
+      "SingleRedactionResponse": {
+        "additionalProperties": false,
+        "description": "Result for requested redactions",
+        "properties": {
+          "externalId": {
+            "description": "An unique id for the redaction request",
+            "format": "uuid",
+            "type": "string"
+          },
+          "successful": {
+            "description": "Indicates if redaction was success/failure",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "externalId",
+          "successful"
+        ],
+        "type": "object"
+      },
+      "StatusCategory": {
+        "additionalProperties": true,
+        "description": "A status category.",
+        "properties": {
+          "colorName": {
+            "description": "The name of the color used to represent the status category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the status category.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "key": {
+            "description": "The key of the status category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the status category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the status category.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "StatusDetails": {
+        "additionalProperties": true,
+        "description": "A status.",
+        "properties": {
+          "description": {
+            "description": "The description of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "iconUrl": {
+            "description": "The URL of the icon used to represent the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Scope"
+              }
+            ],
+            "description": "The scope of the field.",
+            "readOnly": true
+          },
+          "self": {
+            "description": "The URL of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "statusCategory": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusCategory"
+              }
+            ],
+            "description": "The category assigned to the status.",
+            "readOnly": true
+          }
+        },
+        "type": "object"
+      },
+      "TimeTrackingDetails": {
+        "additionalProperties": false,
+        "description": "Time tracking details.",
+        "properties": {
+          "originalEstimate": {
+            "description": "The original estimate of time needed for this issue in readable format.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "originalEstimateSeconds": {
+            "description": "The original estimate of time needed for this issue in seconds.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "remainingEstimate": {
+            "description": "The remaining estimate of time needed for this issue in readable format.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "remainingEstimateSeconds": {
+            "description": "The remaining estimate of time needed for this issue in seconds.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "timeSpent": {
+            "description": "Time worked on this issue in readable format.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "timeSpentSeconds": {
+            "description": "Time worked on this issue in seconds.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "UpdatedProjectCategory": {
+        "additionalProperties": false,
+        "description": "A project category.",
+        "properties": {
+          "description": {
+            "description": "The name of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The description of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the project category.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserDetails": {
+        "additionalProperties": false,
+        "description": "User details permitted by the user's Atlassian Account privacy settings. However, be aware of these exceptions:\n\n *  User record deleted from Atlassian: This occurs as the result of a right to be forgotten request. In this case, `displayName` provides an indication and other parameters have default values or are blank (for example, email is blank).\n *  User record corrupted: This occurs as a results of events such as a server import and can only happen to deleted users. In this case, `accountId` returns *unknown* and all other parameters have fallback values.\n *  User record unavailable: This usually occurs due to an internal service outage. In this case, all parameters have fallback values.",
+        "properties": {
+          "accountId": {
+            "description": "The account ID of the user, which uniquely identifies the user across all Atlassian products. For example, *5b10ac8d82e05b22cc7d4ef5*.",
+            "maxLength": 128,
+            "type": "string"
+          },
+          "accountType": {
+            "description": "The type of account represented by this user. This will be one of 'atlassian' (normal users), 'app' (application user) or 'customer' (Jira Service Desk customer user)",
+            "readOnly": true,
+            "type": "string"
+          },
+          "active": {
+            "description": "Whether the user is active.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "avatarUrls": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AvatarUrlsBean"
+              }
+            ],
+            "description": "The avatars of the user.",
+            "readOnly": true
+          },
+          "displayName": {
+            "description": "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "emailAddress": {
+            "description": "The email address of the user. Depending on the user’s privacy settings, this may be returned as null.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "key": {
+            "description": "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the user.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "timeZone": {
+            "description": "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Visibility": {
+        "additionalProperties": true,
+        "description": "The group or role to which this item is visible.",
+        "properties": {
+          "identifier": {
+            "description": "The ID of the group or the name of the role that visibility of this item is restricted to.",
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "description": "Whether visibility of this item is restricted to a group or role.",
+            "enum": [
+              "group",
+              "role"
+            ],
+            "type": "string"
+          },
+          "value": {
+            "description": "The name of the group or role that visibility of this item is restricted to. Please note that the name of a group is mutable, to reliably identify a group use `identifier`.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Worklog": {
+        "additionalProperties": true,
+        "description": "Details of a worklog.",
+        "properties": {
+          "author": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "Details of the user who created the worklog.",
+            "readOnly": true
+          },
+          "comment": {
+            "description": "A comment about the worklog. Optional when creating or updating a worklog.",
+            "type": "string"
+          },
+          "created": {
+            "description": "The datetime on which the worklog was created.",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the worklog record.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "issueId": {
+            "description": "The ID of the issue this worklog is for.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "properties": {
+            "description": "Details of properties for the worklog. Optional when creating or updating a worklog.",
+            "items": {
+              "$ref": "#/components/schemas/EntityProperty"
+            },
+            "type": "array"
+          },
+          "self": {
+            "description": "The URL of the worklog item.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "started": {
+            "description": "The datetime on which the worklog effort was started. Required when creating a worklog. Optional when updating a worklog.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "timeSpent": {
+            "description": "The time spent working on the issue as days (\\#d), hours (\\#h), or minutes (\\#m or \\#). Required when creating a worklog if `timeSpentSeconds` isn't provided. Optional when updating a worklog. Cannot be provided if `timeSpentSecond` is provided.",
+            "type": "string"
+          },
+          "timeSpentSeconds": {
+            "description": "The time in seconds spent working on the issue. Required when creating a worklog if `timeSpent` isn't provided. Optional when updating a worklog. Cannot be provided if `timeSpent` is provided.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "updateAuthor": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "Details of the user who last updated the worklog.",
+            "readOnly": true
+          },
+          "updated": {
+            "description": "The datetime on which the worklog was last updated.",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "visibility": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              }
+            ],
+            "description": "Details about any restrictions in the visibility of the worklog. Optional when creating or updating a worklog."
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "worklog"
+        }
+      },
+      "WorklogIdsRequestBean": {
+        "additionalProperties": false,
+        "properties": {
+          "ids": {
+            "description": "A list of worklog IDs.",
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "WorklogsMoveRequestBean": {
+        "additionalProperties": false,
+        "properties": {
+          "ids": {
+            "description": "A list of worklog IDs.",
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "issueIdOrKey": {
+            "description": "The issue id or key of the destination issue",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "description": "You can access this resource via basic auth.",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "OAuth2": {
+        "description": "OAuth2 scopes for Jira",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.atlassian.com/authorize",
+            "scopes": {
+              "delete:async-task:jira": "Delete asynchronous task.",
+              "delete:attachment:jira": "Delete issue attachments.",
+              "delete:avatar:jira": "Delete system and custom avatars.",
+              "delete:comment.property:jira": "Delete issue comment properties.",
+              "delete:comment:jira": "Delete issue comments.",
+              "delete:dashboard.property:jira": "Delete dashboard properties.",
+              "delete:dashboard:jira": "Delete dashboards.",
+              "delete:field-configuration-scheme:jira": "Delete field configuration schemes.",
+              "delete:field-configuration:jira": "Delete field configurations.",
+              "delete:field.option:jira": "Delete field options.",
+              "delete:field:jira": "Delete fields.",
+              "delete:filter.column:jira": "Delete filter columns.",
+              "delete:filter:jira": "Delete filters.",
+              "delete:group:jira": "Delete user groups.",
+              "delete:issue-link-type:jira": "Delete issue link types.",
+              "delete:issue-link:jira": "Delete issue links.",
+              "delete:issue-type-scheme:jira": "Delete issue type schemes.",
+              "delete:issue-type-screen-scheme:jira": "Delete issue type screen schemes.",
+              "delete:issue-type.property:jira": "Delete issue type properties.",
+              "delete:issue-type:jira": "Delete issue types.",
+              "delete:issue-worklog.property:jira": "Delete issue worklog properties.",
+              "delete:issue-worklog:jira": "Delete issue worklogs.",
+              "delete:issue.property:jira": "Delete issue properties.",
+              "delete:issue.remote-link:jira": "Delete issue remote links.",
+              "delete:issue:jira": "Delete issues.",
+              "delete:permission-scheme:jira": "Delete permission schemes.",
+              "delete:permission:jira": "Delete permissions.",
+              "delete:project-category:jira": "Delete project categories.",
+              "delete:project-role:jira": "Delete project roles.",
+              "delete:project-version:jira": "Delete project versions.",
+              "delete:project.avatar:jira": "Delete project avatars.",
+              "delete:project.component:jira": "Delete project components.",
+              "delete:project.property:jira": "Delete project properties.",
+              "delete:project:jira": "Delete projects and their details, such as issue types, project lead, and avatars.",
+              "delete:screen-scheme:jira": "Delete screen schemes.",
+              "delete:screen-tab:jira": "Delete screen tabs.",
+              "delete:screen:jira": "Delete screens.",
+              "delete:screenable-field:jira": "Delete screenable fields.",
+              "delete:user-configuration:jira": "Delete user configurations.",
+              "delete:user.property:jira": "Delete user properties.",
+              "delete:webhook:jira": "Delete webhooks.",
+              "delete:workflow-scheme:jira": "Delete workflow schemes.",
+              "delete:workflow.property:jira": "Delete workflow properties.",
+              "delete:workflow:jira": "Delete workflows.",
+              "manage:jira-configuration": "Configure Jira settings that require the Jira administrators permission, for example, create projects and custom fields, view workflows, manage issue link types.",
+              "manage:jira-project": "Create and edit project settings and create new project-level objects, for example, versions, components.",
+              "manage:jira-webhook": "Manage Jira webhooks. Enables an OAuth app to register and unregister dynamic webhooks in Jira. It also provides for fetching of registered webhooks.",
+              "read:app-data:jira": "Read app data.",
+              "read:application-role:jira": "View application roles.",
+              "read:attachment:jira": "View issue attachments.",
+              "read:audit-log:jira": "View audit logs.",
+              "read:avatar:jira": "View system and custom avatars.",
+              "read:comment.property:jira": "View issue comment properties.",
+              "read:comment:jira": "View issue comments.",
+              "read:custom-field-contextual-configuration:jira": "Read custom field contextual configurations.",
+              "read:dashboard.property:jira": "View dashboard properties.",
+              "read:dashboard:jira": "View dashboards.",
+              "read:email-address:jira": "View email addresses of all users regardless of the user's profile visibility settings.",
+              "read:field-configuration-scheme:jira": "View field configuration schemes.",
+              "read:field-configuration:jira": "Read field configurations.",
+              "read:field.default-value:jira": "View field default values.",
+              "read:field.option:jira": "View field options.",
+              "read:field.options:jira": "Read field options.",
+              "read:field:jira": "View fields.",
+              "read:filter.column:jira": "View filter columns.",
+              "read:filter.default-share-scope:jira": "View filter default share scopes.",
+              "read:filter:jira": "View filters.",
+              "read:group:jira": "View user groups.",
+              "read:instance-configuration:jira": "View instance configurations.",
+              "read:issue-details:jira": "View issue details.",
+              "read:issue-event:jira": "Read issue events.",
+              "read:issue-field-values:jira": "View issue field valueses.",
+              "read:issue-link-type:jira": "View issue link types.",
+              "read:issue-link:jira": "View issue links.",
+              "read:issue-meta:jira": "View issue meta.",
+              "read:issue-security-level:jira": "View issue security levels.",
+              "read:issue-security-scheme:jira": "View issue security schemes.",
+              "read:issue-status:jira": "View issue statuses.",
+              "read:issue-type-hierarchy:jira": "Read issue type hierarchies.",
+              "read:issue-type-scheme:jira": "View issue type schemes.",
+              "read:issue-type-screen-scheme:jira": "View issue type screen schemes.",
+              "read:issue-type.property:jira": "View issue type properties.",
+              "read:issue-type:jira": "View issue types.",
+              "read:issue-worklog.property:jira": "View issue worklog properties.",
+              "read:issue-worklog:jira": "View issue worklogs.",
+              "read:issue.changelog:jira": "View issue changelogs.",
+              "read:issue.property:jira": "View issue properties.",
+              "read:issue.remote-link:jira": "View issue remote links.",
+              "read:issue.time-tracking:jira": "View issue time trackings.",
+              "read:issue.transition:jira": "View issue transitions.",
+              "read:issue.vote:jira": "View issue votes.",
+              "read:issue.votes:jira": "View issue voteses.",
+              "read:issue.watcher:jira": "View issue watchers.",
+              "read:issue:jira": "View issues.",
+              "read:jira-expressions:jira": "View jira expressions.",
+              "read:jira-user": "View user information in Jira that you have access to, including usernames, email addresses, and avatars.",
+              "read:jira-work": "Read project and issue data. Search for issues and objects associated with issues (such as attachments and worklogs).",
+              "read:jql:jira": "View JQL.",
+              "read:label:jira": "View labels.",
+              "read:license:jira": "View licenses.",
+              "read:notification-scheme:jira": "View notification schemes.",
+              "read:permission-scheme:jira": "View permission schemes.",
+              "read:permission:jira": "View permissions.",
+              "read:priority:jira": "View priorities.",
+              "read:project-category:jira": "View project categories.",
+              "read:project-role:jira": "View project roles.",
+              "read:project-type:jira": "View project types.",
+              "read:project-version:jira": "View project versions.",
+              "read:project.avatar:jira": "Read project avatars.",
+              "read:project.component:jira": "View project components.",
+              "read:project.email:jira": "View project emails.",
+              "read:project.feature:jira": "Read project features.",
+              "read:project.property:jira": "View project properties.",
+              "read:project:jira": "View projects.",
+              "read:resolution:jira": "View resolutions.",
+              "read:role:jira": "View roles.",
+              "read:screen-field:jira": "View screen fields.",
+              "read:screen-scheme:jira": "View screen schemes.",
+              "read:screen-tab:jira": "View screen tabs.",
+              "read:screen:jira": "View screens.",
+              "read:screenable-field:jira": "View screenable fields.",
+              "read:status:jira": "View statuses.",
+              "read:user-configuration:jira": "View user configurations.",
+              "read:user.columns:jira": "View user columnses.",
+              "read:user.property:jira": "View user properties.",
+              "read:user:jira": "View users.",
+              "read:webhook:jira": "View webhooks.",
+              "read:workflow-scheme:jira": "View workflow schemes.",
+              "read:workflow.property:jira": "View workflow properties.",
+              "read:workflow:jira": "View workflows.",
+              "send:notification:jira": "Send notifications.",
+              "validate:jql:jira": "Validate JQL.",
+              "write:app-data:jira": "Write app data.",
+              "write:attachment:jira": "Create and update issue attachments.",
+              "write:avatar:jira": "Create and update system and custom avatars.",
+              "write:comment.property:jira": "Create and update issue comment properties.",
+              "write:comment:jira": "Create and update issue comments.",
+              "write:custom-field-contextual-configuration:jira": "Save custom field contextual configurations.",
+              "write:dashboard.property:jira": "Create and update dashboard properties.",
+              "write:dashboard:jira": "Create and update dashboards.",
+              "write:field-configuration-scheme:jira": "Create and update field configuration schemes.",
+              "write:field-configuration:jira": "Save field configurations.",
+              "write:field.default-value:jira": "Create and update field default values.",
+              "write:field.option:jira": "Create and update field options.",
+              "write:field:jira": "Create and update fields.",
+              "write:filter.column:jira": "Create and update filter columns.",
+              "write:filter.default-share-scope:jira": "Create and update filter default share scopes.",
+              "write:filter:jira": "Create and update filters.",
+              "write:group:jira": "Create and update user groups.",
+              "write:instance-configuration:jira": "Create and update instance configurations.",
+              "write:issue-link-type:jira": "Create and update issue link types.",
+              "write:issue-link:jira": "Create and update issue links.",
+              "write:issue-type-scheme:jira": "Create and update issue type schemes.",
+              "write:issue-type-screen-scheme:jira": "Create and update issue type screen schemes.",
+              "write:issue-type.property:jira": "Create and update issue type properties.",
+              "write:issue-type:jira": "Create and update issue types.",
+              "write:issue-worklog.property:jira": "Create and update issue worklog properties.",
+              "write:issue-worklog:jira": "Create and update issue worklogs.",
+              "write:issue.property:jira": "Create and update issue properties.",
+              "write:issue.remote-link:jira": "Create and update issue remote links.",
+              "write:issue.time-tracking:jira": "Create and update issue time trackings.",
+              "write:issue.vote:jira": "Create and update issue votes.",
+              "write:issue.watcher:jira": "Create and update issue watchers.",
+              "write:issue:jira": "Create and update issues.",
+              "write:jira-work": "Create and edit issues in Jira, post comments, create worklogs, and delete issues.",
+              "write:permission-scheme:jira": "Create and update permission schemes.",
+              "write:permission:jira": "Create and update permissions.",
+              "write:project-category:jira": "Create and update project categories.",
+              "write:project-role:jira": "Create and update project roles.",
+              "write:project-version:jira": "Create and update project versions.",
+              "write:project.avatar:jira": "Create and update project avatars.",
+              "write:project.component:jira": "Create and update project components.",
+              "write:project.email:jira": "Create and update project emails.",
+              "write:project.feature:jira": "Save project features.",
+              "write:project.property:jira": "Create and update project properties.",
+              "write:project:jira": "Create and update projects.",
+              "write:screen-scheme:jira": "Create and update screen schemes.",
+              "write:screen-tab:jira": "Create and update screen tabs.",
+              "write:screen:jira": "Create and update screens.",
+              "write:screenable-field:jira": "Create and update screenable fields.",
+              "write:user-configuration:jira": "Create and update user configurations.",
+              "write:user.property:jira": "Create and update user properties.",
+              "write:webhook:jira": "Create and update webhooks.",
+              "write:workflow-scheme:jira": "Create and update workflow schemes.",
+              "write:workflow.property:jira": "Create and update workflow properties.",
+              "write:workflow:jira": "Create and update workflows."
+            },
+            "tokenUrl": "https://auth.atlassian.com/oauth/token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  }
+}

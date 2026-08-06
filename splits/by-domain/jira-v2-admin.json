@@ -1,0 +1,3764 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "ecosystem@atlassian.com"
+    },
+    "description": "Jira Cloud platform REST API documentation",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "termsOfService": "https://developer.atlassian.com/platform/marketplace/atlassian-developer-terms/",
+    "title": "The Jira Cloud platform REST API - admin",
+    "version": "1001.0.0-SNAPSHOT-94e91f6947ecc63395c0d5a54f05005b6eab5a8a"
+  },
+  "externalDocs": {
+    "description": "Find out more about Atlassian products and services.",
+    "url": "http://www.atlassian.com"
+  },
+  "servers": [
+    {
+      "url": "https://your-domain.atlassian.net"
+    }
+  ],
+  "tags": [
+    {
+      "description": "This resource represents an announcement banner. Use it to retrieve and update banner configuration.",
+      "name": "Announcement banner"
+    },
+    {
+      "description": "This resource represents application roles. Use it to get details of an application role or all application roles.",
+      "name": "Application roles"
+    },
+    {
+      "description": "This resource represents audits that record activities undertaken in Jira. Use it to get a list of audit records.",
+      "name": "Audit records"
+    },
+    {
+      "description": "This resource represents classification levels.",
+      "name": "Classification levels"
+    },
+    {
+      "description": "This resource represents various settings in Jira. Use it to get and update Jira settings and properties.",
+      "name": "Jira settings"
+    },
+    {
+      "description": "This resource represents license metrics. Use it to get available metrics for Jira licences.",
+      "name": "License metrics"
+    },
+    {
+      "description": "This resource provides information about the Jira instance.",
+      "name": "Server info"
+    },
+    {
+      "description": "This resource represents a [long-running asynchronous tasks](#async-operations). Use it to obtain details about the progress of a long-running task or cancel a long-running task.",
+      "name": "Tasks"
+    },
+    {
+      "description": "This resource represents time tracking and time tracking providers. Use it to get and set the time tracking provider, get and set the time tracking options, and disable time tracking.",
+      "name": "Time tracking"
+    },
+    {
+      "description": "This resource represents webhooks. Webhooks are calls sent to a URL when an event occurs in Jira for issues specified by a JQL query. Only Connect and OAuth 2.0 apps can register and manage webhooks. For more information, see [Webhooks](https://developer.atlassian.com/cloud/jira/platform/webhooks/#registering-a-webhook-via-the-jira-rest-api-for-connect-apps).",
+      "name": "Webhooks"
+    }
+  ],
+  "x-split": {
+    "strategy": "domain",
+    "group": "admin",
+    "part": 1,
+    "of": 1,
+    "tags": [
+      "Announcement banner",
+      "Jira settings",
+      "Application roles",
+      "Audit records",
+      "Classification levels",
+      "Time tracking",
+      "License metrics",
+      "Server info",
+      "Tasks",
+      "Webhooks",
+      "(untagged)"
+    ]
+  },
+  "paths": {
+    "/rest/api/2/announcementBanner": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the current announcement banner configuration.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getBanner",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"hashId\":\"9HN2FJK9DM8BHRWERVW3RRTGDJ4G4D5C\",\"isDismissible\":false,\"isEnabled\":true,\"message\":\"This is a public, enabled, non-dismissible banner, set using the API\",\"visibility\":\"public\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementBannerConfiguration"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "\"Only admins can read banner configuration.\"",
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get announcement banner configuration",
+        "tags": [
+          "Announcement banner"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Updates the announcement banner configuration.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "setBanner",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "isDismissible": false,
+                "isEnabled": true,
+                "message": "This is a public, enabled, non-dismissible banner, set using the API",
+                "visibility": "public"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementBannerConfigurationUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "\"Banner message cannot be null.\"",
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if an invalid parameter is passed."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "\"Only admins can update banner configuration.\"",
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Update announcement banner configuration",
+        "tags": [
+          "Announcement banner"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/application-properties": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns all application properties or an application property.\n\nIf you specify a value for the `key` parameter, then an application property is returned as an object (not in an array). Otherwise, an array of all editable application properties is returned. See [Set application property](#api-rest-api-2-application-properties-id-put) for descriptions of editable properties.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getApplicationProperty",
+        "parameters": [
+          {
+            "description": "The key of the application property.",
+            "in": "query",
+            "name": "key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The permission level of all items being returned in the list.",
+            "in": "query",
+            "name": "permissionLevel",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "When a `key` isn't provided, this filters the list of results by the application property `key` using a regular expression. For example, using `jira.lf.*` will return all application properties with keys that start with *jira.lf.*.",
+            "in": "query",
+            "name": "keyFilter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"defaultValue\":\"\",\"desc\":\"Jira home directory\",\"id\":\"jira.home\",\"key\":\"jira.home\",\"name\":\"jira.home\",\"type\":\"string\",\"value\":\"/var/jira/jira-home\"},{\"defaultValue\":\"CLONE -\",\"id\":\"jira.clone.prefix\",\"key\":\"jira.clone.prefix\",\"name\":\"The prefix added to the Summary field of cloned issues\",\"type\":\"string\",\"value\":\"CLONE -\"}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationProperty"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the application property is not found or the user does not have permission to view it."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get application property",
+        "tags": [
+          "Jira settings"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:instance-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/application-properties/{id}": {
+      "put": {
+        "deprecated": false,
+        "description": "Changes the value of an application property. For example, you can change the value of the `jira.clone.prefix` from its default value of *CLONE -* to *Clone -* if you prefer sentence case capitalization. Editable properties are described below along with their default values.\n\n#### Advanced settings ####\n\nThe advanced settings below are also accessible in [Jira](https://confluence.atlassian.com/x/vYXKM).\n\n| Key | Description | Default value |  \n| -- | -- | -- |  \n| `jira.clone.prefix` | The string of text prefixed to the title of a cloned issue. | `CLONE -` |  \n| `jira.date.picker.java.format` | The date format for the Java (server-side) generated dates. This must be the same as the `jira.date.picker.javascript.format` format setting. | `d/MMM/yy` |  \n| `jira.date.picker.javascript.format` | The date format for the JavaScript (client-side) generated dates. This must be the same as the `jira.date.picker.java.format` format setting. | `%e/%b/%y` |  \n| `jira.date.time.picker.java.format` | The date format for the Java (server-side) generated date times. This must be the same as the `jira.date.time.picker.javascript.format` format setting. | `dd/MMM/yy h:mm a` |  \n| `jira.date.time.picker.javascript.format` | The date format for the JavaScript (client-side) generated date times. This must be the same as the `jira.date.time.picker.java.format` format setting. | `%e/%b/%y %I:%M %p` |  \n| `jira.issue.actions.order` | The default order of actions (such as *Comments* or *Change history*) displayed on the issue view. | `asc` |  \n| `jira.view.issue.links.sort.order` | The sort order of the list of issue links on the issue view. | `type, status, priority` |  \n| `jira.comment.collapsing.minimum.hidden` | The minimum number of comments required for comment collapsing to occur. A value of `0` disables comment collapsing. | `4` |  \n| `jira.newsletter.tip.delay.days` | The number of days before a prompt to sign up to the Jira Insiders newsletter is shown. A value of `-1` disables this feature. | `7` |  \n\n\n#### Look and feel ####\n\nThe settings listed below adjust the [look and feel](https://confluence.atlassian.com/x/VwCLLg).\n\n| Key | Description | Default value |  \n| -- | -- | -- |  \n| `jira.lf.date.time` | The [ time format](https://docs.oracle.com/javase/6/docs/api/index.html?java/text/SimpleDateFormat.html). | `h:mm a` |  \n| `jira.lf.date.day` | The [ day format](https://docs.oracle.com/javase/6/docs/api/index.html?java/text/SimpleDateFormat.html). | `EEEE h:mm a` |  \n| `jira.lf.date.complete` | The [ date and time format](https://docs.oracle.com/javase/6/docs/api/index.html?java/text/SimpleDateFormat.html). | `dd/MMM/yy h:mm a` |  \n| `jira.lf.date.dmy` | The [ date format](https://docs.oracle.com/javase/6/docs/api/index.html?java/text/SimpleDateFormat.html). | `dd/MMM/yy` |  \n| `jira.date.time.picker.use.iso8061` | When enabled, sets Monday as the first day of the week in the date picker, as specified by the ISO8601 standard. | `false` |  \n| `jira.lf.logo.url` | The URL of the logo image file. | `/images/icon-jira-logo.png` |  \n| `jira.lf.logo.show.application.title` | Controls the visibility of the application title on the sidebar. | `false` |  \n| `jira.lf.favicon.url` | The URL of the favicon. | `/favicon.ico` |  \n| `jira.lf.favicon.hires.url` | The URL of the high-resolution favicon. | `/images/64jira.png` |  \n| `jira.lf.navigation.bgcolour` | The background color of the sidebar. | `#0747A6` |  \n| `jira.lf.navigation.highlightcolour` | The color of the text and logo of the sidebar. | `#DEEBFF` |  \n| `jira.lf.hero.button.base.bg.colour` | The background color of the hero button. | `#3b7fc4` |  \n| `jira.title` | The text for the application title. The application title can also be set in *General settings*. | `Jira` |  \n| `jira.option.globalsharing` | Whether filters and dashboards can be shared with anyone signed into Jira. | `true` |  \n| `xflow.product.suggestions.enabled` | Whether to expose product suggestions for other Atlassian products within Jira. | `true` |  \n\n\n#### Other settings ####\n\n| Key | Description | Default value |  \n| -- | -- | -- |  \n| `jira.issuenav.criteria.autoupdate` | Whether instant updates to search criteria is active. | `true` |  \n\n\n*Note: Be careful when changing [application properties and advanced settings](https://confluence.atlassian.com/x/vYXKM).*\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "setApplicationProperty",
+        "parameters": [
+          {
+            "description": "The key of the application property to update.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "id": "jira.home",
+                "value": "/var/jira/jira-home"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/SimpleApplicationPropertyBean"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationProperty"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the data type of the `value` does not match the application property's data type. For example, a string is provided instead of an integer."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the user does not have permission to edit the property."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the property is not found or the user does not have permission to view it."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Set application property",
+        "tags": [
+          "Jira settings"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:instance-configuration:jira",
+              "read:instance-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/application-properties/advanced-settings": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the application properties that are accessible on the *Advanced Settings* page. To navigate to the *Advanced Settings* page in Jira, choose the Jira icon > **Jira settings** > **System**, **General Configuration** and then click **Advanced Settings** (in the upper right).\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getAdvancedSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"defaultValue\":\"\",\"desc\":\"Jira home directory\",\"id\":\"jira.home\",\"key\":\"jira.home\",\"name\":\"jira.home\",\"type\":\"string\",\"value\":\"/var/jira/jira-home\"},{\"defaultValue\":\"CLONE -\",\"id\":\"jira.clone.prefix\",\"key\":\"jira.clone.prefix\",\"name\":\"The prefix added to the Summary field of cloned issues\",\"type\":\"string\",\"value\":\"CLONE -\"}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationProperty"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user is not an administrator."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get advanced settings",
+        "tags": [
+          "Jira settings"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:instance-configuration:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/applicationrole": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns all application roles. In Jira, application roles are managed using the [Application access configuration](https://confluence.atlassian.com/x/3YxjL) page.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getAllApplicationRoles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"defaultGroups\":[\"jira-software-users\"],\"defaultGroupsDetails\":[{\"groupId\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"name\":\"jira-software-users\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=276f955c-63d7-42c8-9520-92d01dca0625\"}],\"defined\":false,\"groupDetails\":[{\"groupId\":\"42c8955c-63d7-42c8-9520-63d7aca0625\",\"name\":\"jira-testers\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=42c8955c-63d7-42c8-9520-63d7aca0625\"},{\"groupId\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"name\":\"jira-software-users\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=276f955c-63d7-42c8-9520-92d01dca0625\"}],\"groups\":[\"jira-software-users\",\"jira-testers\"],\"hasUnlimitedSeats\":false,\"key\":\"jira-software\",\"name\":\"Jira Software\",\"numberOfSeats\":10,\"platform\":false,\"remainingSeats\":5,\"selectedByDefault\":false,\"userCount\":5,\"userCountDescription\":\"5 developers\"},{\"defaultGroups\":[\"jira-core-users\"],\"defaultGroupsDetails\":[{\"groupId\":\"92d01dca0625-42c8-42c8-9520-276f955c\",\"name\":\"jira-core-users\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=92d01dca0625-42c8-42c8-9520-276f955c\"}],\"defined\":false,\"groupDetails\":[{\"groupId\":\"92d01dca0625-42c8-42c8-9520-276f955c\",\"name\":\"jira-core-users\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=92d01dca0625-42c8-42c8-9520-276f955c\"}],\"groups\":[\"jira-core-users\"],\"hasUnlimitedSeats\":false,\"key\":\"jira-core\",\"name\":\"Jira Core\",\"numberOfSeats\":1,\"platform\":true,\"remainingSeats\":1,\"selectedByDefault\":false,\"userCount\":0,\"userCountDescription\":\"0 users\"}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationRole"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user is not an administrator."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get all application roles",
+        "tags": [
+          "Application roles"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:application-role:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/applicationrole/{key}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns an application role.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getApplicationRole",
+        "parameters": [
+          {
+            "description": "The key of the application role. Use the [Get all application roles](#api-rest-api-2-applicationrole-get) operation to get the key for each application role.",
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "example": "jira-software",
+              "type": "string"
+            },
+            "x-showInExample": "true"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"defaultGroups\":[\"jira-software-users\"],\"defaultGroupsDetails\":[{\"groupId\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"name\":\"jira-software-users\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=276f955c-63d7-42c8-9520-92d01dca0625\"}],\"defined\":false,\"groupDetails\":[{\"groupId\":\"42c8955c-63d7-42c8-9520-63d7aca0625\",\"name\":\"jira-testers\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=42c8955c-63d7-42c8-9520-63d7aca0625\"},{\"groupId\":\"276f955c-63d7-42c8-9520-92d01dca0625\",\"name\":\"jira-software-users\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/group?groupId=276f955c-63d7-42c8-9520-92d01dca0625\"}],\"groups\":[\"jira-software-users\",\"jira-testers\"],\"hasUnlimitedSeats\":false,\"key\":\"jira-software\",\"name\":\"Jira Software\",\"numberOfSeats\":10,\"platform\":false,\"remainingSeats\":5,\"selectedByDefault\":false,\"userCount\":5,\"userCountDescription\":\"5 developers\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationRole"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user is not an administrator."
+          },
+          "404": {
+            "description": "Returned if the role is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get application role",
+        "tags": [
+          "Application roles"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:application-role:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/auditing/record": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a list of audit records. The list can be filtered to include items:\n\n *  where each item in `filter` has at least one match in any of these fields:\n    \n     *  `summary`\n     *  `category`\n     *  `eventSource`\n     *  `objectItem.name` If the object is a user, account ID is available to filter.\n     *  `objectItem.parentName`\n     *  `objectItem.typeName`\n     *  `changedValues.changedFrom`\n     *  `changedValues.changedTo`\n     *  `remoteAddress`\n    \n    For example, if `filter` contains *man ed*, an audit record containing `summary\": \"User added to group\"` and `\"category\": \"group management\"` is returned.\n *  created on or after a date and time.\n *  created or or before a date and time.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getAuditRecords",
+        "parameters": [
+          {
+            "description": "The number of records to skip before returning the first result.",
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of results to return.",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 1000,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The strings to match with audit field content, space separated.",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The date and time on or after which returned audit records must have been created. If `to` is provided `from` must be before `to` or no audit records are returned.",
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The date and time on or before which returned audit results must have been created. If `from` is provided `to` must be after `from` or no audit records are returned.",
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"limit\":1000,\"offset\":0,\"records\":[{\"associatedItems\":[{\"id\":\"jira-software-users\",\"name\":\"jira-software-users\",\"parentId\":\"1\",\"parentName\":\"Jira Internal Directory\",\"typeName\":\"GROUP\"}],\"authorAccountId\":\"5ab8f18d741e9c2c7e9d4538\",\"authorKey\":\"administrator\",\"category\":\"user management\",\"changedValues\":[{\"changedFrom\":\"user@atlassian.com\",\"changedTo\":\"newuser@atlassian.com\",\"fieldName\":\"email\"}],\"created\":\"2014-03-19T18:45:42.967+0000\",\"description\":\"Optional description\",\"eventSource\":\"Jira Connect Plugin\",\"id\":1,\"objectItem\":{\"id\":\"user\",\"name\":\"user\",\"parentId\":\"1\",\"parentName\":\"Jira Internal Directory\",\"typeName\":\"USER\"},\"remoteAddress\":\"192.168.1.1\",\"summary\":\"User created\"}],\"total\":1}",
+                "schema": {
+                  "$ref": "#/components/schemas/AuditRecords"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if:\n\n *  the user does not have the required permissions.\n *  all Jira products are on free plans. Audit logs are available when at least one Jira product is on a paid plan."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get audit records",
+        "tags": [
+          "Audit records"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:audit-log:jira",
+              "read:user:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/classification-levels": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns all classification levels.\n\n**[Permissions](#permissions) required:** None.",
+        "operationId": "getAllUserDataClassificationLevels",
+        "parameters": [
+          {
+            "description": "Optional set of statuses to filter by.",
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "items": {
+                "default": "",
+                "description": "The status of the project classification.",
+                "enum": [
+                  "PUBLISHED",
+                  "ARCHIVED",
+                  "DRAFT"
+                ],
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Ordering of the results by a given field. If not provided, values will not be sorted.",
+            "in": "query",
+            "name": "orderBy",
+            "schema": {
+              "enum": [
+                "rank",
+                "-rank",
+                "+rank"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"classifications\":[{\"id\":\"ari:cloud:platform::classification-tag/5bfa70f7-4af1-44f5-9e12-1ce185f15a38\",\"status\":\"published\",\"name\":\"Restricted\",\"rank\":1,\"description\":\"Data we hold that would be very damaging and would cause loss of trust with customers and present legal risk to Atlassian and/or customers if mishandled\",\"guideline\":\"Access to data must be restricted to only individuals who need access in order to perform their job duties.\",\"color\":\"RED\"},{\"id\":\"ari:cloud:platform::classification-tag/bd58e74c-c31b-41a7-ba69-9673ebd9dae9\",\"status\":\"archived\",\"name\":\"Protected\",\"rank\":2,\"description\":\"Data we hold that could cause loss of trust with customers or present legal risk to Atlassian if mishandled\",\"guideline\":\"Access to systems or APIs mapping data to other identifiers must be carefully controlled.\",\"color\":\"ORANGE\"},{\"id\":\"ari:cloud:platform::classification-tag/a82d653e-1035-4aa2-b9de-4265511fd487\",\"status\":\"published\",\"name\":\"Confidential\",\"rank\":3,\"description\":\"Data we hold that would likely be damaging and could cause loss of trust with our customers if mishandled\",\"guideline\":\"Data should be encrypted at rest and in transit.\",\"color\":\"BLUE\"},{\"id\":\"ari:cloud:platform::classification-tag/a82d653e-1035-4aa2-b9de-4265511fd487\",\"status\":\"published\",\"name\":\"system-tag\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/DataClassificationLevelsBean"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get all classification levels",
+        "tags": [
+          "Classification levels"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:project:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/configuration": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the [global settings](https://confluence.atlassian.com/x/qYXKM) in Jira. These settings determine whether optional features (for example, subtasks, time tracking, and others) are enabled. If time tracking is enabled, this operation also returns the time tracking configuration.\n\n**[Permissions](#permissions) required:** Permission to access Jira.",
+        "operationId": "getConfiguration",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"attachmentsEnabled\":true,\"issueLinkingEnabled\":true,\"subTasksEnabled\":false,\"timeTrackingConfiguration\":{\"defaultUnit\":\"day\",\"timeFormat\":\"pretty\",\"workingDaysPerWeek\":5.0,\"workingHoursPerDay\":8.0},\"timeTrackingEnabled\":true,\"unassignedIssuesAllowed\":false,\"votingEnabled\":true,\"watchingEnabled\":true}",
+                "schema": {
+                  "$ref": "#/components/schemas/Configuration"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-user"
+            ]
+          }
+        ],
+        "summary": "Get global settings",
+        "tags": [
+          "Jira settings"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-user"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:instance-configuration:jira",
+              "read:issue.time-tracking:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/configuration/timetracking": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the time tracking provider that is currently selected. Note that if time tracking is disabled, then a successful but empty response is returned.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getSelectedTimeTrackingImplementation",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"key\":\"Jira\",\"name\":\"JIRA provided time tracking\",\"url\":\"/example/config/url\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/TimeTrackingProvider"
+                }
+              }
+            },
+            "description": "Returned if the request is successful and time tracking is enabled."
+          },
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request is successful but time tracking is disabled."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get selected time tracking provider",
+        "tags": [
+          "Time tracking"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue.time-tracking:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Selects a time tracking provider.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "selectTimeTrackingImplementation",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "key": "Jira"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/TimeTrackingProvider"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the time tracking provider is not found."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Select time tracking provider",
+        "tags": [
+          "Time tracking"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue.time-tracking:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/configuration/timetracking/list": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns all time tracking providers. By default, Jira only has one time tracking provider: *JIRA provided time tracking*. However, you can install other time tracking providers via apps from the Atlassian Marketplace. For more information on time tracking providers, see the documentation for the [ Time Tracking Provider](https://developer.atlassian.com/cloud/jira/platform/modules/time-tracking-provider/) module.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getAvailableTimeTrackingImplementations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"key\":\"Jira\",\"name\":\"JIRA provided time tracking\",\"url\":\"/example/config/url\"}]",
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TimeTrackingProvider"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get all time tracking providers",
+        "tags": [
+          "Time tracking"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue.time-tracking:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/configuration/timetracking/options": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the time tracking settings. This includes settings such as the time format, default time unit, and others. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getSharedTimeTrackingConfiguration",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"defaultUnit\":\"hour\",\"timeFormat\":\"pretty\",\"workingDaysPerWeek\":5.5,\"workingHoursPerDay\":7.6}",
+                "schema": {
+                  "$ref": "#/components/schemas/TimeTrackingConfiguration"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get time tracking settings",
+        "tags": [
+          "Time tracking"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue.time-tracking:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Sets the time tracking settings.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "setSharedTimeTrackingConfiguration",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "defaultUnit": "hour",
+                "timeFormat": "pretty",
+                "workingDaysPerWeek": 5.5,
+                "workingHoursPerDay": 7.6
+              },
+              "schema": {
+                "$ref": "#/components/schemas/TimeTrackingConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"defaultUnit\":\"hour\",\"timeFormat\":\"pretty\",\"workingDaysPerWeek\":5.5,\"workingHoursPerDay\":7.6}",
+                "schema": {
+                  "$ref": "#/components/schemas/TimeTrackingConfiguration"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request object is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Set time tracking settings",
+        "tags": [
+          "Time tracking"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue.time-tracking:jira",
+              "read:issue.time-tracking:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "ADMIN"
+      }
+    },
+    "/rest/api/2/instance/license": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns licensing information about the Jira instance.\n\n**[Permissions](#permissions) required:** None.",
+        "operationId": "getLicense",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"applications\":[{\"id\":\"jira-core\",\"plan\":\"PAID\"},{\"id\":\"jira-product-discovery\",\"plan\":\"FREE\"},{\"id\":\"jira-servicedesk\",\"plan\":\"FREE\"},{\"id\":\"jira-software\",\"plan\":\"PAID\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/License"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get license",
+        "tags": [
+          "License metrics"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:license:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/license/approximateLicenseCount": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the approximate number of user accounts across all Jira licenses. Note that this information is cached with a 7-day lifecycle and could be stale at the time of call.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getApproximateLicenseCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"key\":\"license.totalApproximateUserCount\",\"value\":\"1000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseMetric"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Only Jira administrators can access license details.\"],\"errors\":{}}",
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollections"
+                }
+              }
+            },
+            "description": "Returned if the user does not have permission to complete this request."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get approximate license count",
+        "tags": [
+          "License metrics"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:license:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/license/approximateLicenseCount/product/{applicationKey}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the total approximate number of user accounts for a single Jira license. Note that this information is cached with a 7-day lifecycle and could be stale at the time of call.\n\n**[Permissions](#permissions) required:** *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+        "operationId": "getApproximateApplicationLicenseCount",
+        "parameters": [
+          {
+            "description": "The ID of the application, represents a specific version of Jira.",
+            "in": "path",
+            "name": "applicationKey",
+            "required": true,
+            "schema": {
+              "enum": [
+                "jira-core",
+                "jira-product-discovery",
+                "jira-software",
+                "jira-servicedesk"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"key\":\"license.jira-software.approximateUserCount\",\"value\":\"115\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseMetric"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[\"Only Jira administrators can access license details.\"],\"errors\":{}}",
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the user does not have permission to complete this request."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "manage:jira-configuration"
+            ]
+          }
+        ],
+        "summary": "Get approximate application license count",
+        "tags": [
+          "License metrics"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "manage:jira-configuration"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:license:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    },
+    "/rest/api/2/serverInfo": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns information about the Jira instance.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** None.",
+        "operationId": "getServerInfo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"baseUrl\":\"https://your-domain.atlassian.net\",\"buildDate\":\"2020-03-26T22:20:59.000+0000\",\"buildNumber\":582,\"defaultLocale\":{\"locale\":\"en_AU\"},\"displayUrl\":\"https://instance.jira.your-domain.com\",\"displayUrlConfluence\":\"https://instance.confluence.your-domain.com\",\"displayUrlServicedeskHelpCenter\":\"https://instance.help.your-domain.com\",\"scmInfo\":\"1f51473f5c7b75c1a69a0090f4832cdc5053702a\",\"serverTime\":\"2020-03-31T16:43:50.000+0000\",\"serverTimeZone\":\"Australia/Sydney\",\"serverTitle\":\"My Jira instance\",\"version\":\"1001.0.0-SNAPSHOT\",\"versionNumbers\":[5,0,0]}",
+                "schema": {
+                  "$ref": "#/components/schemas/ServerInformation"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": []
+          },
+          {}
+        ],
+        "summary": "Get Jira instance info",
+        "tags": [
+          "Server info"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/task/{taskId}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the status of a [long-running asynchronous task](#async).\n\nWhen a task has finished, this operation returns the JSON blob applicable to the task. See the documentation of the operation that created the task for details. Task details are not permanently retained. As of September 2019, details are retained for 14 days although this period may change without notice.\n\n**Deprecation notice:** The required OAuth 2.0 scopes will be updated on June 15, 2024.\n\n *  `read:jira-work`\n\n**[Permissions](#permissions) required:** either of:\n\n *  *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).\n *  Creator of the task.",
+        "operationId": "getTask",
+        "parameters": [
+          {
+            "description": "The ID of the task.",
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"self\":\"https://your-domain.atlassian.net/rest/api/2/task/1\",\"id\":\"1\",\"description\":\"Task description\",\"status\":\"COMPLETE\",\"result\":\"the task result, this may be any JSON\",\"submittedBy\":10000,\"progress\":100,\"elapsedRuntime\":156,\"submitted\":1501708132800,\"started\":1501708132900,\"finished\":1501708133000,\"lastUpdate\":1501708133000}",
+                "schema": {
+                  "$ref": "#/components/schemas/TaskProgressBeanObject"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "description": "Returned if the task is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          }
+        ],
+        "summary": "Get task",
+        "tags": [
+          "Tasks"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "NONE"
+      }
+    },
+    "/rest/api/2/task/{taskId}/cancel": {
+      "post": {
+        "deprecated": false,
+        "description": "Cancels a task.\n\n**[Permissions](#permissions) required:** either of:\n\n *  *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).\n *  Creator of the task.",
+        "operationId": "cancelTask",
+        "parameters": [
+          {
+            "description": "The ID of the task.",
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if cancellation of the task is not possible."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the user does not have the necessary permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Returned if the task is not found."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          }
+        ],
+        "summary": "Cancel task",
+        "tags": [
+          "Tasks"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:async-task:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "NONE"
+      }
+    },
+    "/rest/api/2/webhook": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a [paginated](#pagination) list of the webhooks registered by the calling app.\n\n**[Permissions](#permissions) required:** Only [Connect](https://developer.atlassian.com/cloud/jira/platform/#connect-apps) and [OAuth 2.0](https://developer.atlassian.com/cloud/jira/platform/oauth-2-3lo-apps) apps can use this operation.",
+        "operationId": "getDynamicWebhooksForApp",
+        "parameters": [
+          {
+            "description": "The index of the first item to return in a page of results (page offset).",
+            "in": "query",
+            "name": "startAt",
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The maximum number of items to return per page.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "default": 100,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"isLast\":true,\"maxResults\":3,\"startAt\":0,\"total\":3,\"values\":[{\"events\":[\"jira:issue_updated\",\"jira:issue_created\"],\"expirationDate\":\"2019-06-01T12:42:30.000+0000\",\"fieldIdsFilter\":[\"summary\",\"customfield_10029\"],\"id\":10000,\"jqlFilter\":\"project = PRJ\",\"url\":\"https://your-app.example.com/webhook-received\"},{\"events\":[\"jira:issue_created\"],\"expirationDate\":\"2019-06-01T12:42:30.000+0000\",\"id\":10001,\"jqlFilter\":\"issuetype = Bug\",\"url\":\"https://your-app.example.com/webhook-received\"},{\"events\":[\"issue_property_set\"],\"expirationDate\":\"2019-06-01T12:42:30.000+0000\",\"id\":10002,\"issuePropertyKeysFilter\":[\"my-issue-property-key\"],\"jqlFilter\":\"project = PRJ\",\"url\":\"https://your-app.example.com/webhook-received\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/PageBeanWebhook"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the caller isn't an app."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ]
+          }
+        ],
+        "summary": "Get dynamic webhooks for app",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:webhook:jira",
+              "read:jql:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Registers webhooks.\n\n**NOTE:** for non-public OAuth apps, webhooks are delivered only if there is a match between the app owner and the user who registered a dynamic webhook.\n\n**[Permissions](#permissions) required:** Only [Connect](https://developer.atlassian.com/cloud/jira/platform/#connect-apps) and [OAuth 2.0](https://developer.atlassian.com/cloud/jira/platform/oauth-2-3lo-apps) apps can use this operation.",
+        "operationId": "registerDynamicWebhooks",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "url": "https://your-app.example.com/webhook-received",
+                "webhooks": [
+                  {
+                    "events": [
+                      "jira:issue_created",
+                      "jira:issue_updated"
+                    ],
+                    "fieldIdsFilter": [
+                      "summary",
+                      "customfield_10029"
+                    ],
+                    "jqlFilter": "project = PROJ"
+                  },
+                  {
+                    "events": [
+                      "jira:issue_deleted"
+                    ],
+                    "jqlFilter": "project IN (PROJ, EXP) AND status = done"
+                  },
+                  {
+                    "events": [
+                      "issue_property_set"
+                    ],
+                    "issuePropertyKeysFilter": [
+                      "my-issue-property-key"
+                    ],
+                    "jqlFilter": "project = PROJ"
+                  }
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/WebhookRegistrationDetails"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"webhookRegistrationResult\":[{\"createdWebhookId\":1000},{\"errors\":[\"The clause watchCount is unsupported\"]},{\"createdWebhookId\":1001}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/ContainerForRegisteredWebhooks"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the caller isn't an app."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ]
+          }
+        ],
+        "summary": "Register dynamic webhooks",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field:jira",
+              "read:project:jira",
+              "write:webhook:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Removes webhooks by ID. Only webhooks registered by the calling app are removed. If webhooks created by other apps are specified, they are ignored.\n\n**[Permissions](#permissions) required:** Only [Connect](https://developer.atlassian.com/cloud/jira/platform/#connect-apps) and [OAuth 2.0](https://developer.atlassian.com/cloud/jira/platform/oauth-2-3lo-apps) apps can use this operation.",
+        "operationId": "deleteWebhookById",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "webhookIds": [
+                  10000,
+                  10001,
+                  10042
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ContainerForWebhookIDs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the list of webhook IDs is missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the caller isn't an app."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ]
+          }
+        ],
+        "summary": "Delete webhooks by ID",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:webhook:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/webhook/failed": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns webhooks that have recently failed to be delivered to the requesting app after the maximum number of retries.\n\nAfter 72 hours the failure may no longer be returned by this operation.\n\nThe oldest failure is returned first.\n\nThis method uses a cursor-based pagination. To request the next page use the failure time of the last webhook on the list as the `failedAfter` value or use the URL provided in `next`.\n\n**[Permissions](#permissions) required:** Only [Connect apps](https://developer.atlassian.com/cloud/jira/platform/index/#connect-apps) can use this operation.",
+        "operationId": "getFailedWebhooks",
+        "parameters": [
+          {
+            "description": "The maximum number of webhooks to return per page. If obeying the maxResults directive would result in records with the same failure time being split across pages, the directive is ignored and all records with the same failure time included on the page.",
+            "in": "query",
+            "name": "maxResults",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The time after which any webhook failure must have occurred for the record to be returned, expressed as milliseconds since the UNIX epoch.",
+            "in": "query",
+            "name": "after",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"values\":[{\"id\":\"1\",\"body\":\"{\\\"data\\\":\\\"webhook data\\\"}\",\"url\":\"https://example.com\",\"failureTime\":1573118132000},{\"id\":\"2\",\"url\":\"https://example.com\",\"failureTime\":1573540473480}],\"maxResults\":100,\"next\":\"https://your-domain.atlassian.net/rest/api/2/webhook/failed?failedAfter=1573540473480&maxResults=100\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/FailedWebhooks"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "400 response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the caller is not a Connect app."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ]
+          }
+        ],
+        "summary": "Get failed webhooks",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-details:jira",
+              "read:webhook:jira",
+              "read:comment.property:jira",
+              "read:group:jira",
+              "read:issue-type:jira",
+              "read:project-role:jira",
+              "read:epic:jira-software"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-experimental": true,
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/api/2/webhook/refresh": {
+      "put": {
+        "deprecated": false,
+        "description": "Extends the life of webhook. Webhooks registered through the REST API expire after 30 days. Call this operation to keep them alive.\n\nUnrecognized webhook IDs (those that are not found or belong to other apps) are ignored.\n\n**[Permissions](#permissions) required:** Only [Connect](https://developer.atlassian.com/cloud/jira/platform/#connect-apps) and [OAuth 2.0](https://developer.atlassian.com/cloud/jira/platform/oauth-2-3lo-apps) apps can use this operation.",
+        "operationId": "refreshWebhooks",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "webhookIds": [
+                  10000,
+                  10001,
+                  10042
+                ]
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ContainerForWebhookIDs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"expirationDate\":\"2019-06-01T12:42:30.000+0000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/WebhooksExpirationDate"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the request is invalid."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorCollection"
+                }
+              }
+            },
+            "description": "Returned if the caller isn't an app."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ]
+          }
+        ],
+        "summary": "Extend webhook life",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work",
+              "manage:jira-webhook"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:webhook:jira",
+              "read:webhook:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    },
+    "/rest/internal/api/latest/worklog/bulk": {
+      "post": {
+        "deprecated": false,
+        "description": "Returns worklog details for a list of issue ID and worklog ID pairs.\n\nThis is an internal API for bulk fetching worklogs by their issue and worklog IDs. Worklogs that don't exist will be filtered out from the response.\n\nThe returned list of worklogs is limited to 1000 items.\n\n**[Permissions](#permissions) required:** This is an internal service-to-service API that requires ASAP authentication. No user permission checks are performed as this bypasses normal user context.",
+        "operationId": "getWorklogsByIssueIdAndWorklogId",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkWorklogKeyRequestBean"
+              }
+            }
+          },
+          "description": "A JSON object containing a list of issue ID and worklog ID pairs.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkWorklogKeyResponseBean"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the request contains more than 1000 worklog pairs, is empty, or has invalid format."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "500": {
+            "description": "Returned if there is an internal server error."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "summary": "Get worklogs by issue id and worklog id",
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-connect-scope": "INACCESSIBLE"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnnouncementBannerConfiguration": {
+        "additionalProperties": false,
+        "description": "Announcement banner configuration.",
+        "properties": {
+          "hashId": {
+            "description": "Hash of the banner data. The client detects updates by comparing hash IDs.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "isDismissible": {
+            "description": "Flag indicating if the announcement banner can be dismissed by the user.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "isEnabled": {
+            "description": "Flag indicating if the announcement banner is enabled or not.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "message": {
+            "description": "The text on the announcement banner.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "visibility": {
+            "description": "Visibility of the announcement banner.",
+            "enum": [
+              "public",
+              "private"
+            ],
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AnnouncementBannerConfigurationUpdate": {
+        "additionalProperties": false,
+        "description": "Configuration of the announcement banner.",
+        "properties": {
+          "isDismissible": {
+            "description": "Flag indicating if the announcement banner can be dismissed by the user.",
+            "type": "boolean"
+          },
+          "isEnabled": {
+            "description": "Flag indicating if the announcement banner is enabled or not.",
+            "type": "boolean"
+          },
+          "message": {
+            "description": "The text on the announcement banner.",
+            "type": "string"
+          },
+          "visibility": {
+            "description": "Visibility of the announcement banner. Can be public or private.",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "writeOnly": true
+      },
+      "ApplicationProperty": {
+        "additionalProperties": false,
+        "description": "Details of an application property.",
+        "properties": {
+          "allowedValues": {
+            "description": "The allowed values, if applicable.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "defaultValue": {
+            "description": "The default value of the application property.",
+            "type": "string"
+          },
+          "desc": {
+            "description": "The description of the application property.",
+            "type": "string"
+          },
+          "example": {
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the application property. The ID and key are the same.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The key of the application property. The ID and key are the same.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the application property.",
+            "type": "string"
+          },
+          "type": {
+            "description": "The data type of the application property.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The new value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApplicationRole": {
+        "additionalProperties": false,
+        "description": "Details of an application role.",
+        "properties": {
+          "defaultGroups": {
+            "description": "The groups that are granted default access for this application role. As a group's name can change, use of `defaultGroupsDetails` is recommended to identify a groups.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "defaultGroupsDetails": {
+            "description": "The groups that are granted default access for this application role.",
+            "items": {
+              "$ref": "#/components/schemas/GroupName"
+            },
+            "type": "array"
+          },
+          "defined": {
+            "description": "Deprecated.",
+            "type": "boolean"
+          },
+          "groupDetails": {
+            "description": "The groups associated with the application role.",
+            "items": {
+              "$ref": "#/components/schemas/GroupName"
+            },
+            "type": "array"
+          },
+          "groups": {
+            "description": "The groups associated with the application role. As a group's name can change, use of `groupDetails` is recommended to identify a groups.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "hasUnlimitedSeats": {
+            "type": "boolean"
+          },
+          "key": {
+            "description": "The key of the application role.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The display name of the application role.",
+            "type": "string"
+          },
+          "numberOfSeats": {
+            "description": "The maximum count of users on your license.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "platform": {
+            "description": "Indicates if the application role belongs to Jira platform (`jira-core`).",
+            "type": "boolean"
+          },
+          "remainingSeats": {
+            "description": "The count of users remaining on your license.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "selectedByDefault": {
+            "description": "Determines whether this application role should be selected by default on user creation.",
+            "type": "boolean"
+          },
+          "userCount": {
+            "description": "The number of users counting against your license.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "userCountDescription": {
+            "description": "The [type of users](https://confluence.atlassian.com/x/lRW3Ng) being counted against your license.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AssociatedItemBean": {
+        "additionalProperties": false,
+        "description": "Details of an item associated with the changed record.",
+        "properties": {
+          "id": {
+            "description": "The ID of the associated record.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the associated record.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "parentId": {
+            "description": "The ID of the associated parent record.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "parentName": {
+            "description": "The name of the associated parent record.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "typeName": {
+            "description": "The type of the associated record.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AuditRecordBean": {
+        "additionalProperties": false,
+        "description": "An audit record.",
+        "properties": {
+          "associatedItems": {
+            "description": "The list of items associated with the changed record.",
+            "items": {
+              "$ref": "#/components/schemas/AssociatedItemBean"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "authorKey": {
+            "description": "Deprecated, use `authorAccountId` instead. The key of the user who created the audit record.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "category": {
+            "description": "The category of the audit record. For a list of these categories, see the help article [Auditing in Jira applications](https://confluence.atlassian.com/x/noXKM).",
+            "readOnly": true,
+            "type": "string"
+          },
+          "changedValues": {
+            "description": "The list of values changed in the record event.",
+            "items": {
+              "$ref": "#/components/schemas/ChangedValueBean"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "created": {
+            "description": "The date and time on which the audit record was created.",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "description": {
+            "description": "The description of the audit record.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "eventSource": {
+            "description": "The event the audit record originated from.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the audit record.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "objectItem": {
+            "$ref": "#/components/schemas/AssociatedItemBean"
+          },
+          "remoteAddress": {
+            "description": "The URL of the computer where the creation of the audit record was initiated.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "summary": {
+            "description": "The summary of the audit record.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AuditRecords": {
+        "additionalProperties": false,
+        "description": "Container for a list of audit records.",
+        "properties": {
+          "limit": {
+            "description": "The requested or default limit on the number of audit items to be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "The number of audit items skipped before the first item in this list.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "records": {
+            "description": "The list of audit items.",
+            "items": {
+              "$ref": "#/components/schemas/AuditRecordBean"
+            },
+            "readOnly": true,
+            "type": "array"
+          },
+          "total": {
+            "description": "The total number of audit items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "BulkWorklogKeyRequestBean": {
+        "additionalProperties": false,
+        "properties": {
+          "requests": {
+            "description": "A list of issue and worklog ID pairs.",
+            "items": {
+              "$ref": "#/components/schemas/WorklogCompositeKey"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "BulkWorklogKeyResponseBean": {
+        "additionalProperties": false,
+        "properties": {
+          "worklogs": {
+            "description": "A list of successfully retrieved worklogs with their issue and worklog IDs.",
+            "items": {
+              "$ref": "#/components/schemas/WorklogKeyResult"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ChangedValueBean": {
+        "additionalProperties": false,
+        "description": "Details of names changed in the record event.",
+        "properties": {
+          "changedFrom": {
+            "description": "The value of the field before the change.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "changedTo": {
+            "description": "The value of the field after the change.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "fieldName": {
+            "description": "The name of the field changed.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Configuration": {
+        "additionalProperties": false,
+        "description": "Details about the configuration of Jira.",
+        "properties": {
+          "attachmentsEnabled": {
+            "description": "Whether the ability to add attachments to issues is enabled.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "issueLinkingEnabled": {
+            "description": "Whether the ability to link issues is enabled.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "subTasksEnabled": {
+            "description": "Whether the ability to create subtasks for issues is enabled.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "timeTrackingConfiguration": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimeTrackingConfiguration"
+              }
+            ],
+            "description": "The configuration of time tracking.",
+            "readOnly": true
+          },
+          "timeTrackingEnabled": {
+            "description": "Whether the ability to track time is enabled. This property is deprecated.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "unassignedIssuesAllowed": {
+            "description": "Whether the ability to create unassigned issues is enabled. See [Configuring Jira application options](https://confluence.atlassian.com/x/uYXKM) for details.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "votingEnabled": {
+            "description": "Whether the ability for users to vote on issues is enabled. See [Configuring Jira application options](https://confluence.atlassian.com/x/uYXKM) for details.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "watchingEnabled": {
+            "description": "Whether the ability for users to watch issues is enabled. See [Configuring Jira application options](https://confluence.atlassian.com/x/uYXKM) for details.",
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ContainerForRegisteredWebhooks": {
+        "additionalProperties": false,
+        "description": "Container for a list of registered webhooks. Webhook details are returned in the same order as the request.",
+        "properties": {
+          "webhookRegistrationResult": {
+            "description": "A list of registered webhooks.",
+            "items": {
+              "$ref": "#/components/schemas/RegisteredWebhook"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ContainerForWebhookIDs": {
+        "additionalProperties": false,
+        "description": "Container for a list of webhook IDs.",
+        "properties": {
+          "webhookIds": {
+            "description": "A list of webhook IDs.",
+            "items": {
+              "description": "A list of webhook IDs.",
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "webhookIds"
+        ],
+        "type": "object"
+      },
+      "DataClassificationLevelsBean": {
+        "additionalProperties": false,
+        "description": "The data classification.",
+        "properties": {
+          "classifications": {
+            "description": "The data classifications.",
+            "items": {
+              "$ref": "#/components/schemas/DataClassificationTagBean"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "DataClassificationTagBean": {
+        "additionalProperties": false,
+        "description": "The data classification.",
+        "properties": {
+          "color": {
+            "description": "The color of the data classification object.",
+            "type": "string"
+          },
+          "description": {
+            "description": "The description of the data classification object.",
+            "type": "string"
+          },
+          "guideline": {
+            "description": "The guideline of the data classification object.",
+            "type": "string"
+          },
+          "guidelineADF": {
+            "description": "The guideline in ADF (Atlassian Document Format) for rich text rendering.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the data classification object.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the data classification object.",
+            "type": "string"
+          },
+          "rank": {
+            "description": "The rank of the data classification object.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "status": {
+            "description": "The status of the data classification object.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "type": "object"
+      },
+      "ErrorCollection": {
+        "additionalProperties": false,
+        "description": "Error messages from an operation.",
+        "properties": {
+          "errorMessages": {
+            "description": "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "errors": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The list of errors by parameter returned by the operation. For example,\"projectKey\": \"Project keys must start with an uppercase letter, followed by one or more uppercase alphanumeric characters.\"",
+            "type": "object"
+          },
+          "status": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ErrorCollections": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "FailedWebhook": {
+        "additionalProperties": false,
+        "description": "Details about a failed webhook.",
+        "properties": {
+          "body": {
+            "description": "The webhook body.",
+            "type": "string"
+          },
+          "failureTime": {
+            "description": "The time the webhook was added to the list of failed webhooks (that is, the time of the last failed retry).",
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "description": "The webhook ID, as sent in the `X-Atlassian-Webhook-Identifier` header with the webhook.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The original webhook destination.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "failureTime",
+          "id",
+          "url"
+        ],
+        "type": "object"
+      },
+      "FailedWebhooks": {
+        "additionalProperties": false,
+        "description": "A page of failed webhooks.",
+        "properties": {
+          "maxResults": {
+            "description": "The maximum number of items on the page. If the list of values is shorter than this number, then there are no more pages.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "next": {
+            "description": "The URL to the next page of results. Present only if the request returned at least one result.The next page may be empty at the time of receiving the response, but new failed webhooks may appear in time. You can save the URL to the next page and query for new results periodically (for example, every hour).",
+            "format": "uri",
+            "type": "string"
+          },
+          "values": {
+            "description": "The list of webhooks.",
+            "items": {
+              "$ref": "#/components/schemas/FailedWebhook"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "maxResults",
+          "values"
+        ],
+        "type": "object"
+      },
+      "GroupName": {
+        "additionalProperties": false,
+        "description": "Details about a group.",
+        "properties": {
+          "groupId": {
+            "description": "The ID of the group, which uniquely identifies the group across all Atlassian products. For example, *952d12c3-5b5b-4d04-bb32-44d383afc4b2*.",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of group.",
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL for these group details.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "HealthCheckResult": {
+        "additionalProperties": false,
+        "description": "Jira instance health check results. Deprecated and no longer returned.",
+        "properties": {
+          "description": {
+            "description": "The description of the Jira health check item.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the Jira health check item.",
+            "type": "string"
+          },
+          "passed": {
+            "description": "Whether the Jira health check item passed or failed.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "License": {
+        "additionalProperties": false,
+        "description": "Details about a license for the Jira instance.",
+        "properties": {
+          "applications": {
+            "description": "The applications under this license.",
+            "items": {
+              "$ref": "#/components/schemas/LicensedApplication"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "applications"
+        ],
+        "type": "object"
+      },
+      "LicensedApplication": {
+        "additionalProperties": false,
+        "description": "Details about a licensed Jira application.",
+        "properties": {
+          "id": {
+            "description": "The ID of the application.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "plan": {
+            "description": "The licensing plan.",
+            "enum": [
+              "UNLICENSED",
+              "FREE",
+              "PAID"
+            ],
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "plan"
+        ],
+        "type": "object"
+      },
+      "LicenseMetric": {
+        "additionalProperties": false,
+        "description": "A metric that provides insight into the active licence details",
+        "properties": {
+          "key": {
+            "description": "The key of a specific license metric.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The calculated value of a licence metric linked to the key. An example licence metric is the approximate number of user accounts.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PageBeanWebhook": {
+        "additionalProperties": false,
+        "description": "A page of items.",
+        "properties": {
+          "isLast": {
+            "description": "Whether this is the last page.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "maxResults": {
+            "description": "The maximum number of items that could be returned.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "nextPage": {
+            "description": "If there is another page of results, the URL of the next page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the page.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "startAt": {
+            "description": "The index of the first item returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "total": {
+            "description": "The number of items returned.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "values": {
+            "description": "The list of items.",
+            "items": {
+              "$ref": "#/components/schemas/Webhook"
+            },
+            "readOnly": true,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "RegisteredWebhook": {
+        "additionalProperties": false,
+        "description": "ID of a registered webhook or error messages explaining why a webhook wasn't registered.",
+        "properties": {
+          "createdWebhookId": {
+            "description": "The ID of the webhook. Returned if the webhook is created.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "errors": {
+            "description": "Error messages specifying why the webhook creation failed.",
+            "items": {
+              "description": "Error messages specifying why the webhook creation failed.",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ServerInformation": {
+        "additionalProperties": false,
+        "description": "Details about the Jira instance.",
+        "properties": {
+          "baseUrl": {
+            "description": "The base URL of the Jira instance.",
+            "type": "string"
+          },
+          "buildDate": {
+            "description": "The timestamp when the Jira version was built.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "buildNumber": {
+            "description": "The build number of the Jira version.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "deploymentType": {
+            "description": "The type of server deployment. This is always returned as *Cloud*.",
+            "type": "string"
+          },
+          "displayUrl": {
+            "description": "The display URL of the Jira instance.",
+            "type": "string"
+          },
+          "displayUrlConfluence": {
+            "description": "The display URL of Confluence.",
+            "type": "string"
+          },
+          "displayUrlServicedeskHelpCenter": {
+            "description": "The display URL of the Servicedesk Help Center.",
+            "type": "string"
+          },
+          "healthChecks": {
+            "description": "Jira instance health check results. Deprecated and no longer returned.",
+            "items": {
+              "$ref": "#/components/schemas/HealthCheckResult"
+            },
+            "type": "array"
+          },
+          "scmInfo": {
+            "description": "The unique identifier of the Jira version.",
+            "type": "string"
+          },
+          "serverTime": {
+            "description": "The time in Jira when this request was responded to.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "serverTimeZone": {
+            "description": "The default timezone of the Jira server. In a format known as Olson Time Zones, IANA Time Zones or TZ Database Time Zones.",
+            "type": "string"
+          },
+          "serverTitle": {
+            "description": "The name of the Jira instance.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The version of Jira.",
+            "type": "string"
+          },
+          "versionNumbers": {
+            "description": "The major, minor, and revision version numbers of the Jira version.",
+            "items": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "SimpleApplicationPropertyBean": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "The ID of the application property.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The new value.",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "applicationProperty"
+        }
+      },
+      "TaskProgressBeanObject": {
+        "additionalProperties": false,
+        "description": "Details about a task.",
+        "properties": {
+          "description": {
+            "description": "The description of the task.",
+            "type": "string"
+          },
+          "elapsedRuntime": {
+            "description": "The execution time of the task, in milliseconds.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "finished": {
+            "description": "A timestamp recording when the task was finished.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "description": "The ID of the task.",
+            "type": "string"
+          },
+          "lastUpdate": {
+            "description": "A timestamp recording when the task progress was last updated.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "message": {
+            "description": "Information about the progress of the task.",
+            "type": "string"
+          },
+          "progress": {
+            "description": "The progress of the task, as a percentage complete.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "result": {
+            "description": "The result of the task execution."
+          },
+          "self": {
+            "description": "The URL of the task.",
+            "format": "uri",
+            "type": "string"
+          },
+          "started": {
+            "description": "A timestamp recording when the task was started.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "status": {
+            "description": "The status of the task.",
+            "enum": [
+              "ENQUEUED",
+              "RUNNING",
+              "COMPLETE",
+              "FAILED",
+              "CANCEL_REQUESTED",
+              "CANCELLED",
+              "DEAD"
+            ],
+            "type": "string"
+          },
+          "submitted": {
+            "description": "A timestamp recording when the task was submitted.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "submittedBy": {
+            "description": "The ID of the user who submitted the task.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "elapsedRuntime",
+          "id",
+          "lastUpdate",
+          "progress",
+          "self",
+          "status",
+          "submitted",
+          "submittedBy"
+        ],
+        "type": "object"
+      },
+      "TimeTrackingConfiguration": {
+        "additionalProperties": false,
+        "description": "Details of the time tracking configuration.",
+        "properties": {
+          "defaultUnit": {
+            "description": "The default unit of time applied to logged time.",
+            "enum": [
+              "minute",
+              "hour",
+              "day",
+              "week"
+            ],
+            "type": "string"
+          },
+          "timeFormat": {
+            "description": "The format that will appear on an issue's *Time Spent* field.",
+            "enum": [
+              "pretty",
+              "days",
+              "hours"
+            ],
+            "type": "string"
+          },
+          "workingDaysPerWeek": {
+            "description": "The number of days in a working week.",
+            "format": "double",
+            "type": "number"
+          },
+          "workingHoursPerDay": {
+            "description": "The number of hours in a working day.",
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "required": [
+          "defaultUnit",
+          "timeFormat",
+          "workingDaysPerWeek",
+          "workingHoursPerDay"
+        ],
+        "type": "object"
+      },
+      "TimeTrackingProvider": {
+        "additionalProperties": false,
+        "description": "Details about the time tracking provider.",
+        "properties": {
+          "key": {
+            "description": "The key for the time tracking provider. For example, *JIRA*.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the time tracking provider. For example, *JIRA provided time tracking*.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL of the configuration page for the time tracking provider app. For example, */example/config/url*. This property is only returned if the `adminPageKey` property is set in the module descriptor of the time tracking provider app.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "type": "object"
+      },
+      "Webhook": {
+        "additionalProperties": false,
+        "description": "A webhook.",
+        "properties": {
+          "events": {
+            "description": "The Jira events that trigger the webhook.",
+            "items": {
+              "enum": [
+                "jira:issue_created",
+                "jira:issue_updated",
+                "jira:issue_deleted",
+                "comment_created",
+                "comment_updated",
+                "comment_deleted",
+                "issue_property_set",
+                "issue_property_deleted",
+                "sprint_created",
+                "sprint_updated",
+                "sprint_closed",
+                "sprint_deleted",
+                "sprint_started",
+                "jira:version_released",
+                "jira:version_unreleased",
+                "jira:version_created",
+                "jira:version_moved",
+                "jira:version_updated",
+                "jira:version_merged",
+                "jira:version_deleted"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "expirationDate": {
+            "description": "The date after which the webhook is no longer sent. Use [Extend webhook life](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-webhooks/#api-rest-api-3-webhook-refresh-put) to extend the date.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "fieldIdsFilter": {
+            "description": "A list of field IDs. When the issue changelog contains any of the fields, the webhook `jira:issue_updated` is sent. If this parameter is not present, the app is notified about all field updates.",
+            "items": {
+              "description": "A list of field IDs. When the issue changelog contains any of the fields, the webhook <code>jira:issue_updated</code> is sent. If this parameter is not present, the app is notified about all field updates.",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "description": "The ID of the webhook.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "issuePropertyKeysFilter": {
+            "description": "A list of issue property keys. A change of those issue properties triggers the `issue_property_set` or `issue_property_deleted` webhooks. If this parameter is not present, the app is notified about all issue property updates.",
+            "items": {
+              "description": "A list of issue property keys. A change of those issue properties triggers the <code>issue_property_set</code> or <code>issue_property_deleted</code> webhooks. If this parameter is not present, the app is notified about all issue property updates.",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "jqlFilter": {
+            "description": "The JQL filter that specifies which issues the webhook is sent for.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL that specifies where the webhooks are sent.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "events",
+          "id",
+          "jqlFilter",
+          "url"
+        ],
+        "type": "object"
+      },
+      "WebhookDetails": {
+        "additionalProperties": false,
+        "description": "A list of webhooks.",
+        "properties": {
+          "events": {
+            "description": "The Jira events that trigger the webhook.",
+            "items": {
+              "enum": [
+                "jira:issue_created",
+                "jira:issue_updated",
+                "jira:issue_deleted",
+                "comment_created",
+                "comment_updated",
+                "comment_deleted",
+                "issue_property_set",
+                "issue_property_deleted",
+                "sprint_created",
+                "sprint_updated",
+                "sprint_closed",
+                "sprint_deleted",
+                "sprint_started",
+                "jira:version_released",
+                "jira:version_unreleased",
+                "jira:version_created",
+                "jira:version_moved",
+                "jira:version_updated",
+                "jira:version_merged",
+                "jira:version_deleted"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "fieldIdsFilter": {
+            "description": "A list of field IDs. When the issue changelog contains any of the fields, the webhook `jira:issue_updated` is sent. If this parameter is not present, the app is notified about all field updates.",
+            "items": {
+              "description": "A list of field IDs. When the issue changelog contains any of the fields, the webhook <code>jira:issue_updated</code> is sent. If this parameter is not present, the app is notified about all field updates.",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "issuePropertyKeysFilter": {
+            "description": "A list of issue property keys. A change of those issue properties triggers the `issue_property_set` or `issue_property_deleted` webhooks. If this parameter is not present, the app is notified about all issue property updates.",
+            "items": {
+              "description": "A list of issue property keys. A change of those issue properties triggers the <code>issue_property_set</code> or <code>issue_property_deleted</code> webhooks. If this parameter is not present, the app is notified about all issue property updates.",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "jqlFilter": {
+            "description": "The JQL filter that specifies which issues the webhook is sent for. Only a subset of JQL can be used. The supported elements are:\n\n *  Fields: `issueKey`, `project`, `issuetype`, `status`, `assignee`, `reporter`, `issue.property`, and `cf[id]`. For custom fields (`cf[id]`), only the epic label custom field is supported.\".\n *  Operators: `=`, `!=`, `IN`, and `NOT IN`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "events",
+          "jqlFilter"
+        ],
+        "type": "object"
+      },
+      "WebhookRegistrationDetails": {
+        "additionalProperties": false,
+        "description": "Details of webhooks to register.",
+        "properties": {
+          "url": {
+            "description": "The URL that specifies where to send the webhooks. This URL must use the same base URL as the Connect app. Only a single URL per app is allowed to be registered.",
+            "type": "string"
+          },
+          "webhooks": {
+            "description": "A list of webhooks.",
+            "items": {
+              "$ref": "#/components/schemas/WebhookDetails"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "url",
+          "webhooks"
+        ],
+        "type": "object"
+      },
+      "WebhooksExpirationDate": {
+        "additionalProperties": false,
+        "description": "The date the refreshed webhooks expire.",
+        "properties": {
+          "expirationDate": {
+            "description": "The expiration date of all the refreshed webhooks.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expirationDate"
+        ],
+        "type": "object"
+      },
+      "WorklogCompositeKey": {
+        "additionalProperties": false,
+        "properties": {
+          "issueId": {
+            "description": "The issue ID.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "worklogId": {
+            "description": "The worklog ID.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "WorklogKeyResult": {
+        "additionalProperties": false,
+        "properties": {
+          "issueId": {
+            "description": "The issue ID.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "worklogId": {
+            "description": "The worklog ID.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "description": "You can access this resource via basic auth.",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "OAuth2": {
+        "description": "OAuth2 scopes for Jira",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.atlassian.com/authorize",
+            "scopes": {
+              "delete:async-task:jira": "Delete asynchronous task.",
+              "delete:attachment:jira": "Delete issue attachments.",
+              "delete:avatar:jira": "Delete system and custom avatars.",
+              "delete:comment.property:jira": "Delete issue comment properties.",
+              "delete:comment:jira": "Delete issue comments.",
+              "delete:dashboard.property:jira": "Delete dashboard properties.",
+              "delete:dashboard:jira": "Delete dashboards.",
+              "delete:field-configuration-scheme:jira": "Delete field configuration schemes.",
+              "delete:field-configuration:jira": "Delete field configurations.",
+              "delete:field.option:jira": "Delete field options.",
+              "delete:field:jira": "Delete fields.",
+              "delete:filter.column:jira": "Delete filter columns.",
+              "delete:filter:jira": "Delete filters.",
+              "delete:group:jira": "Delete user groups.",
+              "delete:issue-link-type:jira": "Delete issue link types.",
+              "delete:issue-link:jira": "Delete issue links.",
+              "delete:issue-type-scheme:jira": "Delete issue type schemes.",
+              "delete:issue-type-screen-scheme:jira": "Delete issue type screen schemes.",
+              "delete:issue-type.property:jira": "Delete issue type properties.",
+              "delete:issue-type:jira": "Delete issue types.",
+              "delete:issue-worklog.property:jira": "Delete issue worklog properties.",
+              "delete:issue-worklog:jira": "Delete issue worklogs.",
+              "delete:issue.property:jira": "Delete issue properties.",
+              "delete:issue.remote-link:jira": "Delete issue remote links.",
+              "delete:issue:jira": "Delete issues.",
+              "delete:permission-scheme:jira": "Delete permission schemes.",
+              "delete:permission:jira": "Delete permissions.",
+              "delete:project-category:jira": "Delete project categories.",
+              "delete:project-role:jira": "Delete project roles.",
+              "delete:project-version:jira": "Delete project versions.",
+              "delete:project.avatar:jira": "Delete project avatars.",
+              "delete:project.component:jira": "Delete project components.",
+              "delete:project.property:jira": "Delete project properties.",
+              "delete:project:jira": "Delete projects and their details, such as issue types, project lead, and avatars.",
+              "delete:screen-scheme:jira": "Delete screen schemes.",
+              "delete:screen-tab:jira": "Delete screen tabs.",
+              "delete:screen:jira": "Delete screens.",
+              "delete:screenable-field:jira": "Delete screenable fields.",
+              "delete:user-configuration:jira": "Delete user configurations.",
+              "delete:user.property:jira": "Delete user properties.",
+              "delete:webhook:jira": "Delete webhooks.",
+              "delete:workflow-scheme:jira": "Delete workflow schemes.",
+              "delete:workflow.property:jira": "Delete workflow properties.",
+              "delete:workflow:jira": "Delete workflows.",
+              "manage:jira-configuration": "Configure Jira settings that require the Jira administrators permission, for example, create projects and custom fields, view workflows, manage issue link types.",
+              "manage:jira-project": "Create and edit project settings and create new project-level objects, for example, versions, components.",
+              "manage:jira-webhook": "Manage Jira webhooks. Enables an OAuth app to register and unregister dynamic webhooks in Jira. It also provides for fetching of registered webhooks.",
+              "read:app-data:jira": "Read app data.",
+              "read:application-role:jira": "View application roles.",
+              "read:attachment:jira": "View issue attachments.",
+              "read:audit-log:jira": "View audit logs.",
+              "read:avatar:jira": "View system and custom avatars.",
+              "read:comment.property:jira": "View issue comment properties.",
+              "read:comment:jira": "View issue comments.",
+              "read:custom-field-contextual-configuration:jira": "Read custom field contextual configurations.",
+              "read:dashboard.property:jira": "View dashboard properties.",
+              "read:dashboard:jira": "View dashboards.",
+              "read:email-address:jira": "View email addresses of all users regardless of the user's profile visibility settings.",
+              "read:field-configuration-scheme:jira": "View field configuration schemes.",
+              "read:field-configuration:jira": "Read field configurations.",
+              "read:field.default-value:jira": "View field default values.",
+              "read:field.option:jira": "View field options.",
+              "read:field.options:jira": "Read field options.",
+              "read:field:jira": "View fields.",
+              "read:filter.column:jira": "View filter columns.",
+              "read:filter.default-share-scope:jira": "View filter default share scopes.",
+              "read:filter:jira": "View filters.",
+              "read:group:jira": "View user groups.",
+              "read:instance-configuration:jira": "View instance configurations.",
+              "read:issue-details:jira": "View issue details.",
+              "read:issue-event:jira": "Read issue events.",
+              "read:issue-field-values:jira": "View issue field valueses.",
+              "read:issue-link-type:jira": "View issue link types.",
+              "read:issue-link:jira": "View issue links.",
+              "read:issue-meta:jira": "View issue meta.",
+              "read:issue-security-level:jira": "View issue security levels.",
+              "read:issue-security-scheme:jira": "View issue security schemes.",
+              "read:issue-status:jira": "View issue statuses.",
+              "read:issue-type-hierarchy:jira": "Read issue type hierarchies.",
+              "read:issue-type-scheme:jira": "View issue type schemes.",
+              "read:issue-type-screen-scheme:jira": "View issue type screen schemes.",
+              "read:issue-type.property:jira": "View issue type properties.",
+              "read:issue-type:jira": "View issue types.",
+              "read:issue-worklog.property:jira": "View issue worklog properties.",
+              "read:issue-worklog:jira": "View issue worklogs.",
+              "read:issue.changelog:jira": "View issue changelogs.",
+              "read:issue.property:jira": "View issue properties.",
+              "read:issue.remote-link:jira": "View issue remote links.",
+              "read:issue.time-tracking:jira": "View issue time trackings.",
+              "read:issue.transition:jira": "View issue transitions.",
+              "read:issue.vote:jira": "View issue votes.",
+              "read:issue.votes:jira": "View issue voteses.",
+              "read:issue.watcher:jira": "View issue watchers.",
+              "read:issue:jira": "View issues.",
+              "read:jira-expressions:jira": "View jira expressions.",
+              "read:jira-user": "View user information in Jira that you have access to, including usernames, email addresses, and avatars.",
+              "read:jira-work": "Read project and issue data. Search for issues and objects associated with issues (such as attachments and worklogs).",
+              "read:jql:jira": "View JQL.",
+              "read:label:jira": "View labels.",
+              "read:license:jira": "View licenses.",
+              "read:notification-scheme:jira": "View notification schemes.",
+              "read:permission-scheme:jira": "View permission schemes.",
+              "read:permission:jira": "View permissions.",
+              "read:priority:jira": "View priorities.",
+              "read:project-category:jira": "View project categories.",
+              "read:project-role:jira": "View project roles.",
+              "read:project-type:jira": "View project types.",
+              "read:project-version:jira": "View project versions.",
+              "read:project.avatar:jira": "Read project avatars.",
+              "read:project.component:jira": "View project components.",
+              "read:project.email:jira": "View project emails.",
+              "read:project.feature:jira": "Read project features.",
+              "read:project.property:jira": "View project properties.",
+              "read:project:jira": "View projects.",
+              "read:resolution:jira": "View resolutions.",
+              "read:role:jira": "View roles.",
+              "read:screen-field:jira": "View screen fields.",
+              "read:screen-scheme:jira": "View screen schemes.",
+              "read:screen-tab:jira": "View screen tabs.",
+              "read:screen:jira": "View screens.",
+              "read:screenable-field:jira": "View screenable fields.",
+              "read:status:jira": "View statuses.",
+              "read:user-configuration:jira": "View user configurations.",
+              "read:user.columns:jira": "View user columnses.",
+              "read:user.property:jira": "View user properties.",
+              "read:user:jira": "View users.",
+              "read:webhook:jira": "View webhooks.",
+              "read:workflow-scheme:jira": "View workflow schemes.",
+              "read:workflow.property:jira": "View workflow properties.",
+              "read:workflow:jira": "View workflows.",
+              "send:notification:jira": "Send notifications.",
+              "validate:jql:jira": "Validate JQL.",
+              "write:app-data:jira": "Write app data.",
+              "write:attachment:jira": "Create and update issue attachments.",
+              "write:avatar:jira": "Create and update system and custom avatars.",
+              "write:comment.property:jira": "Create and update issue comment properties.",
+              "write:comment:jira": "Create and update issue comments.",
+              "write:custom-field-contextual-configuration:jira": "Save custom field contextual configurations.",
+              "write:dashboard.property:jira": "Create and update dashboard properties.",
+              "write:dashboard:jira": "Create and update dashboards.",
+              "write:field-configuration-scheme:jira": "Create and update field configuration schemes.",
+              "write:field-configuration:jira": "Save field configurations.",
+              "write:field.default-value:jira": "Create and update field default values.",
+              "write:field.option:jira": "Create and update field options.",
+              "write:field:jira": "Create and update fields.",
+              "write:filter.column:jira": "Create and update filter columns.",
+              "write:filter.default-share-scope:jira": "Create and update filter default share scopes.",
+              "write:filter:jira": "Create and update filters.",
+              "write:group:jira": "Create and update user groups.",
+              "write:instance-configuration:jira": "Create and update instance configurations.",
+              "write:issue-link-type:jira": "Create and update issue link types.",
+              "write:issue-link:jira": "Create and update issue links.",
+              "write:issue-type-scheme:jira": "Create and update issue type schemes.",
+              "write:issue-type-screen-scheme:jira": "Create and update issue type screen schemes.",
+              "write:issue-type.property:jira": "Create and update issue type properties.",
+              "write:issue-type:jira": "Create and update issue types.",
+              "write:issue-worklog.property:jira": "Create and update issue worklog properties.",
+              "write:issue-worklog:jira": "Create and update issue worklogs.",
+              "write:issue.property:jira": "Create and update issue properties.",
+              "write:issue.remote-link:jira": "Create and update issue remote links.",
+              "write:issue.time-tracking:jira": "Create and update issue time trackings.",
+              "write:issue.vote:jira": "Create and update issue votes.",
+              "write:issue.watcher:jira": "Create and update issue watchers.",
+              "write:issue:jira": "Create and update issues.",
+              "write:jira-work": "Create and edit issues in Jira, post comments, create worklogs, and delete issues.",
+              "write:permission-scheme:jira": "Create and update permission schemes.",
+              "write:permission:jira": "Create and update permissions.",
+              "write:project-category:jira": "Create and update project categories.",
+              "write:project-role:jira": "Create and update project roles.",
+              "write:project-version:jira": "Create and update project versions.",
+              "write:project.avatar:jira": "Create and update project avatars.",
+              "write:project.component:jira": "Create and update project components.",
+              "write:project.email:jira": "Create and update project emails.",
+              "write:project.feature:jira": "Save project features.",
+              "write:project.property:jira": "Create and update project properties.",
+              "write:project:jira": "Create and update projects.",
+              "write:screen-scheme:jira": "Create and update screen schemes.",
+              "write:screen-tab:jira": "Create and update screen tabs.",
+              "write:screen:jira": "Create and update screens.",
+              "write:screenable-field:jira": "Create and update screenable fields.",
+              "write:user-configuration:jira": "Create and update user configurations.",
+              "write:user.property:jira": "Create and update user properties.",
+              "write:webhook:jira": "Create and update webhooks.",
+              "write:workflow-scheme:jira": "Create and update workflow schemes.",
+              "write:workflow.property:jira": "Create and update workflow properties.",
+              "write:workflow:jira": "Create and update workflows."
+            },
+            "tokenUrl": "https://auth.atlassian.com/oauth/token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  }
+}
