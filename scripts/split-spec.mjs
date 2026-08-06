@@ -135,6 +135,92 @@ const UNTAGGED = "(untagged)";
 const slug = (s) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
+// Curated "most-used" strategy: the ~70 endpoints that carry the bulk of
+// real-world Jira Cloud API traffic (integrations, scripts, marketplace apps),
+// hand-grouped into usage domains. Keyed as "METHOD /path"; every key must
+// exist in the source spec or the run aborts. Endpoints not listed here are
+// simply excluded from this strategy's output.
+const P = "/rest/api/2";
+const USAGE_ENDPOINTS = {
+  // --- issue-lifecycle: create/read/update/delete + transitions + meta ---
+  [`POST ${P}/issue`]: "issue-lifecycle",
+  [`POST ${P}/issue/bulk`]: "issue-lifecycle",
+  [`GET ${P}/issue/{issueIdOrKey}`]: "issue-lifecycle",
+  [`PUT ${P}/issue/{issueIdOrKey}`]: "issue-lifecycle",
+  [`DELETE ${P}/issue/{issueIdOrKey}`]: "issue-lifecycle",
+  [`PUT ${P}/issue/{issueIdOrKey}/assignee`]: "issue-lifecycle",
+  [`GET ${P}/issue/{issueIdOrKey}/transitions`]: "issue-lifecycle",
+  [`POST ${P}/issue/{issueIdOrKey}/transitions`]: "issue-lifecycle",
+  [`GET ${P}/issue/createmeta`]: "issue-lifecycle",
+  [`GET ${P}/issue/createmeta/{projectIdOrKey}/issuetypes`]: "issue-lifecycle",
+  [`GET ${P}/issue/{issueIdOrKey}/editmeta`]: "issue-lifecycle",
+  [`GET ${P}/issue/{issueIdOrKey}/changelog`]: "issue-lifecycle",
+  // --- collaboration: comments, attachments, worklogs, watchers, votes ---
+  [`GET ${P}/issue/{issueIdOrKey}/comment`]: "collaboration",
+  [`POST ${P}/issue/{issueIdOrKey}/comment`]: "collaboration",
+  [`GET ${P}/issue/{issueIdOrKey}/comment/{id}`]: "collaboration",
+  [`PUT ${P}/issue/{issueIdOrKey}/comment/{id}`]: "collaboration",
+  [`DELETE ${P}/issue/{issueIdOrKey}/comment/{id}`]: "collaboration",
+  [`POST ${P}/issue/{issueIdOrKey}/attachments`]: "collaboration",
+  [`GET ${P}/attachment/{id}`]: "collaboration",
+  [`GET ${P}/attachment/content/{id}`]: "collaboration",
+  [`DELETE ${P}/attachment/{id}`]: "collaboration",
+  [`GET ${P}/issue/{issueIdOrKey}/worklog`]: "collaboration",
+  [`POST ${P}/issue/{issueIdOrKey}/worklog`]: "collaboration",
+  [`GET ${P}/issue/{issueIdOrKey}/worklog/{id}`]: "collaboration",
+  [`PUT ${P}/issue/{issueIdOrKey}/worklog/{id}`]: "collaboration",
+  [`DELETE ${P}/issue/{issueIdOrKey}/worklog/{id}`]: "collaboration",
+  [`GET ${P}/issue/{issueIdOrKey}/watchers`]: "collaboration",
+  [`POST ${P}/issue/{issueIdOrKey}/watchers`]: "collaboration",
+  [`DELETE ${P}/issue/{issueIdOrKey}/watchers`]: "collaboration",
+  [`POST ${P}/issue/{issueIdOrKey}/votes`]: "collaboration",
+  // --- issue-graph: issue links and remote links ---
+  [`POST ${P}/issueLink`]: "issue-graph",
+  [`GET ${P}/issueLink/{linkId}`]: "issue-graph",
+  [`DELETE ${P}/issueLink/{linkId}`]: "issue-graph",
+  [`GET ${P}/issueLinkType`]: "issue-graph",
+  [`GET ${P}/issue/{issueIdOrKey}/remotelink`]: "issue-graph",
+  [`POST ${P}/issue/{issueIdOrKey}/remotelink`]: "issue-graph",
+  [`DELETE ${P}/issue/{issueIdOrKey}/remotelink/{linkId}`]: "issue-graph",
+  // --- search-and-jql ---
+  [`GET ${P}/search`]: "search-and-jql",
+  [`POST ${P}/search`]: "search-and-jql",
+  [`GET ${P}/search/jql`]: "search-and-jql",
+  [`POST ${P}/search/jql`]: "search-and-jql",
+  [`POST ${P}/jql/parse`]: "search-and-jql",
+  [`GET ${P}/jql/autocompletedata`]: "search-and-jql",
+  [`POST ${P}/jql/match`]: "search-and-jql",
+  // --- project-catalog: projects, versions, components, roles ---
+  [`GET ${P}/project/search`]: "project-catalog",
+  [`GET ${P}/project/{projectIdOrKey}`]: "project-catalog",
+  [`POST ${P}/project`]: "project-catalog",
+  [`PUT ${P}/project/{projectIdOrKey}`]: "project-catalog",
+  [`GET ${P}/project/recent`]: "project-catalog",
+  [`GET ${P}/project/{projectIdOrKey}/statuses`]: "project-catalog",
+  [`GET ${P}/project/{projectIdOrKey}/components`]: "project-catalog",
+  [`POST ${P}/component`]: "project-catalog",
+  [`GET ${P}/project/{projectIdOrKey}/versions`]: "project-catalog",
+  [`POST ${P}/version`]: "project-catalog",
+  [`PUT ${P}/version/{id}`]: "project-catalog",
+  [`GET ${P}/version/{id}`]: "project-catalog",
+  [`GET ${P}/project/{projectIdOrKey}/role`]: "project-catalog",
+  // --- identity-and-access: users, groups, permissions ---
+  [`GET ${P}/myself`]: "identity-and-access",
+  [`GET ${P}/user`]: "identity-and-access",
+  [`GET ${P}/user/search`]: "identity-and-access",
+  [`GET ${P}/user/assignable/search`]: "identity-and-access",
+  [`GET ${P}/users/search`]: "identity-and-access",
+  [`GET ${P}/groupuserpicker`]: "identity-and-access",
+  [`GET ${P}/group/member`]: "identity-and-access",
+  [`GET ${P}/mypermissions`]: "identity-and-access",
+  [`GET ${P}/permissions`]: "identity-and-access",
+  // --- metadata-essentials: the lookup tables every client caches ---
+  [`GET ${P}/field`]: "metadata-essentials",
+  [`GET ${P}/issuetype`]: "metadata-essentials",
+  [`GET ${P}/priority`]: "metadata-essentials",
+  [`GET ${P}/status`]: "metadata-essentials",
+};
+
 const STRATEGIES = {
   domain: {
     dir: "by-domain",
@@ -143,6 +229,10 @@ const STRATEGIES = {
   tag: {
     dir: "by-tag",
     groupOf: (tag) => (tag === UNTAGGED ? "untagged" : slug(tag)),
+  },
+  usage: {
+    dir: "by-usage",
+    curated: USAGE_ENDPOINTS,
   },
 };
 
@@ -157,28 +247,47 @@ if (!strategy) {
 
 const spec = JSON.parse(fs.readFileSync(INPUT, "utf8"));
 
-// --- 1. Bucket operations by tag, preserving spec path order -----------------
-const opsByTag = new Map(); // tag -> [{path, method, op, pathItem}]
+// --- 1. Bucket operations, preserving spec path order ------------------------
+// Tag strategies bucket by the op's first tag; curated strategies bucket by an
+// explicit "METHOD /path" -> group map (unlisted ops are excluded).
+const opsByTag = new Map(); // bucket key -> [{path, method, op, pathItem}]
+const foundCurated = new Set();
 for (const [p, item] of Object.entries(spec.paths)) {
   for (const method of HTTP_METHODS) {
     const op = item[method];
     if (!op) continue;
-    const tag = op.tags?.[0] ?? UNTAGGED;
-    if (tag !== UNTAGGED && !TAG_GROUPS[tag]) {
-      console.error(`Unmapped tag "${tag}" — add it to TAG_GROUPS.`);
-      process.exit(1);
+    let key;
+    if (strategy.curated) {
+      const opKey = `${method.toUpperCase()} ${p}`;
+      key = strategy.curated[opKey];
+      if (!key) continue;
+      foundCurated.add(opKey);
+    } else {
+      key = op.tags?.[0] ?? UNTAGGED;
+      if (key !== UNTAGGED && !TAG_GROUPS[key]) {
+        console.error(`Unmapped tag "${key}" — add it to TAG_GROUPS.`);
+        process.exit(1);
+      }
     }
-    if (!opsByTag.has(tag)) opsByTag.set(tag, []);
-    opsByTag.get(tag).push({ path: p, method, op, pathItem: item });
+    if (!opsByTag.has(key)) opsByTag.set(key, []);
+    opsByTag.get(key).push({ path: p, method, op, pathItem: item });
+  }
+}
+if (strategy.curated) {
+  const missing = Object.keys(strategy.curated).filter((k) => !foundCurated.has(k));
+  if (missing.length) {
+    console.error("Curated endpoints not found in source spec:");
+    for (const m of missing) console.error("  " + m);
+    process.exit(1);
   }
 }
 
 // --- 2. Group tags per strategy, then chunk each group to MAX_OPS_PER_FILE ---
 // Chunking is greedy over whole tags (largest tag is 23 ops, so tags never split
 // across files) — operations sharing a tag stay together.
-const groups = new Map(); // group -> [tag]
+const groups = new Map(); // group -> [bucket key]
 for (const tag of opsByTag.keys()) {
-  const g = strategy.groupOf(tag);
+  const g = strategy.curated ? tag : strategy.groupOf(tag);
   if (!groups.has(g)) groups.set(g, []);
   groups.get(g).push(tag);
 }
@@ -272,7 +381,10 @@ for (const [group, tags] of [...groups.entries()].sort()) {
     );
     const part = chunks.length > 1 ? `-part${i + 1}` : "";
     const name = `jira-v2-${group}${part}`;
-    const usedTags = new Set(chunkTagList);
+    const usedTags = new Set();
+    for (const item of Object.values(sortedPaths)) {
+      for (const m of HTTP_METHODS) item[m]?.tags?.forEach((t) => usedTags.add(t));
+    }
     const out = {
       openapi: OPENAPI_VERSION,
       info: {
@@ -283,7 +395,13 @@ for (const [group, tags] of [...groups.entries()].sort()) {
       servers: spec.servers,
       security: spec.security,
       tags: (spec.tags ?? []).filter((t) => usedTags.has(t.name)),
-      "x-split": { strategy: strategyName, group, part: i + 1, of: chunks.length, tags: chunkTagList },
+      "x-split": {
+        strategy: strategyName,
+        group,
+        part: i + 1,
+        of: chunks.length,
+        tags: strategy.curated ? [...usedTags].sort() : chunkTagList,
+      },
       paths: sortedPaths,
       components: buildComponents(sortedPaths),
     };

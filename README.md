@@ -9,12 +9,30 @@ files sized for Apigee deployment.
 source/    jira-cloud-v2-openapi.json   — full upstream spec (unmodified)
 scripts/   split-spec.mjs               — the splitter
 splits/    one subdirectory per splitting strategy
-  by-domain/                            — grouped by functional domain (28 files)
+  by-domain/                            — grouped by functional domain (28 files, all 607 ops)
+  by-usage/                             — curated top-70 most-used endpoints (7 files)
 ```
 
-Each splitting strategy gets its own subdirectory under `splits/`. Additional
-strategies can be added in `scripts/split-spec.mjs` (see `STRATEGIES` — a
-strategy is a directory name plus a function mapping each spec tag to a group).
+Each splitting strategy gets its own subdirectory under `splits/`. Two kinds of
+strategy exist in `scripts/split-spec.mjs` (see `STRATEGIES`):
+
+- **tag-based** — a function mapping each spec tag to a group; covers every
+  operation in the spec (`domain`, `tag`).
+- **curated** — an explicit `"METHOD /path" -> group` map; covers only the
+  listed operations (`usage`). The run aborts if a listed endpoint disappears
+  from the upstream spec.
+
+### `by-usage` domains (top 70 endpoints by expected traffic)
+
+| File | Ops | Covers |
+|---|---|---|
+| issue-lifecycle | 12 | issue CRUD, assignee, transitions, create/edit meta, changelog |
+| collaboration | 18 | comments, attachments, worklogs, watchers, votes |
+| issue-graph | 7 | issue links, link types, remote links |
+| search-and-jql | 7 | JQL search (legacy + enhanced), parse, autocomplete, match |
+| project-catalog | 13 | projects, versions, components, statuses, roles |
+| identity-and-access | 9 | myself, user lookup/search, group members, permissions |
+| metadata-essentials | 4 | fields, issue types, priorities, statuses |
 
 ## Deployment constraints (Apigee)
 

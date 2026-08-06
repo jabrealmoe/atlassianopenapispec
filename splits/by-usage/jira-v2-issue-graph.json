@@ -1,0 +1,1877 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "ecosystem@atlassian.com"
+    },
+    "description": "Jira Cloud platform REST API documentation",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "termsOfService": "https://developer.atlassian.com/platform/marketplace/atlassian-developer-terms/",
+    "title": "The Jira Cloud platform REST API - issue-graph",
+    "version": "1001.0.0-SNAPSHOT-94e91f6947ecc63395c0d5a54f05005b6eab5a8a"
+  },
+  "externalDocs": {
+    "description": "Find out more about Atlassian products and services.",
+    "url": "http://www.atlassian.com"
+  },
+  "servers": [
+    {
+      "url": "https://your-domain.atlassian.net"
+    }
+  ],
+  "tags": [
+    {
+      "description": "This resource represents [issue link](#api-group-Issue-links) types. Use it to get, create, update, and delete link issue types as well as get lists of all link issue types.\n\nTo use it, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.",
+      "name": "Issue link types"
+    },
+    {
+      "description": "This resource represents links between issues. Use it to get, create, and delete links between issues.\n\nTo use it, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.",
+      "name": "Issue links"
+    },
+    {
+      "description": "This resource represents remote issue links, a way of linking Jira to information in other systems. Use it to get, create, update, and delete remote issue links either by ID or global ID. The global ID provides a way of accessing remote issue links using information about the item's remote system host and remote system identifier.",
+      "name": "Issue remote links"
+    }
+  ],
+  "x-split": {
+    "strategy": "usage",
+    "group": "issue-graph",
+    "part": 1,
+    "of": 1,
+    "tags": [
+      "Issue link types",
+      "Issue links",
+      "Issue remote links"
+    ]
+  },
+  "paths": {
+    "/rest/api/2/issue/{issueIdOrKey}/remotelink": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns the remote issue links for an issue. When a remote issue link global ID is provided the record with that global ID is returned, otherwise all remote issue links are returned. Where a global ID includes reserved URL characters these must be escaped in the request. For example, pass `system=http://www.mycompany.com/support&id=1` as `system%3Dhttp%3A%2F%2Fwww.mycompany.com%2Fsupport%26id%3D1`.\n\nThis operation requires [issue linking to be active](https://confluence.atlassian.com/x/yoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
+        "operationId": "getRemoteIssueLinks",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "example": "10000",
+              "type": "string"
+            },
+            "x-showInExample": "true"
+          },
+          {
+            "description": "The global ID of the remote issue link.",
+            "in": "query",
+            "name": "globalId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "[{\"application\":{\"name\":\"My Acme Tracker\",\"type\":\"com.acme.tracker\"},\"globalId\":\"system=http://www.mycompany.com/support&id=1\",\"id\":10000,\"object\":{\"icon\":{\"title\":\"Support Ticket\",\"url16x16\":\"http://www.mycompany.com/support/ticket.png\"},\"status\":{\"icon\":{\"link\":\"http://www.mycompany.com/support?id=1&details=closed\",\"title\":\"Case Closed\",\"url16x16\":\"http://www.mycompany.com/support/resolved.png\"},\"resolved\":true},\"summary\":\"Customer support issue\",\"title\":\"TSTSUP-111\",\"url\":\"http://www.mycompany.com/support?id=1\"},\"relationship\":\"causes\",\"self\":\"https://your-domain.atlassian.net/rest/api/issue/MKY-1/remotelink/10000\"},{\"application\":{\"name\":\"My Acme Tester\",\"type\":\"com.acme.tester\"},\"globalId\":\"system=http://www.anothercompany.com/tester&id=1234\",\"id\":10001,\"object\":{\"icon\":{\"title\":\"Test Case\",\"url16x16\":\"http://www.anothercompany.com/tester/images/testcase.gif\"},\"status\":{\"icon\":{\"link\":\"http://www.anothercompany.com/tester/person?accountId=5b10a2844c20165700ede21g\",\"title\":\"Tested by Mia Krystof\",\"url16x16\":\"http://www.anothercompany.com/tester/images/person/mia.gif\"},\"resolved\":false},\"summary\":\"Test that the submit button saves the item\",\"title\":\"Test Case #1234\",\"url\":\"http://www.anothercompany.com/tester/testcase/1234\"},\"relationship\":\"is tested by\",\"self\":\"https://your-domain.atlassian.net/rest/api/issue/MKY-1/remotelink/10001\"}]",
+                "schema": {
+                  "oneOf": [
+                    {
+                      "items": {
+                        "$ref": "#/components/schemas/RemoteIssueLink"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RemoteIssueLink"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Returned if the request is successful. A single RemoteIssueLink will be returned when specifying `globalId`, otherwise an array of RemoteIssueLink is returned."
+          },
+          "400": {
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if issue linking is disabled."
+          },
+          "404": {
+            "description": "Returned if the issue or remote issue link is not found or the user does not have permission to view the issue."
+          },
+          "413": {
+            "description": "Returned if the per-issue limit for remote links has been breached."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get remote issue links",
+        "tags": [
+          "Issue remote links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue.remote-link:jira",
+              "read:status:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Creates or updates a remote issue link for an issue.\n\nIf a `globalId` is provided and a remote issue link with that global ID is found it is updated. Any fields without values in the request are set to null. Otherwise, the remote issue link is created.\n\nThis operation requires [issue linking to be active](https://confluence.atlassian.com/x/yoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* and *Link issues* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
+        "operationId": "createOrUpdateRemoteIssueLink",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "application": {
+                  "name": "My Acme Tracker",
+                  "type": "com.acme.tracker"
+                },
+                "globalId": "system=http://www.mycompany.com/support&id=1",
+                "object": {
+                  "icon": {
+                    "title": "Support Ticket",
+                    "url16x16": "http://www.mycompany.com/support/ticket.png"
+                  },
+                  "status": {
+                    "icon": {
+                      "link": "http://www.mycompany.com/support?id=1&details=closed",
+                      "title": "Case Closed",
+                      "url16x16": "http://www.mycompany.com/support/resolved.png"
+                    },
+                    "resolved": true
+                  },
+                  "summary": "Customer support issue",
+                  "title": "TSTSUP-111",
+                  "url": "http://www.mycompany.com/support?id=1"
+                },
+                "relationship": "causes"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/RemoteIssueLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"id\":10000,\"self\":\"https://your-domain.atlassian.net/rest/api/issue/MKY-1/remotelink/10000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteIssueLinkIdentifies"
+                }
+              }
+            },
+            "description": "Returned if the remote issue link is updated."
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "example": "{\"id\":10000,\"self\":\"https://your-domain.atlassian.net/rest/api/issue/MKY-1/remotelink/10000\"}",
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteIssueLinkIdentifies"
+                }
+              }
+            },
+            "description": "Returned if the remote issue link is created."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": "{\"errorMessages\":[],\"errors\":{\"title\":\"'title' is required.\"}}"
+              }
+            },
+            "description": "Returned if the request is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have permission to link issues."
+          },
+          "404": {
+            "description": "Returned if the issue is not found or the user does not have permission to view the issue."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Create or update remote issue link",
+        "tags": [
+          "Issue remote links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:issue:jira",
+              "write:issue.remote-link:jira",
+              "read:issue.remote-link:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "WRITE"
+      }
+    },
+    "/rest/api/2/issue/{issueIdOrKey}/remotelink/{linkId}": {
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes a remote issue link from an issue.\n\nThis operation requires [issue linking to be active](https://confluence.atlassian.com/x/yoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects*, *Edit issues*, and *Link issues* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
+        "operationId": "deleteRemoteIssueLinkById",
+        "parameters": [
+          {
+            "description": "The ID or key of the issue.",
+            "in": "path",
+            "name": "issueIdOrKey",
+            "required": true,
+            "schema": {
+              "example": "10000",
+              "type": "string"
+            },
+            "x-showInExample": "true"
+          },
+          {
+            "description": "The ID of a remote issue link.",
+            "in": "path",
+            "name": "linkId",
+            "required": true,
+            "schema": {
+              "example": "10000",
+              "type": "string"
+            },
+            "x-showInExample": "true"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the link ID is invalid or the remote issue link does not belong to the issue."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "403": {
+            "description": "Returned if the user does not have permission to link issues."
+          },
+          "404": {
+            "description": "Returned if the issue or remote issue link is not found or the user does not have permission to view the issue."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete remote issue link by ID",
+        "tags": [
+          "Issue remote links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:issue.remote-link:jira",
+              "write:issue:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "DELETE"
+      }
+    },
+    "/rest/api/2/issueLink": {
+      "post": {
+        "deprecated": false,
+        "description": "Creates a link between two issues. Use this operation to indicate a relationship between two issues and optionally add a comment to the from (outward) issue. To use this resource the site must have [Issue Linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\nThis resource returns nothing on the creation of an issue link. To obtain the ID of the issue link, use `https://your-domain.atlassian.net/rest/api/2/issue/[linked issue key]?fields=issuelinks`.\n\nIf the link request duplicates a link, the response indicates that the issue link was created. If the request included a comment, the comment is added.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse project* [project permission](https://confluence.atlassian.com/x/yodKLg) for all the projects containing the issues to be linked,\n *  *Link issues* [project permission](https://confluence.atlassian.com/x/yodKLg) on the project containing the from (outward) issue,\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the comment has visibility restrictions, belongs to the group or has the role visibility is restricted to.",
+        "operationId": "linkIssues",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "comment": {
+                  "body": "Linked related issue!",
+                  "visibility": {
+                    "identifier": "276f955c-63d7-42c8-9520-92d01dca0625",
+                    "type": "group",
+                    "value": "jira-software-users"
+                  }
+                },
+                "inwardIssue": {
+                  "key": "HSP-1"
+                },
+                "outwardIssue": {
+                  "key": "MKY-1"
+                },
+                "type": {
+                  "name": "Duplicate"
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/LinkIssueRequestJsonBean"
+              }
+            }
+          },
+          "description": "The issue link request.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the comment is not created. The response contains an error message indicating why the comment wasn't created. The issue link is also not created."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the user cannot view one or both of the issues. For example, the user doesn't have *Browse project* project permission for a project containing one of the issues.\n *  the user does not have *link issues* project permission.\n *  either of the link issues are not found.\n *  the issue link type is not found."
+          },
+          "413": {
+            "description": "Returned if the per-issue limit for issue links has been breached."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Create issue link",
+        "tags": [
+          "Issue links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:comment:jira",
+              "write:issue:jira",
+              "write:issue-link:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "WRITE"
+      }
+    },
+    "/rest/api/2/issueLink/{linkId}": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns an issue link.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse project* [project permission](https://confluence.atlassian.com/x/yodKLg) for all the projects containing the linked issues.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, permission to view both of the issues.",
+        "operationId": "getIssueLink",
+        "parameters": [
+          {
+            "description": "The ID of the issue link.",
+            "in": "path",
+            "name": "linkId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"id\":\"10001\",\"inwardIssue\":{\"fields\":{\"issuetype\":{\"avatarId\":10002,\"description\":\"A problem with the software.\",\"entityId\":\"9d7dd6f7-e8b6-4247-954b-7b2c9b2a5ba2\",\"hierarchyLevel\":0,\"iconUrl\":\"https://your-domain.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype\\\",\",\"id\":\"1\",\"name\":\"Bug\",\"scope\":{\"project\":{\"id\":\"10000\"},\"type\":\"PROJECT\"},\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueType/1\",\"subtask\":false},\"priority\":{\"description\":\"Very little impact.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/priorities/trivial.png\",\"id\":\"2\",\"name\":\"Trivial\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/priority/5\",\"statusColor\":\"#cfcfcf\"},\"status\":{\"description\":\"The issue is closed.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/closed.gif\",\"id\":\"5\",\"name\":\"Closed\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/status/5\",\"statusCategory\":{\"colorName\":\"green\",\"id\":9,\"key\":\"completed\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/statuscategory/9\"}}},\"id\":\"10004\",\"key\":\"PR-3\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/PR-3\"},\"outwardIssue\":{\"fields\":{\"issuetype\":{\"avatarId\":1,\"description\":\"A task that needs to be done.\",\"hierarchyLevel\":0,\"iconUrl\":\"https://your-domain.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10299&avatarType=issuetype\\\",\",\"id\":\"3\",\"name\":\"Task\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueType/3\",\"subtask\":false},\"priority\":{\"description\":\"Major loss of function.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/priorities/major.png\",\"id\":\"1\",\"name\":\"Major\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/priority/3\",\"statusColor\":\"#009900\"},\"status\":{\"description\":\"The issue is currently being worked on.\",\"iconUrl\":\"https://your-domain.atlassian.net/images/icons/progress.gif\",\"id\":\"10000\",\"name\":\"In Progress\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/status/10000\",\"statusCategory\":{\"colorName\":\"yellow\",\"id\":1,\"key\":\"in-flight\",\"name\":\"In Progress\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/statuscategory/1\"}}},\"id\":\"10004L\",\"key\":\"PR-2\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issue/PR-2\"},\"type\":{\"id\":\"1000\",\"inward\":\"Duplicated by\",\"name\":\"Duplicate\",\"outward\":\"Duplicates\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1000\"}}",
+                "schema": {
+                  "$ref": "#/components/schemas/IssueLink"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the issue link ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link is not found.\n *  the user doesn't have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get issue link",
+        "tags": [
+          "Issue links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:field:jira",
+              "read:issue-link-type:jira",
+              "read:issue:jira",
+              "read:issue-type:jira",
+              "read:priority:jira",
+              "read:status:jira",
+              "read:avatar:jira",
+              "read:issue.time-tracking:jira",
+              "read:project-category:jira",
+              "read:project:jira",
+              "read:user:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Deletes an issue link.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  Browse project [project permission](https://confluence.atlassian.com/x/yodKLg) for all the projects containing the issues in the link.\n *  *Link issues* [project permission](https://confluence.atlassian.com/x/yodKLg) for at least one of the projects containing issues in the link.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, permission to view both of the issues.",
+        "operationId": "deleteIssueLink",
+        "parameters": [
+          {
+            "description": "The ID of the issue link.",
+            "in": "path",
+            "name": "linkId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response"
+          },
+          "204": {
+            "description": "Returned if the request is successful."
+          },
+          "400": {
+            "description": "Returned if the issue link ID is invalid."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if:\n\n *  issue linking is disabled.\n *  the issue link is not found.\n *  the user doesn't have the required permissions."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "write:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Delete issue link",
+        "tags": [
+          "Issue links"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": false
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "write:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "delete:issue-link:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "DELETE"
+      }
+    },
+    "/rest/api/2/issueLinkType": {
+      "get": {
+        "deprecated": false,
+        "description": "Returns a list of all issue link types.\n\nTo use this operation, the site must have [issue linking](https://confluence.atlassian.com/x/yoXKM) enabled.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for a project in the site.",
+        "operationId": "getIssueLinkTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": "{\"issueLinkTypes\":[{\"id\":\"1000\",\"inward\":\"Duplicated by\",\"name\":\"Duplicate\",\"outward\":\"Duplicates\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1000\"},{\"id\":\"1010\",\"inward\":\"Blocked by\",\"name\":\"Blocks\",\"outward\":\"Blocks\",\"self\":\"https://your-domain.atlassian.net/rest/api/2/issueLinkType/1010\"}]}",
+                "schema": {
+                  "$ref": "#/components/schemas/IssueLinkTypes"
+                }
+              }
+            },
+            "description": "Returned if the request is successful."
+          },
+          "401": {
+            "description": "Returned if the authentication credentials are incorrect or missing."
+          },
+          "404": {
+            "description": "Returned if issue linking is disabled."
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "OAuth2": [
+              "read:jira-work"
+            ]
+          },
+          {}
+        ],
+        "summary": "Get issue link types",
+        "tags": [
+          "Issue link types"
+        ],
+        "x-atlassian-data-security-policy": [
+          {
+            "app-access-rule-exempt": true
+          }
+        ],
+        "x-atlassian-oauth2-scopes": [
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:jira-work"
+            ],
+            "state": "Current"
+          },
+          {
+            "scheme": "OAuth2",
+            "scopes": [
+              "read:issue-link-type:jira"
+            ],
+            "state": "Beta"
+          }
+        ],
+        "x-atlassian-connect-scope": "READ"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Application": {
+        "additionalProperties": true,
+        "description": "The application the linked item is in.",
+        "properties": {
+          "name": {
+            "description": "The name of the application. Used in conjunction with the (remote) object icon title to display a tooltip for the link's icon. The tooltip takes the format \"\\[application name\\] icon title\". Blank items are excluded from the tooltip title. If both items are blank, the icon tooltop displays as \"Web Link\". Grouping and sorting of links may place links without an application name last.",
+            "type": "string"
+          },
+          "type": {
+            "description": "The name-spaced type of the application, used by registered rendering apps.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AvatarUrlsBean": {
+        "additionalProperties": false,
+        "properties": {
+          "16x16": {
+            "description": "The URL of the item's 16x16 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          },
+          "24x24": {
+            "description": "The URL of the item's 24x24 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          },
+          "32x32": {
+            "description": "The URL of the item's 32x32 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          },
+          "48x48": {
+            "description": "The URL of the item's 48x48 pixel avatar.",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Comment": {
+        "additionalProperties": true,
+        "description": "A comment.",
+        "properties": {
+          "author": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "The ID of the user who created the comment.",
+            "readOnly": true
+          },
+          "body": {
+            "description": "The comment text.",
+            "type": "string"
+          },
+          "created": {
+            "description": "The date and time at which the comment was created.",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the comment.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "jsdAuthorCanSeeRequest": {
+            "description": "Whether the comment was added from an email sent by a person who is not part of the issue. See [Allow external emails to be added as comments on issues](https://support.atlassian.com/jira-service-management-cloud/docs/allow-external-emails-to-be-added-as-comments-on-issues/)for information on setting up this feature.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "jsdPublic": {
+            "description": "Whether the comment is visible in Jira Service Desk. Defaults to true when comments are created in the Jira Cloud Platform. This includes when the site doesn't use Jira Service Desk or the project isn't a Jira Service Desk project and, therefore, there is no Jira Service Desk for the issue to be visible on. To create a comment with its visibility in Jira Service Desk set to false, use the Jira Service Desk REST API [Create request comment](https://developer.atlassian.com/cloud/jira/service-desk/rest/#api-rest-servicedeskapi-request-issueIdOrKey-comment-post) operation.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "properties": {
+            "description": "A list of comment properties. Optional on create and update.",
+            "items": {
+              "$ref": "#/components/schemas/EntityProperty"
+            },
+            "type": "array"
+          },
+          "renderedBody": {
+            "description": "The rendered version of the comment.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the comment.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "updateAuthor": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "The ID of the user who updated the comment last.",
+            "readOnly": true
+          },
+          "updated": {
+            "description": "The date and time at which the comment was updated last.",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "visibility": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              }
+            ],
+            "description": "The group or role to which this comment is visible. Optional on create and update."
+          }
+        },
+        "type": "object"
+      },
+      "EntityProperty": {
+        "additionalProperties": false,
+        "description": "An entity property, for more information see [Entity properties](https://developer.atlassian.com/cloud/jira/platform/jira-entity-properties/).",
+        "properties": {
+          "key": {
+            "description": "The key of the property. Required on create and update.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the property. Required on create and update."
+          }
+        },
+        "type": "object"
+      },
+      "ExpandPrioritySchemePage": {
+        "additionalProperties": true,
+        "properties": {
+          "maxResults": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "startAt": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "Fields": {
+        "additionalProperties": false,
+        "description": "Key fields from the linked issue.",
+        "properties": {
+          "assignee": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserDetails"
+              }
+            ],
+            "description": "The assignee of the linked issue.",
+            "readOnly": true
+          },
+          "issueType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IssueTypeDetails"
+              }
+            ],
+            "description": "The type of the linked issue.",
+            "readOnly": true
+          },
+          "issuetype": {
+            "description": "The type of the linked issue.",
+            "$ref": "#/components/schemas/IssueTypeDetails"
+          },
+          "priority": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Priority"
+              }
+            ],
+            "description": "The priority of the linked issue.",
+            "readOnly": true
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusDetails"
+              }
+            ],
+            "description": "The status of the linked issue.",
+            "readOnly": true
+          },
+          "summary": {
+            "description": "The summary description of the linked issue.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "timetracking": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimeTrackingDetails"
+              }
+            ],
+            "description": "The time tracking of the linked issue.",
+            "readOnly": true
+          }
+        },
+        "type": "object"
+      },
+      "Icon": {
+        "additionalProperties": true,
+        "description": "An icon. If no icon is defined:\n\n *  for a status icon, no status icon displays in Jira.\n *  for the remote object icon, the default link icon displays in Jira.",
+        "properties": {
+          "link": {
+            "description": "The URL of the tooltip, used only for a status icon. If not set, the status icon in Jira is not clickable.",
+            "type": "string"
+          },
+          "title": {
+            "description": "The title of the icon. This is used as follows:\n\n *  For a status icon it is used as a tooltip on the icon. If not set, the status icon doesn't display a tooltip in Jira.\n *  For the remote object icon it is used in conjunction with the application name to display a tooltip for the link's icon. The tooltip takes the format \"\\[application name\\] icon title\". Blank itemsare excluded from the tooltip title. If both items are blank, the icon tooltop displays as \"Web Link\".",
+            "type": "string"
+          },
+          "url16x16": {
+            "description": "The URL of an icon that displays at 16x16 pixel in Jira.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "IssueLink": {
+        "additionalProperties": false,
+        "description": "Details of a link between issues.",
+        "properties": {
+          "id": {
+            "description": "The ID of the issue link.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "inwardIssue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LinkedIssue"
+              }
+            ],
+            "description": "Provides details about the linked issue. If presenting this link in a user interface, use the `inward` field of the issue link type to label the link."
+          },
+          "outwardIssue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LinkedIssue"
+              }
+            ],
+            "description": "Provides details about the linked issue. If presenting this link in a user interface, use the `outward` field of the issue link type to label the link."
+          },
+          "self": {
+            "description": "The URL of the issue link.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IssueLinkType"
+              }
+            ],
+            "description": "The type of link between the issues."
+          }
+        },
+        "required": [
+          "inwardIssue",
+          "outwardIssue",
+          "type"
+        ],
+        "type": "object",
+        "xml": {
+          "name": "issueLinks"
+        }
+      },
+      "IssueLinkType": {
+        "additionalProperties": false,
+        "description": "This object is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it defines and reports on the type of link between the issues. Find a list of issue link types with [Get issue link types](#api-rest-api-2-issueLinkType-get).\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it defines and reports on issue link types.",
+        "properties": {
+          "id": {
+            "description": "The ID of the issue link type and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is the type of issue link. Required on create when `name` isn't provided. Otherwise, read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is read only.",
+            "type": "string"
+          },
+          "inward": {
+            "description": "The description of the issue link type inward link and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is required on create and optional on update. Otherwise, read only.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the issue link type and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is the type of issue link. Required on create when `id` isn't provided. Otherwise, read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is required on create and optional on update. Otherwise, read only.",
+            "type": "string"
+          },
+          "outward": {
+            "description": "The description of the issue link type outward link and is used as follows:\n\n *  In the [ issueLink](#api-rest-api-2-issueLink-post) resource it is read only.\n *  In the [ issueLinkType](#api-rest-api-2-issueLinkType-post) resource it is required on create and optional on update. Otherwise, read only.",
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the issue link type. Read only.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "IssueLinkTypes": {
+        "additionalProperties": false,
+        "description": "A list of issue link type beans.",
+        "properties": {
+          "issueLinkTypes": {
+            "description": "The issue link type bean.",
+            "items": {
+              "$ref": "#/components/schemas/IssueLinkType"
+            },
+            "readOnly": true,
+            "type": "array",
+            "xml": {
+              "name": "issueLinkTypes"
+            }
+          }
+        },
+        "type": "object",
+        "xml": {
+          "name": "issueLinkTypes"
+        }
+      },
+      "IssueTypeDetails": {
+        "additionalProperties": false,
+        "description": "Details about an issue type.",
+        "properties": {
+          "avatarId": {
+            "description": "The ID of the issue type's avatar.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "description": {
+            "description": "The description of the issue type.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "entityId": {
+            "description": "Unique ID for next-gen projects.",
+            "format": "uuid",
+            "readOnly": true,
+            "type": "string"
+          },
+          "hierarchyLevel": {
+            "description": "Hierarchy level of the issue type.",
+            "format": "int32",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "iconUrl": {
+            "description": "The URL of the issue type's avatar.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the issue type.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the issue type.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Scope"
+              }
+            ],
+            "description": "Details of the next-gen projects the issue type is available in.",
+            "readOnly": true
+          },
+          "self": {
+            "description": "The URL of these issue type details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "subtask": {
+            "description": "Whether this issue type is used to create subtasks.",
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "LinkedIssue": {
+        "additionalProperties": false,
+        "description": "The ID or key of a linked issue.",
+        "properties": {
+          "fields": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Fields"
+              }
+            ],
+            "description": "The fields associated with the issue.",
+            "readOnly": true
+          },
+          "id": {
+            "description": "The ID of an issue. Required if `key` isn't provided.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The key of an issue. Required if `id` isn't provided.",
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the issue.",
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LinkIssueRequestJsonBean": {
+        "additionalProperties": false,
+        "properties": {
+          "comment": {
+            "$ref": "#/components/schemas/Comment"
+          },
+          "inwardIssue": {
+            "$ref": "#/components/schemas/LinkedIssue"
+          },
+          "outwardIssue": {
+            "$ref": "#/components/schemas/LinkedIssue"
+          },
+          "type": {
+            "$ref": "#/components/schemas/IssueLinkType"
+          }
+        },
+        "required": [
+          "inwardIssue",
+          "outwardIssue",
+          "type"
+        ],
+        "type": "object"
+      },
+      "Priority": {
+        "additionalProperties": true,
+        "description": "An issue priority.",
+        "properties": {
+          "avatarId": {
+            "description": "The avatarId of the avatar for the issue priority. This parameter is nullable and when set, this avatar references the universal avatar APIs.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "description": {
+            "description": "The description of the issue priority.",
+            "type": "string"
+          },
+          "iconUrl": {
+            "description": "The URL of the icon for the issue priority.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the issue priority.",
+            "type": "string"
+          },
+          "isDefault": {
+            "description": "Whether this priority is the default.",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "The name of the issue priority.",
+            "type": "string"
+          },
+          "schemes": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExpandPrioritySchemePage"
+              }
+            ],
+            "description": "Priority schemes associated with the issue priority."
+          },
+          "self": {
+            "description": "The URL of the issue priority.",
+            "type": "string"
+          },
+          "statusColor": {
+            "description": "The color used to indicate the issue priority.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectDetails": {
+        "additionalProperties": false,
+        "description": "Details about a project.",
+        "properties": {
+          "avatarUrls": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AvatarUrlsBean"
+              }
+            ],
+            "description": "The URLs of the project's avatars.",
+            "readOnly": true
+          },
+          "id": {
+            "description": "The ID of the project.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The key of the project.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the project.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "projectCategory": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedProjectCategory"
+              }
+            ],
+            "description": "The category the project belongs to.",
+            "readOnly": true
+          },
+          "projectTypeKey": {
+            "description": "The [project type](https://confluence.atlassian.com/x/GwiiLQ#Jiraapplicationsoverview-Productfeaturesandprojecttypes) of the project.",
+            "enum": [
+              "software",
+              "service_desk",
+              "business"
+            ],
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the project details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "simplified": {
+            "description": "Whether or not the project is simplified.",
+            "readOnly": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "RemoteIssueLink": {
+        "additionalProperties": false,
+        "description": "Details of an issue remote link.",
+        "properties": {
+          "application": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Application"
+              }
+            ],
+            "description": "Details of the remote application the linked item is in."
+          },
+          "globalId": {
+            "description": "The global ID of the link, such as the ID of the item on the remote system.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the link.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "object": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RemoteObject"
+              }
+            ],
+            "description": "Details of the item linked to."
+          },
+          "relationship": {
+            "description": "Description of the relationship between the issue and the linked item.",
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the link.",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RemoteIssueLinkIdentifies": {
+        "additionalProperties": false,
+        "description": "Details of the identifiers for a created or updated remote issue link.",
+        "properties": {
+          "id": {
+            "description": "The ID of the remote issue link, such as the ID of the item on the remote system.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "xml": {
+              "attribute": true
+            }
+          },
+          "self": {
+            "description": "The URL of the remote issue link.",
+            "readOnly": true,
+            "type": "string",
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "type": "object"
+      },
+      "RemoteIssueLinkRequest": {
+        "additionalProperties": true,
+        "description": "Details of a remote issue link.",
+        "properties": {
+          "application": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Application"
+              }
+            ],
+            "description": "Details of the remote application the linked item is in. For example, trello."
+          },
+          "globalId": {
+            "description": "An identifier for the remote item in the remote system. For example, the global ID for a remote item in Confluence would consist of the app ID and page ID, like this: `appId=456&pageId=123`.\n\nSetting this field enables the remote issue link details to be updated or deleted using remote system and item details as the record identifier, rather than using the record's Jira ID.\n\nThe maximum length is 255 characters.",
+            "type": "string"
+          },
+          "object": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RemoteObject"
+              }
+            ],
+            "description": "Details of the item linked to."
+          },
+          "relationship": {
+            "description": "Description of the relationship between the issue and the linked item. If not set, the relationship description \"links to\" is used in Jira.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "object"
+        ],
+        "type": "object"
+      },
+      "RemoteObject": {
+        "additionalProperties": true,
+        "description": "The linked item.",
+        "properties": {
+          "icon": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Icon"
+              }
+            ],
+            "description": "Details of the icon for the item. If no icon is defined, the default link icon is used in Jira."
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Status"
+              }
+            ],
+            "description": "The status of the item."
+          },
+          "summary": {
+            "description": "The summary details of the item.",
+            "type": "string"
+          },
+          "title": {
+            "description": "The title of the item.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL of the item.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "url"
+        ],
+        "type": "object"
+      },
+      "Scope": {
+        "additionalProperties": true,
+        "description": "The projects the item is associated with. Indicated for items associated with [next-gen projects](https://confluence.atlassian.com/x/loMyO).",
+        "properties": {
+          "project": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProjectDetails"
+              }
+            ],
+            "description": "The project the item has scope in.",
+            "readOnly": true
+          },
+          "type": {
+            "description": "The type of scope.",
+            "enum": [
+              "PROJECT",
+              "TEMPLATE"
+            ],
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Status": {
+        "additionalProperties": true,
+        "description": "The status of the item.",
+        "properties": {
+          "icon": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Icon"
+              }
+            ],
+            "description": "Details of the icon representing the status. If not provided, no status icon displays in Jira."
+          },
+          "resolved": {
+            "description": "Whether the item is resolved. If set to \"true\", the link to the issue is displayed in a strikethrough font, otherwise the link displays in normal font.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "StatusCategory": {
+        "additionalProperties": true,
+        "description": "A status category.",
+        "properties": {
+          "colorName": {
+            "description": "The name of the color used to represent the status category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the status category.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "key": {
+            "description": "The key of the status category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the status category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the status category.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "StatusDetails": {
+        "additionalProperties": true,
+        "description": "A status.",
+        "properties": {
+          "description": {
+            "description": "The description of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "iconUrl": {
+            "description": "The URL of the icon used to represent the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Scope"
+              }
+            ],
+            "description": "The scope of the field.",
+            "readOnly": true
+          },
+          "self": {
+            "description": "The URL of the status.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "statusCategory": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusCategory"
+              }
+            ],
+            "description": "The category assigned to the status.",
+            "readOnly": true
+          }
+        },
+        "type": "object"
+      },
+      "TimeTrackingDetails": {
+        "additionalProperties": false,
+        "description": "Time tracking details.",
+        "properties": {
+          "originalEstimate": {
+            "description": "The original estimate of time needed for this issue in readable format.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "originalEstimateSeconds": {
+            "description": "The original estimate of time needed for this issue in seconds.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "remainingEstimate": {
+            "description": "The remaining estimate of time needed for this issue in readable format.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "remainingEstimateSeconds": {
+            "description": "The remaining estimate of time needed for this issue in seconds.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "timeSpent": {
+            "description": "Time worked on this issue in readable format.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "timeSpentSeconds": {
+            "description": "Time worked on this issue in seconds.",
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "UpdatedProjectCategory": {
+        "additionalProperties": false,
+        "description": "A project category.",
+        "properties": {
+          "description": {
+            "description": "The name of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "The ID of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "The description of the project category.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the project category.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserDetails": {
+        "additionalProperties": false,
+        "description": "User details permitted by the user's Atlassian Account privacy settings. However, be aware of these exceptions:\n\n *  User record deleted from Atlassian: This occurs as the result of a right to be forgotten request. In this case, `displayName` provides an indication and other parameters have default values or are blank (for example, email is blank).\n *  User record corrupted: This occurs as a results of events such as a server import and can only happen to deleted users. In this case, `accountId` returns *unknown* and all other parameters have fallback values.\n *  User record unavailable: This usually occurs due to an internal service outage. In this case, all parameters have fallback values.",
+        "properties": {
+          "accountId": {
+            "description": "The account ID of the user, which uniquely identifies the user across all Atlassian products. For example, *5b10ac8d82e05b22cc7d4ef5*.",
+            "maxLength": 128,
+            "type": "string"
+          },
+          "accountType": {
+            "description": "The type of account represented by this user. This will be one of 'atlassian' (normal users), 'app' (application user) or 'customer' (Jira Service Desk customer user)",
+            "readOnly": true,
+            "type": "string"
+          },
+          "active": {
+            "description": "Whether the user is active.",
+            "readOnly": true,
+            "type": "boolean"
+          },
+          "avatarUrls": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AvatarUrlsBean"
+              }
+            ],
+            "description": "The avatars of the user.",
+            "readOnly": true
+          },
+          "displayName": {
+            "description": "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "emailAddress": {
+            "description": "The email address of the user. Depending on the user’s privacy settings, this may be returned as null.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "key": {
+            "description": "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "self": {
+            "description": "The URL of the user.",
+            "readOnly": true,
+            "type": "string"
+          },
+          "timeZone": {
+            "description": "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.",
+            "readOnly": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Visibility": {
+        "additionalProperties": true,
+        "description": "The group or role to which this item is visible.",
+        "properties": {
+          "identifier": {
+            "description": "The ID of the group or the name of the role that visibility of this item is restricted to.",
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "description": "Whether visibility of this item is restricted to a group or role.",
+            "enum": [
+              "group",
+              "role"
+            ],
+            "type": "string"
+          },
+          "value": {
+            "description": "The name of the group or role that visibility of this item is restricted to. Please note that the name of a group is mutable, to reliably identify a group use `identifier`.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "description": "You can access this resource via basic auth.",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "OAuth2": {
+        "description": "OAuth2 scopes for Jira",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.atlassian.com/authorize",
+            "scopes": {
+              "delete:async-task:jira": "Delete asynchronous task.",
+              "delete:attachment:jira": "Delete issue attachments.",
+              "delete:avatar:jira": "Delete system and custom avatars.",
+              "delete:comment.property:jira": "Delete issue comment properties.",
+              "delete:comment:jira": "Delete issue comments.",
+              "delete:dashboard.property:jira": "Delete dashboard properties.",
+              "delete:dashboard:jira": "Delete dashboards.",
+              "delete:field-configuration-scheme:jira": "Delete field configuration schemes.",
+              "delete:field-configuration:jira": "Delete field configurations.",
+              "delete:field.option:jira": "Delete field options.",
+              "delete:field:jira": "Delete fields.",
+              "delete:filter.column:jira": "Delete filter columns.",
+              "delete:filter:jira": "Delete filters.",
+              "delete:group:jira": "Delete user groups.",
+              "delete:issue-link-type:jira": "Delete issue link types.",
+              "delete:issue-link:jira": "Delete issue links.",
+              "delete:issue-type-scheme:jira": "Delete issue type schemes.",
+              "delete:issue-type-screen-scheme:jira": "Delete issue type screen schemes.",
+              "delete:issue-type.property:jira": "Delete issue type properties.",
+              "delete:issue-type:jira": "Delete issue types.",
+              "delete:issue-worklog.property:jira": "Delete issue worklog properties.",
+              "delete:issue-worklog:jira": "Delete issue worklogs.",
+              "delete:issue.property:jira": "Delete issue properties.",
+              "delete:issue.remote-link:jira": "Delete issue remote links.",
+              "delete:issue:jira": "Delete issues.",
+              "delete:permission-scheme:jira": "Delete permission schemes.",
+              "delete:permission:jira": "Delete permissions.",
+              "delete:project-category:jira": "Delete project categories.",
+              "delete:project-role:jira": "Delete project roles.",
+              "delete:project-version:jira": "Delete project versions.",
+              "delete:project.avatar:jira": "Delete project avatars.",
+              "delete:project.component:jira": "Delete project components.",
+              "delete:project.property:jira": "Delete project properties.",
+              "delete:project:jira": "Delete projects and their details, such as issue types, project lead, and avatars.",
+              "delete:screen-scheme:jira": "Delete screen schemes.",
+              "delete:screen-tab:jira": "Delete screen tabs.",
+              "delete:screen:jira": "Delete screens.",
+              "delete:screenable-field:jira": "Delete screenable fields.",
+              "delete:user-configuration:jira": "Delete user configurations.",
+              "delete:user.property:jira": "Delete user properties.",
+              "delete:webhook:jira": "Delete webhooks.",
+              "delete:workflow-scheme:jira": "Delete workflow schemes.",
+              "delete:workflow.property:jira": "Delete workflow properties.",
+              "delete:workflow:jira": "Delete workflows.",
+              "manage:jira-configuration": "Configure Jira settings that require the Jira administrators permission, for example, create projects and custom fields, view workflows, manage issue link types.",
+              "manage:jira-project": "Create and edit project settings and create new project-level objects, for example, versions, components.",
+              "manage:jira-webhook": "Manage Jira webhooks. Enables an OAuth app to register and unregister dynamic webhooks in Jira. It also provides for fetching of registered webhooks.",
+              "read:app-data:jira": "Read app data.",
+              "read:application-role:jira": "View application roles.",
+              "read:attachment:jira": "View issue attachments.",
+              "read:audit-log:jira": "View audit logs.",
+              "read:avatar:jira": "View system and custom avatars.",
+              "read:comment.property:jira": "View issue comment properties.",
+              "read:comment:jira": "View issue comments.",
+              "read:custom-field-contextual-configuration:jira": "Read custom field contextual configurations.",
+              "read:dashboard.property:jira": "View dashboard properties.",
+              "read:dashboard:jira": "View dashboards.",
+              "read:email-address:jira": "View email addresses of all users regardless of the user's profile visibility settings.",
+              "read:field-configuration-scheme:jira": "View field configuration schemes.",
+              "read:field-configuration:jira": "Read field configurations.",
+              "read:field.default-value:jira": "View field default values.",
+              "read:field.option:jira": "View field options.",
+              "read:field.options:jira": "Read field options.",
+              "read:field:jira": "View fields.",
+              "read:filter.column:jira": "View filter columns.",
+              "read:filter.default-share-scope:jira": "View filter default share scopes.",
+              "read:filter:jira": "View filters.",
+              "read:group:jira": "View user groups.",
+              "read:instance-configuration:jira": "View instance configurations.",
+              "read:issue-details:jira": "View issue details.",
+              "read:issue-event:jira": "Read issue events.",
+              "read:issue-field-values:jira": "View issue field valueses.",
+              "read:issue-link-type:jira": "View issue link types.",
+              "read:issue-link:jira": "View issue links.",
+              "read:issue-meta:jira": "View issue meta.",
+              "read:issue-security-level:jira": "View issue security levels.",
+              "read:issue-security-scheme:jira": "View issue security schemes.",
+              "read:issue-status:jira": "View issue statuses.",
+              "read:issue-type-hierarchy:jira": "Read issue type hierarchies.",
+              "read:issue-type-scheme:jira": "View issue type schemes.",
+              "read:issue-type-screen-scheme:jira": "View issue type screen schemes.",
+              "read:issue-type.property:jira": "View issue type properties.",
+              "read:issue-type:jira": "View issue types.",
+              "read:issue-worklog.property:jira": "View issue worklog properties.",
+              "read:issue-worklog:jira": "View issue worklogs.",
+              "read:issue.changelog:jira": "View issue changelogs.",
+              "read:issue.property:jira": "View issue properties.",
+              "read:issue.remote-link:jira": "View issue remote links.",
+              "read:issue.time-tracking:jira": "View issue time trackings.",
+              "read:issue.transition:jira": "View issue transitions.",
+              "read:issue.vote:jira": "View issue votes.",
+              "read:issue.votes:jira": "View issue voteses.",
+              "read:issue.watcher:jira": "View issue watchers.",
+              "read:issue:jira": "View issues.",
+              "read:jira-expressions:jira": "View jira expressions.",
+              "read:jira-user": "View user information in Jira that you have access to, including usernames, email addresses, and avatars.",
+              "read:jira-work": "Read project and issue data. Search for issues and objects associated with issues (such as attachments and worklogs).",
+              "read:jql:jira": "View JQL.",
+              "read:label:jira": "View labels.",
+              "read:license:jira": "View licenses.",
+              "read:notification-scheme:jira": "View notification schemes.",
+              "read:permission-scheme:jira": "View permission schemes.",
+              "read:permission:jira": "View permissions.",
+              "read:priority:jira": "View priorities.",
+              "read:project-category:jira": "View project categories.",
+              "read:project-role:jira": "View project roles.",
+              "read:project-type:jira": "View project types.",
+              "read:project-version:jira": "View project versions.",
+              "read:project.avatar:jira": "Read project avatars.",
+              "read:project.component:jira": "View project components.",
+              "read:project.email:jira": "View project emails.",
+              "read:project.feature:jira": "Read project features.",
+              "read:project.property:jira": "View project properties.",
+              "read:project:jira": "View projects.",
+              "read:resolution:jira": "View resolutions.",
+              "read:role:jira": "View roles.",
+              "read:screen-field:jira": "View screen fields.",
+              "read:screen-scheme:jira": "View screen schemes.",
+              "read:screen-tab:jira": "View screen tabs.",
+              "read:screen:jira": "View screens.",
+              "read:screenable-field:jira": "View screenable fields.",
+              "read:status:jira": "View statuses.",
+              "read:user-configuration:jira": "View user configurations.",
+              "read:user.columns:jira": "View user columnses.",
+              "read:user.property:jira": "View user properties.",
+              "read:user:jira": "View users.",
+              "read:webhook:jira": "View webhooks.",
+              "read:workflow-scheme:jira": "View workflow schemes.",
+              "read:workflow.property:jira": "View workflow properties.",
+              "read:workflow:jira": "View workflows.",
+              "send:notification:jira": "Send notifications.",
+              "validate:jql:jira": "Validate JQL.",
+              "write:app-data:jira": "Write app data.",
+              "write:attachment:jira": "Create and update issue attachments.",
+              "write:avatar:jira": "Create and update system and custom avatars.",
+              "write:comment.property:jira": "Create and update issue comment properties.",
+              "write:comment:jira": "Create and update issue comments.",
+              "write:custom-field-contextual-configuration:jira": "Save custom field contextual configurations.",
+              "write:dashboard.property:jira": "Create and update dashboard properties.",
+              "write:dashboard:jira": "Create and update dashboards.",
+              "write:field-configuration-scheme:jira": "Create and update field configuration schemes.",
+              "write:field-configuration:jira": "Save field configurations.",
+              "write:field.default-value:jira": "Create and update field default values.",
+              "write:field.option:jira": "Create and update field options.",
+              "write:field:jira": "Create and update fields.",
+              "write:filter.column:jira": "Create and update filter columns.",
+              "write:filter.default-share-scope:jira": "Create and update filter default share scopes.",
+              "write:filter:jira": "Create and update filters.",
+              "write:group:jira": "Create and update user groups.",
+              "write:instance-configuration:jira": "Create and update instance configurations.",
+              "write:issue-link-type:jira": "Create and update issue link types.",
+              "write:issue-link:jira": "Create and update issue links.",
+              "write:issue-type-scheme:jira": "Create and update issue type schemes.",
+              "write:issue-type-screen-scheme:jira": "Create and update issue type screen schemes.",
+              "write:issue-type.property:jira": "Create and update issue type properties.",
+              "write:issue-type:jira": "Create and update issue types.",
+              "write:issue-worklog.property:jira": "Create and update issue worklog properties.",
+              "write:issue-worklog:jira": "Create and update issue worklogs.",
+              "write:issue.property:jira": "Create and update issue properties.",
+              "write:issue.remote-link:jira": "Create and update issue remote links.",
+              "write:issue.time-tracking:jira": "Create and update issue time trackings.",
+              "write:issue.vote:jira": "Create and update issue votes.",
+              "write:issue.watcher:jira": "Create and update issue watchers.",
+              "write:issue:jira": "Create and update issues.",
+              "write:jira-work": "Create and edit issues in Jira, post comments, create worklogs, and delete issues.",
+              "write:permission-scheme:jira": "Create and update permission schemes.",
+              "write:permission:jira": "Create and update permissions.",
+              "write:project-category:jira": "Create and update project categories.",
+              "write:project-role:jira": "Create and update project roles.",
+              "write:project-version:jira": "Create and update project versions.",
+              "write:project.avatar:jira": "Create and update project avatars.",
+              "write:project.component:jira": "Create and update project components.",
+              "write:project.email:jira": "Create and update project emails.",
+              "write:project.feature:jira": "Save project features.",
+              "write:project.property:jira": "Create and update project properties.",
+              "write:project:jira": "Create and update projects.",
+              "write:screen-scheme:jira": "Create and update screen schemes.",
+              "write:screen-tab:jira": "Create and update screen tabs.",
+              "write:screen:jira": "Create and update screens.",
+              "write:screenable-field:jira": "Create and update screenable fields.",
+              "write:user-configuration:jira": "Create and update user configurations.",
+              "write:user.property:jira": "Create and update user properties.",
+              "write:webhook:jira": "Create and update webhooks.",
+              "write:workflow-scheme:jira": "Create and update workflow schemes.",
+              "write:workflow.property:jira": "Create and update workflow properties.",
+              "write:workflow:jira": "Create and update workflows."
+            },
+            "tokenUrl": "https://auth.atlassian.com/oauth/token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  }
+}
