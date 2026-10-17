@@ -1,0 +1,38 @@
+# Instances the Hermes mapping run and the Playwright suite target.
+# Storage-state files are created by a human through SSO (see hermes_mapping_prompt.md, section 2).
+# Never commit auth/*.json - add "auth/" to .gitignore.
+
+instances:
+  - id: testjira
+    base_url: https://testjira.gtri.gatech.edu          # no context path
+    products: [jira-software]                           # confirmed in Phase 0
+    locale: en_US
+    sandbox:
+      project_key: "{{TEST_PROJECT_KEY}}"
+    storage_states:                                     # pattern: auth/<instance>.<role>.json
+      admin: auth/testjira.admin.json
+      user: auth/testjira.user.json
+
+  - id: testhelpdesk
+    base_url: https://testhelpdesk.gtri.gatech.edu/jira # context path /jira - keep it in every URL
+    products: [jira-software, jira-service-management]  # JSM assumed from the hostname; confirmed in Phase 0
+    locale: en_US
+    sandbox:
+      project_key: "{{TEST_PROJECT_KEY}}"
+      service_desk_project_key: "{{TEST_SD_PROJECT_KEY}}"
+    storage_states:
+      admin: auth/testhelpdesk.admin.json
+      agent: auth/testhelpdesk.agent.json               # JSM agent (queues, SLAs)
+      customer: auth/testhelpdesk.customer.json         # JSM customer portal
+
+# Optional - add when you want Confluence in scope:
+#  - id: testconfluence
+#    base_url: https://{{CONFLUENCE_HOST}}
+#    products: [confluence]
+#    storage_states:
+#      user: auth/testconfluence.user.json
+
+policy:
+  admin_mode: read_only        # read_only | allowed
+  page_visit_budget_per_card: 40
+  created_content_prefix: "HERMES-MAP-"
