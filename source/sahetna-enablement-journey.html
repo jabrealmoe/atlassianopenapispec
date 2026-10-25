@@ -1,0 +1,2057 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Patient Record Enablement Journey · Sahetna.tn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap">
+<style>
+/* Full-screen 3D patient-record journey. Stop chips on top, stop card bottom-start, HUD bottom-end.
+   Logical properties throughout so the whole UI mirrors when Arabic turns the document RTL. */
+:root {
+  --sky: #e7eef2;
+  --panel: rgba(250, 252, 253, 0.94);
+  --fg: #16222b;
+  --muted: #566a76;
+  --line: #c3d2da;
+  --sign: #0f6b7a;
+  --sign-ink: #f2fbfd;
+  --amber: #a85c00;
+  --amber-fill: #f0a830;
+  --guard: #2a6fa8;
+  --human: #2f7d52;
+  --live: #c23a2b;
+  --cell-off: #d5e1e7;
+  --code: #6c4bb6;
+  --font-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-arabic: "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sky: #0b1418; --panel: rgba(14, 22, 27, 0.92); --fg: #e4eef3; --muted: #93a8b4; --line: #27373f;
+    --sign: #2aa0b0; --sign-ink: #04181c; --amber: #f5bf52; --amber-fill: #f5bf52; --guard: #78b2f0;
+    --human: #72d39b; --live: #ff6b5b; --cell-off: #22333a; --code: #b49bf0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --sky: #0b1418; --panel: rgba(14, 22, 27, 0.92); --fg: #e4eef3; --muted: #93a8b4; --line: #27373f;
+  --sign: #2aa0b0; --sign-ink: #04181c; --amber: #f5bf52; --amber-fill: #f5bf52; --guard: #78b2f0;
+  --human: #72d39b; --live: #ff6b5b; --cell-off: #22333a; --code: #b49bf0;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--sky); color: var(--fg); font-family: var(--font-body); overflow: hidden; }
+/* Arabic gets a Naskh face and slightly looser lines for legibility */
+html[lang="ar"] body { font-family: var(--font-arabic); }
+html[lang="ar"] .card h2, html[lang="ar"] .brand h1, html[lang="ar"] .btn, html[lang="ar"] .chip { font-family: var(--font-arabic); }
+html[lang="ar"] .bullet, html[lang="ar"] .tagline, html[lang="ar"] .work { line-height: 1.7; }
+#app { position: relative; height: 100%; }
+canvas#scene { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+canvas#scene:active { cursor: grabbing; }
+
+.topbar {
+  position: absolute; inset-block-start: 0; inset-inline: 0;
+  padding-block: 14px 0;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 900; font-size: 1.3rem; letter-spacing: -0.01em; text-wrap: balance;
+  background: var(--panel); padding: 4px 10px; border-radius: 6px; }
+.brand span { font-size: 0.8rem; background: var(--panel); padding: 3px 8px; border-radius: 5px; }
+.sim { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.1em;
+  background: var(--live); color: #fff; padding: 3px 8px; border-radius: 5px; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; pointer-events: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--fg);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.76rem; letter-spacing: 0.03em;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; gap: 6px; align-items: center;
+}
+.chip b { font-family: var(--font-mono); font-weight: 500; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); border-color: var(--sign); }
+.chip[aria-pressed="true"] b { color: var(--sign-ink); opacity: 0.8; }
+.chip.dest { border-color: var(--amber); }
+.chip:focus-visible, .btn:focus-visible, .bullet:focus-visible, .icon-btn:focus-visible { outline: 2px solid var(--amber-fill); outline-offset: 2px; }
+
+.card {
+  position: absolute; inset-inline-start: max(16px, env(safe-area-inset-left, 0px));
+  inset-block-end: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(var(--card-w, 350px), calc(100% - 32px)); max-height: 56%;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s;
+}
+.card.moved { transition: opacity .3s; }
+.card.traveling { opacity: 0.08; pointer-events: none; transform: translateY(12px) scale(0.98); transition: opacity .35s, transform .35s; }
+.card-head { display: flex; gap: 12px; align-items: stretch; padding: 14px 16px 10px; border-bottom: 1px solid var(--line);
+  cursor: grab; user-select: none; touch-action: none; }
+.card.dragging .card-head { cursor: grabbing; }
+.card-tools { margin-inline-start: auto; display: flex; gap: 4px; align-items: flex-start; }
+.icon-btn { width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid var(--line); background: transparent; color: var(--fg);
+  border-radius: 5px; font: 700 0.9rem/1 var(--font-mono); cursor: pointer; padding: 0; }
+.icon-btn:hover { border-color: var(--sign); color: var(--sign); }
+.now { display: none; margin: 2px 0 0; font-size: 0.82rem; line-height: 1.4; color: var(--amber); font-weight: 600; }
+.card.compact { max-height: none; }
+.card.compact .meter, .card.compact .card-body, .card.compact .tagline { display: none; }
+.card.compact .now { display: block; }
+.card.compact .card-head { border-bottom: 0; padding-block: 10px; }
+.card.compact .shield { width: 40px; font-size: 1.3rem; }
+.card.compact h2 { font-size: 1rem; }
+.card.compact .card-foot { padding-block: 6px 8px; }
+.card.compact .grip { display: none; }
+.grip { position: absolute; inset-inline-end: 0; inset-block-end: 0; width: 18px; height: 18px; cursor: nwse-resize; touch-action: none;
+  background: linear-gradient(135deg, transparent 50%, var(--line) 50%, var(--line) 58%, transparent 58%, transparent 70%, var(--line) 70%, var(--line) 78%, transparent 78%); }
+html[dir="rtl"] .grip { cursor: nesw-resize; transform: scaleX(-1); }
+.card.hidden-card { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
+.shield {
+  flex: 0 0 auto; width: 52px; background: var(--sign); color: var(--sign-ink); border-radius: 6px;
+  display: grid; place-items: center; font-family: var(--font-display); font-weight: 900; font-size: 1.7rem;
+  border: 2px solid var(--sign-ink); outline: 2px solid var(--sign);
+}
+.shield.dest { background: var(--amber-fill); color: #1a1a1a; outline-color: var(--amber-fill); }
+.head-text { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.livebadge { color: var(--live); font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+.livebadge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--live); animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.card h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.04rem; line-height: 1.25; text-wrap: balance; }
+.tagline { margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.45; }
+
+.meter { padding: 10px 16px 2px; display: flex; flex-direction: column; gap: 5px; }
+.meter-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; }
+.cell { height: 7px; border-radius: 2px; background: var(--cell-off); transition: background .4s; }
+.cell.ai { background: var(--amber-fill); }
+.cell.hu { background: var(--human); }
+.meter-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.64rem;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+.card-body { padding: 8px 16px 6px; overflow-y: auto; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.items { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.bullet {
+  width: 100%; text-align: start; display: flex; gap: 9px; align-items: flex-start;
+  background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 5px 7px;
+  font: inherit; font-size: 0.89rem; line-height: 1.45; color: var(--fg); cursor: pointer;
+  transition: opacity .35s, background .3s, border-color .3s, transform .35s;
+}
+.bullet i { flex: 0 0 auto; font-style: normal; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); padding-top: 2px; }
+.bullet.active { background: color-mix(in srgb, var(--amber-fill) 16%, transparent); border-color: color-mix(in srgb, var(--amber-fill) 55%, transparent); }
+.bullet.active i { color: var(--amber); }
+.bullet.pending { opacity: 0.22; }
+.bullet.enter { animation: slideIn .5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+html[dir="rtl"] @keyframes slideIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.work { padding: 9px 11px; border-radius: 6px; border: 1px dashed var(--line); font-size: 0.85rem; line-height: 1.5; }
+.work strong { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  font-size: 0.68rem; color: var(--sign); display: block; margin-bottom: 3px; }
+.roles { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 0.82rem; line-height: 1.45; }
+.roles dt { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+.roles dd { margin: 0; min-width: 0; }
+.roles .you { color: var(--human); } .roles .ai { color: var(--amber); } .roles .gd { color: var(--guard); }
+.card-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 16px 12px; border-top: 1px solid var(--line); }
+.steps { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn { border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 6px;
+  padding: 7px 12px; font-family: var(--font-display); font-weight: 700; font-size: 0.79rem; cursor: pointer; }
+.btn:hover:not(:disabled) { border-color: var(--sign); color: var(--sign); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+.hud { position: absolute; inset-inline-end: max(16px, env(safe-area-inset-right, 0px));
+  inset-block-end: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: none; }
+html[dir="rtl"] .hud { align-items: flex-start; }
+.keys { font-size: 0.71rem; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; line-height: 1.65; text-align: end; }
+.keys kbd { font-family: var(--font-mono); font-size: 0.67rem; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+.modes { display: flex; gap: 6px; pointer-events: auto; flex-wrap: wrap; justify-content: flex-end; }
+.modes .btn { background: var(--panel); font-size: 0.73rem; padding: 5px 9px; }
+.modes .btn[aria-pressed="true"] { border-color: var(--amber-fill); color: var(--amber); }
+.langs { display: flex; gap: 4px; pointer-events: auto; }
+.langs .btn { background: var(--panel); font-size: 0.73rem; padding: 5px 10px; font-family: var(--font-mono); }
+.langs .btn[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); border-color: var(--sign); }
+.timer { pointer-events: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px;
+  display: grid; grid-template-columns: auto auto; gap: 2px 14px; font-variant-numeric: tabular-nums; }
+.timer span { font-family: var(--font-mono); font-size: 0.67rem; text-transform: uppercase; color: var(--muted); letter-spacing: .05em; align-self: center; }
+.timer b { font-family: var(--font-display); font-size: 1.1rem; text-align: end; }
+.timer b.warn { color: var(--amber); } .timer b.bad { color: var(--live); }
+.timer button { grid-column: 1 / -1; margin-top: 4px; }
+.err { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
+@media (max-width: 820px) { .keys { display: none; } }
+@media (max-width: 640px) {
+  .card { inset-inline: 0; inset-block-end: 0; width: 100%; max-height: 52%; border-radius: 12px 12px 0 0;
+    border-inline: 0; border-block-end: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .grip { display: none; }
+  .card-head { cursor: default; }
+  .hud { inset-block-end: auto; inset-block-start: calc(100px + env(safe-area-inset-top, 0px)); }
+  .brand span.sub { display: none; }
+}
+</style>
+</head><body>
+
+<div id="app">
+  <canvas id="scene" aria-label="3D visualization of a patient record moving between clinics, health centres and hospitals as the system matures"></canvas>
+  <div class="topbar">
+    <div class="brand">
+      <h1 id="brandTitle"></h1>
+      <span class="sub" id="brandSub"></span>
+      <span class="sim" id="brandSim"></span>
+    </div>
+    <div class="chips" id="chips" role="toolbar" aria-label="Stops"></div>
+  </div>
+
+  <section class="card" id="card" aria-live="polite">
+    <div class="card-head">
+      <div class="shield" id="shield">0</div>
+      <div class="head-text">
+        <div class="eyebrow" id="eyebrow"></div>
+        <h2 id="title"></h2>
+        <p class="tagline" id="tagline"></p>
+        <p class="now" id="now"></p>
+      </div>
+      <div class="card-tools">
+        <button class="icon-btn" id="cCompact" type="button" aria-pressed="false" title="Collapse (C)">–</button>
+        <button class="icon-btn" id="cReset" type="button" title="Reset size and position">↺</button>
+      </div>
+    </div>
+    <div class="meter" aria-label="Who is steering">
+      <div class="meter-row" id="meter"></div>
+      <div class="meter-labels"><span id="mLabHuman"></span><span id="mLabAI"></span></div>
+    </div>
+    <div class="card-body">
+      <ul class="items" id="items"></ul>
+      <div class="work" id="work"></div>
+      <dl class="roles" id="roles"></dl>
+    </div>
+    <div class="card-foot">
+      <button class="btn" id="prev" type="button"></button>
+      <span class="steps" id="steps"></span>
+      <button class="btn" id="next" type="button"></button>
+    </div>
+    <div class="grip" id="grip"></div>
+  </section>
+
+  <div class="hud">
+    <div class="timer" id="timer" hidden>
+      <span id="tLabStop"></span><b id="tStop">0:00</b>
+      <span id="tLabTotal"></span><b id="tTotal">0:00</b>
+      <button class="btn" id="tReset" type="button"></button>
+    </div>
+    <div class="langs" role="group" aria-label="Language">
+      <button class="btn" id="lang-ar" type="button" aria-pressed="false" lang="ar">العربية</button>
+      <button class="btn" id="lang-fr" type="button" aria-pressed="false" lang="fr">Français</button>
+      <button class="btn" id="lang-en" type="button" aria-pressed="true" lang="en">English</button>
+    </div>
+    <div class="modes">
+      <button class="btn" id="mPresent" type="button" aria-pressed="false"></button>
+      <button class="btn" id="mNight" type="button" aria-pressed="false"></button>
+      <button class="btn" id="mTimer" type="button" aria-pressed="false"></button>
+      <button class="btn" id="mOverview" type="button" aria-pressed="false"></button>
+    </div>
+    <div class="keys" id="keysHelp"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+
+// ============================================================================
+// Patient Record Enablement Journey — an illustrative visualization of how a
+// patient record moves between facilities as a health system matures, from a
+// hand-carried paper carnet to a coded record that arrives before the patient.
+//
+// NOTHING HERE IS A LIVE SYSTEM. Every note, code, identifier and number on
+// screen is synthetic and for teaching only. No real patient data is used,
+// displayed, or implied. Facility nodes are generic TYPES, not named
+// institutions, and this deck does not imply any organisation's participation
+// in Tunisia's Sahetna.tn programme.
+//
+// Public facts referenced on the final stop come from Ecofin Agency's report of
+// 22 July 2026 on Sahetna.tn and are attributed on screen.
+// ============================================================================
+
+// ---------- Language ----------
+// Three fully-translated UI locales. Arabic flips the document to RTL; in-scene
+// canvas text re-renders per language, so Arabic strings are drawn right-to-left
+// with a Naskh face rather than being mirrored.
+const LANGS = ["en", "fr", "ar"];
+const RTL = { ar: true };
+
+const UI = {
+  en: {
+    brand: "The Patient Record Enablement Journey",
+    sub: "From a hand-carried carnet to a record that arrives first",
+    sim: "Illustrative simulation · synthetic data",
+    human: "Clinician steers", ai: "System assists",
+    prev: "← Previous", next: "Next →", point: (a, b) => `Point ${a} of ${b}`,
+    level: (n) => "Level " + n, dest: "Destination", live: "Live demo",
+    atWork: "At work", inDemo: "In the walkthrough",
+    you: "Clinician", aiRole: "System", guard: "Guardrail",
+    present: "Presenter", night: "Night", timer: "Timer", overview: "Overview",
+    thisStop: "This stop", total: "Total / 30:00", resetTimers: "Reset timers",
+    keys: "<kbd>→</kbd> <kbd>←</kbd> stops · <kbd>Space</kbd> next point<br>" +
+          "<kbd>P</kbd> presenter · <kbd>T</kbd> timer · <kbd>O</kbd> overview · <kbd>N</kbd> night<br>" +
+          "<kbd>L</kbd> language · <kbd>C</kbd> compact · <kbd>H</kbd> hide · <kbd>0</kbd>–<kbd>6</kbd> jump",
+    webglFail: "This visualization needs WebGL, which this browser isn't providing. The stop cards still work with the arrow keys.",
+  },
+  fr: {
+    brand: "Le parcours vers le dossier patient numérique",
+    sub: "Du carnet de santé porté à la main au dossier qui arrive avant le patient",
+    sim: "Simulation illustrative · données synthétiques",
+    human: "Le clinicien décide", ai: "Le système assiste",
+    prev: "← Précédent", next: "Suivant →", point: (a, b) => `Point ${a} sur ${b}`,
+    level: (n) => "Niveau " + n, dest: "Destination", live: "Démo en direct",
+    atWork: "Sur le terrain", inDemo: "Dans la démonstration",
+    you: "Clinicien", aiRole: "Système", guard: "Garde-fou",
+    present: "Présentateur", night: "Nuit", timer: "Minuteur", overview: "Vue d'ensemble",
+    thisStop: "Cette étape", total: "Total / 30:00", resetTimers: "Réinitialiser",
+    keys: "<kbd>→</kbd> <kbd>←</kbd> étapes · <kbd>Espace</kbd> point suivant<br>" +
+          "<kbd>P</kbd> présentateur · <kbd>T</kbd> minuteur · <kbd>O</kbd> vue · <kbd>N</kbd> nuit<br>" +
+          "<kbd>L</kbd> langue · <kbd>C</kbd> compact · <kbd>H</kbd> masquer · <kbd>0</kbd>–<kbd>6</kbd>",
+    webglFail: "Cette visualisation nécessite WebGL, non fourni par ce navigateur. Les fiches d'étape fonctionnent avec les flèches.",
+  },
+  ar: {
+    brand: "مسار التحول إلى الملف الطبي الرقمي",
+    sub: "من دفتر صحي يُحمل باليد إلى ملف يَسبق وصول المريض",
+    sim: "محاكاة توضيحية · بيانات تركيبية",
+    human: "الطبيب يقرّر", ai: "النظام يساعد",
+    prev: "→ السابق", next: "التالي ←", point: (a, b) => `النقطة ${a} من ${b}`,
+    level: (n) => "المستوى " + n, dest: "الوصول", live: "عرض مباشر",
+    atWork: "في الميدان", inDemo: "في العرض التوضيحي",
+    you: "الطبيب", aiRole: "النظام", guard: "ضمانة",
+    present: "العارض", night: "ليل", timer: "المؤقّت", overview: "نظرة شاملة",
+    thisStop: "هذه المرحلة", total: "الإجمالي / 30:00", resetTimers: "إعادة ضبط",
+    keys: "<kbd>→</kbd> <kbd>←</kbd> المراحل · <kbd>مسافة</kbd> النقطة التالية<br>" +
+          "<kbd>P</kbd> العارض · <kbd>T</kbd> المؤقّت · <kbd>O</kbd> نظرة · <kbd>N</kbd> ليل<br>" +
+          "<kbd>L</kbd> اللغة · <kbd>C</kbd> مُصغّر · <kbd>H</kbd> إخفاء · <kbd>0</kbd>–<kbd>6</kbd>",
+    webglFail: "تتطلب هذه المحاكاة تقنية WebGL غير المتوفرة في هذا المتصفح. لا تزال البطاقات تعمل بمفاتيح الأسهم.",
+  },
+};
+
+// Facility type names, used on in-scene node labels in all three languages
+const FACILITY = {
+  cabinet:  { en: "Private cabinet",      fr: "Cabinet privé",          ar: "عيادة خاصة" },
+  csb:      { en: "Basic health centre",  fr: "Centre de santé de base", ar: "مركز صحة أساسية" },
+  regional: { en: "Regional hospital",    fr: "Hôpital régional",        ar: "مستشفى جهوي" },
+  chu:      { en: "University hospital",  fr: "CHU",                     ar: "مستشفى جامعي" },
+  rural:    { en: "Rural dispensary",     fr: "Dispensaire rural",       ar: "مستوصف ريفي" },
+  national: { en: "National portal",      fr: "Portail national",        ar: "البوابة الوطنية" },
+};
+
+// In-scene labels that are not facility names
+const SCENE = {
+  carnet:    { en: "Paper carnet",        fr: "Carnet papier",      ar: "دفتر ورقي" },
+  noRecord:  { en: "No record",           fr: "Aucun dossier",      ar: "لا يوجد ملف" },
+  island:    { en: "Local file only",     fr: "Fichier local",      ar: "ملف محلي فقط" },
+  ins:       { en: "Health ID",           fr: "Identifiant INS",    ar: "المعرّف الصحي" },
+  merged:    { en: "Duplicates merged",   fr: "Doublons fusionnés", ar: "دمج التكرارات" },
+  consent:   { en: "Consent gate",        fr: "Portail de consentement", ar: "بوابة الموافقة" },
+  auditLog:  { en: "Access log",          fr: "Journal d'accès",    ar: "سجل الوصول" },
+  queued:    { en: "Queued offline",      fr: "En attente hors ligne", ar: "في الانتظار دون اتصال" },
+  synced:    { en: "Synced",              fr: "Synchronisé",        ar: "تمت المزامنة" },
+  confirmed: { en: "Clinician confirmed", fr: "Confirmé par le clinicien", ar: "أكّده الطبيب" },
+  suggested: { en: "Suggested",           fr: "Suggéré",            ar: "مُقترح" },
+  recordAhead:{ en: "Record arrived first", fr: "Dossier déjà arrivé", ar: "الملف وصل قبل المريض" },
+  patient:   { en: "Patient",             fr: "Patient",            ar: "المريض" },
+  source:    { en: "Public facts: Ecofin Agency, 22 Jul 2026", fr: "Faits publics : Ecofin Agency, 22 juil. 2026", ar: "معطيات عامة: وكالة إيكوفين، ٢٢ جويلية ٢٠٢٦" },
+};
+
+// ---------- ICD-10 coding demo data ----------
+// Synthetic clinical notes with the ICD-10 codes a coder would reasonably reach
+// for. The CODE is deliberately language-invariant: the note and the label
+// change language, the code does not. That is the teaching point.
+const CODING = [
+  {
+    note: {
+      en: "58-year-old, polyuria and thirst 3 weeks. Fasting glucose 9.8 mmol/L, HbA1c 8.4%. No ketones.",
+      fr: "58 ans, polyurie et soif depuis 3 semaines. Glycémie à jeun 9,8 mmol/L, HbA1c 8,4 %. Pas de cétonurie.",
+      ar: "٥٨ سنة، تبوّل مفرط وعطش منذ ٣ أسابيع. سكر الدم صائماً ٩٫٨ مليمول/ل، الخضاب السكري ٨٫٤٪. لا أجسام كيتونية.",
+    },
+    codes: [
+      { code: "E11.9", conf: 0.86, pick: true,
+        label: { en: "Type 2 diabetes, no complications", fr: "Diabète de type 2, sans complication", ar: "داء السكري من النوع ٢، دون اختلاطات" } },
+      { code: "E11.65", conf: 0.41,
+        label: { en: "Type 2 diabetes with hyperglycaemia", fr: "Diabète de type 2 avec hyperglycémie", ar: "السكري النوع ٢ مع فرط سكر الدم" } },
+      { code: "R73.9", conf: 0.22,
+        label: { en: "Hyperglycaemia, unspecified", fr: "Hyperglycémie non précisée", ar: "فرط سكر الدم غير محدد" } },
+    ],
+  },
+  {
+    note: {
+      en: "Child 4 y, fever 39.1 °C, productive cough, right basal crackles. Chest film: right lower lobe consolidation.",
+      fr: "Enfant 4 ans, fièvre 39,1 °C, toux productive, râles crépitants basaux droits. Radio : foyer lobaire inférieur droit.",
+      ar: "طفل ٤ سنوات، حرارة ٣٩٫١، سعال منتج، خراخر قاعدية يمنى. صورة الصدر: تكثّف الفص السفلي الأيمن.",
+    },
+    codes: [
+      { code: "J18.1", conf: 0.79, pick: true,
+        label: { en: "Lobar pneumonia, organism unspecified", fr: "Pneumonie lobaire, germe non précisé", ar: "التهاب رئوي فصي، العامل غير محدد" } },
+      { code: "J18.9", conf: 0.52,
+        label: { en: "Pneumonia, unspecified", fr: "Pneumonie non précisée", ar: "التهاب رئوي غير محدد" } },
+      { code: "R50.9", conf: 0.18,
+        label: { en: "Fever, unspecified", fr: "Fièvre non précisée", ar: "حرارة غير محددة" } },
+    ],
+  },
+  {
+    note: {
+      en: "Hypertension follow-up. BP 158/96 seated, repeat 154/94. On amlodipine 5 mg. No chest pain.",
+      fr: "Suivi d'hypertension. TA 158/96 assis, contrôle 154/94. Sous amlodipine 5 mg. Pas de douleur thoracique.",
+      ar: "متابعة ارتفاع ضغط الدم. الضغط ١٥٨/٩٦ جلوساً، الإعادة ١٥٤/٩٤. على أملوديبين ٥ ملغ. لا ألم صدري.",
+    },
+    codes: [
+      { code: "I10", conf: 0.91, pick: true,
+        label: { en: "Essential hypertension", fr: "Hypertension essentielle", ar: "ارتفاع ضغط الدم الأساسي" } },
+      { code: "I15.9", conf: 0.19,
+        label: { en: "Secondary hypertension, unspecified", fr: "Hypertension secondaire non précisée", ar: "ارتفاع ضغط ثانوي غير محدد" } },
+      { code: "Z51.81", conf: 0.14,
+        label: { en: "Encounter for therapeutic drug monitoring", fr: "Surveillance thérapeutique", ar: "زيارة لمراقبة العلاج الدوائي" } },
+    ],
+  },
+];
+
+// ---------- Content: seven levels, from paper carnet to record-arrives-first ----------
+// Each stop carries its own translations. Maturity changes what happens when the
+// patient ARRIVES at a facility; the patient traverses the same facilities throughout.
+const STOPS = [
+  { n: 0, short: { en: "Paper", fr: "Papier", ar: "ورقي" }, budget: 180, node: "cabinet",
+    title: { en: "Paper carnet: the patient is the network",
+             fr: "Carnet papier : le patient est le réseau",
+             ar: "الدفتر الورقي: المريض هو الشبكة" },
+    tagline: { en: "If the folder is not in the bag, the history does not exist.",
+               fr: "Si le carnet n'est pas dans le sac, l'histoire n'existe pas.",
+               ar: "إذا لم يكن الدفتر في الحقيبة، فلا وجود للتاريخ المرضي." },
+    bullets: {
+      en: ["The patient hand-carries the only copy", "Each facility starts the history again",
+           "Lost carnet means lost history", "Nothing is coded, so nothing can be counted"],
+      fr: ["Le patient transporte la seule copie", "Chaque structure recommence l'anamnèse",
+           "Carnet perdu, histoire perdue", "Rien n'est codé, donc rien n'est mesurable"],
+      ar: ["المريض يحمل النسخة الوحيدة", "كل مؤسسة تبدأ التاريخ المرضي من جديد",
+           "فقدان الدفتر يعني فقدان التاريخ", "لا شيء مُرمّز، فلا شيء قابل للقياس"],
+    },
+    work: { en: "A patient referred from a private cabinet to the regional hospital arrives with a folder, or arrives with nothing.",
+            fr: "Un patient orienté d'un cabinet privé vers l'hôpital régional arrive avec un carnet, ou sans rien.",
+            ar: "مريض مُحوّل من عيادة خاصة إلى المستشفى الجهوي يصل بدفتره، أو يصل بلا شيء." },
+    you: { en: "Re-take the whole history", fr: "Refaire toute l'anamnèse", ar: "إعادة أخذ التاريخ المرضي بالكامل" },
+    ai: { en: "None", fr: "Aucun", ar: "لا يوجد" },
+    guard: { en: "Clinical judgment alone", fr: "Le seul jugement clinique", ar: "الحكم السريري وحده" } },
+
+  { n: 1, short: { en: "Islands", fr: "Îlots", ar: "جزر" }, budget: 180, node: "csb",
+    title: { en: "Digital islands: typed, but trapped",
+             fr: "Îlots numériques : saisi, mais captif",
+             ar: "جزر رقمية: مُدخَل، لكنه محتجز" },
+    tagline: { en: "Every facility has a screen. None of them can talk to each other.",
+               fr: "Chaque structure a un écran. Aucune ne se parle.",
+               ar: "لكل مؤسسة شاشة. ولا تتحدث أي منها مع الأخرى." },
+    bullets: {
+      en: ["Notes are typed into a local file", "The file cannot leave the building",
+           "Referrals still travel on paper or by phone", "Same patient, a new identity at every door"],
+      fr: ["Les notes sont saisies dans un fichier local", "Le fichier ne peut pas quitter le bâtiment",
+           "Les orientations circulent encore sur papier", "Même patient, nouvelle identité à chaque porte"],
+      ar: ["تُدخل الملاحظات في ملف محلي", "لا يمكن للملف أن يترك المبنى",
+           "الإحالات لا تزال تنتقل ورقياً أو هاتفياً", "المريض نفسه، وهوية جديدة عند كل باب"],
+    },
+    work: { en: "A note exists in digital form, and still cannot reach the clinician who needs it next.",
+            fr: "Une note existe sous forme numérique et n'atteint toujours pas le clinicien suivant.",
+            ar: "الملاحظة موجودة رقمياً، ومع ذلك لا تصل إلى الطبيب التالي الذي يحتاجها." },
+    you: { en: "Type it again at each site", fr: "Ressaisir à chaque site", ar: "إعادة الإدخال في كل موقع" },
+    ai: { en: "Local search only", fr: "Recherche locale seulement", ar: "بحث محلي فقط" },
+    guard: { en: "Data exists, but cannot travel", fr: "Les données existent, mais ne circulent pas", ar: "البيانات موجودة، لكنها لا تنتقل" } },
+
+  { n: 2, short: { en: "Health ID", fr: "INS", ar: "المعرّف" }, budget: 240, node: "csb", ins: true,
+    title: { en: "One identifier: the same person everywhere",
+             fr: "Un identifiant : la même personne partout",
+             ar: "معرّف واحد: نفس الشخص في كل مكان" },
+    tagline: { en: "Identity has to come before interoperability.",
+               fr: "L'identité doit précéder l'interopérabilité.",
+               ar: "الهوية يجب أن تأتي قبل قابلية التشغيل البيني." },
+    bullets: {
+      en: ["A unique health identifier per patient", "Duplicate records are found and merged",
+           "Newborns can be registered at birth", "One identity makes continuity possible"],
+      fr: ["Un identifiant de santé unique par patient", "Les doublons sont détectés et fusionnés",
+           "Les nouveau-nés enregistrés à la naissance", "Une identité unique rend la continuité possible"],
+      ar: ["معرّف صحي فريد لكل مريض", "يتم العثور على السجلات المكررة ودمجها",
+           "يمكن تسجيل المواليد عند الولادة", "هوية واحدة تجعل الاستمرارية ممكنة"],
+    },
+    work: { en: "Two records for one person — one from a cabinet, one from a health centre — resolve into a single identity.",
+            fr: "Deux dossiers pour une personne — cabinet et centre de santé — se résolvent en une seule identité.",
+            ar: "ملفان لشخص واحد — أحدهما من عيادة والآخر من مركز صحي — يُدمجان في هوية واحدة." },
+    you: { en: "Confirm the match", fr: "Confirmer la correspondance", ar: "تأكيد التطابق" },
+    ai: { en: "Proposes candidate duplicates", fr: "Propose des doublons candidats", ar: "يقترح التكرارات المحتملة" },
+    guard: { en: "A human confirms every merge", fr: "Un humain valide chaque fusion", ar: "يؤكّد إنسان كل عملية دمج" } },
+
+  { n: 3, short: { en: "Coding", fr: "Codage", ar: "الترميز" }, budget: 420, node: "cabinet", live: true, coding: true,
+    title: { en: "Notes to ICD-10: the clinician still signs",
+             fr: "Des notes à la CIM-10 : le clinicien signe toujours",
+             ar: "من الملاحظات إلى التصنيف الدولي: الطبيب هو من يوقّع" },
+    tagline: { en: "Write in Arabic or French. The code is the same code.",
+               fr: "Écrivez en arabe ou en français. Le code reste le même.",
+               ar: "اكتب بالعربية أو الفرنسية. الرمز يبقى نفس الرمز." },
+    bullets: {
+      en: ["The clinician writes freely, in their own language",
+           "Candidate ICD-10 codes appear with confidence shown",
+           "The clinician confirms one, and rejects the rest",
+           "The code travels; the language stays local"],
+      fr: ["Le clinicien écrit librement, dans sa langue",
+           "Des codes CIM-10 candidats apparaissent avec leur confiance",
+           "Le clinicien en confirme un et rejette les autres",
+           "Le code circule ; la langue reste locale"],
+      ar: ["يكتب الطبيب بحرية، وبلغته",
+           "تظهر رموز مُقترحة مع درجة الثقة",
+           "يؤكّد الطبيب رمزاً واحداً ويرفض الباقي",
+           "الرمز ينتقل؛ واللغة تبقى محلية"],
+    },
+    work: { en: "Walkthrough: a free-text note in Arabic or French yields coded candidates. Nothing is filed until a clinician confirms.",
+            fr: "Démonstration : une note libre en arabe ou en français produit des candidats codés. Rien n'est enregistré sans confirmation.",
+            ar: "عرض توضيحي: ملاحظة حرة بالعربية أو الفرنسية تُنتج رموزاً مُقترحة. لا يُسجّل شيء قبل تأكيد الطبيب." },
+    you: { en: "Confirm or reject each code", fr: "Confirmer ou rejeter chaque code", ar: "تأكيد أو رفض كل رمز" },
+    ai: { en: "Suggests codes, shows confidence", fr: "Suggère des codes, affiche la confiance", ar: "يقترح الرموز ويعرض الثقة" },
+    guard: { en: "Suggestions only. Confidence visible. Clinician signs.",
+             fr: "Suggestions seulement. Confiance visible. Le clinicien signe.",
+             ar: "اقتراحات فقط. الثقة مرئية. الطبيب يوقّع." } },
+
+  { n: 4, short: { en: "Regional", fr: "Régional", ar: "جهوي" }, budget: 300, node: "regional", rails: true,
+    title: { en: "Regional exchange: consent, acknowledge, log",
+             fr: "Échange régional : consentement, accusé, journal",
+             ar: "التبادل الجهوي: موافقة، إقرار، سجل" },
+    tagline: { en: "A write is not done until the other side says so.",
+               fr: "Une écriture n'est faite que si l'autre côté le confirme.",
+               ar: "لا تكتمل الكتابة حتى يُقرّ الطرف الآخر بوصولها." },
+    bullets: {
+      en: ["Facilities in a governorate exchange records",
+           "A consent gate opens before any record moves",
+           "Every write returns an acknowledgement",
+           "A rural site goes offline, queues, and catches up"],
+      fr: ["Les structures d'un gouvernorat échangent les dossiers",
+           "Un portail de consentement s'ouvre avant tout transfert",
+           "Chaque écriture renvoie un accusé de réception",
+           "Un site rural se déconnecte, met en file, puis rattrape"],
+      ar: ["تتبادل مؤسسات الولاية الملفات",
+           "تُفتح بوابة الموافقة قبل نقل أي ملف",
+           "كل عملية كتابة تُرجع إقراراً بالاستلام",
+           "موقع ريفي يفقد الاتصال، فينتظر ثم يتزامن"],
+    },
+    work: { en: "Connectivity is intermittent in the real world. The queue draining is the feature, not the failure.",
+            fr: "La connectivité est intermittente dans la réalité. La file qui se vide est la fonctionnalité, pas la panne.",
+            ar: "الاتصال متقطّع في الواقع. تصريف قائمة الانتظار هو الميزة، لا العيب." },
+    you: { en: "Grant and revoke access", fr: "Accorder et révoquer l'accès", ar: "منح الوصول وسحبه" },
+    ai: { en: "Routes and retries delivery", fr: "Acheminement et nouvelles tentatives", ar: "يوجّه التسليم ويعيد المحاولة" },
+    guard: { en: "Consent required. Every access written to the log.",
+             fr: "Consentement requis. Chaque accès inscrit au journal.",
+             ar: "الموافقة مطلوبة. كل وصول يُسجّل في السجل." } },
+
+  { n: 5, short: { en: "Portal", fr: "Portail", ar: "البوابة" }, budget: 300, node: "national",
+    title: { en: "National portal: the patient can see it too",
+             fr: "Portail national : le patient y accède aussi",
+             ar: "البوابة الوطنية: المريض يرى ملفه أيضاً" },
+    tagline: { en: "A record the patient cannot read is a record they cannot correct.",
+               fr: "Un dossier illisible pour le patient est un dossier incorrigible.",
+               ar: "ملف لا يستطيع المريض قراءته هو ملف لا يستطيع تصحيحه." },
+    bullets: {
+      en: ["Patients consult their own record online",
+           "Appointments and treatments in one place",
+           "A parent can consult a child's record",
+           "Errors get found because someone is reading"],
+      fr: ["Les patients consultent leur dossier en ligne",
+           "Rendez-vous et traitements au même endroit",
+           "Un parent peut consulter le dossier de son enfant",
+           "Les erreurs sont trouvées parce que quelqu'un lit"],
+      ar: ["يطّلع المرضى على ملفاتهم عبر الإنترنت",
+           "المواعيد والعلاجات في مكان واحد",
+           "يمكن للوالد الاطلاع على ملف طفله",
+           "تُكتشف الأخطاء لأن هناك من يقرأ"],
+    },
+    work: { en: "Tunisia's Sahetna.tn portal is built for exactly this: records, appointments, treatments, and a parent's view of a child's file.",
+            fr: "Le portail Sahetna.tn est conçu pour cela : dossiers, rendez-vous, traitements, et la vue d'un parent sur le dossier de l'enfant.",
+            ar: "بوابة Sahetna.tn مُصمّمة لهذا تماماً: الملفات والمواعيد والعلاجات، واطلاع الوالد على ملف طفله." },
+    you: { en: "Read, question, correct", fr: "Lire, questionner, corriger", ar: "القراءة والاستفسار والتصحيح" },
+    ai: { en: "Presents history plainly", fr: "Présente l'historique clairement", ar: "يعرض التاريخ بوضوح" },
+    guard: { en: "The patient sees their own data", fr: "Le patient voit ses propres données", ar: "المريض يرى بياناته الخاصة" } },
+
+  { n: 6, short: { en: "Continuity", fr: "Continuité", ar: "الاستمرارية" }, budget: 360, node: "chu", dest: true,
+    title: { en: "Continuity of care: the record arrives first",
+             fr: "Continuité des soins : le dossier arrive d'abord",
+             ar: "استمرارية الرعاية: الملف يصل أولاً" },
+    tagline: { en: "The patient walks in. The history is already on the desk.",
+               fr: "Le patient entre. L'historique est déjà sur le bureau.",
+               ar: "يدخل المريض. والتاريخ المرضي على المكتب سلفاً." },
+    bullets: {
+      en: ["Move between private, public, local or national care",
+           "Coded, bilingual, continuous, de-duplicated",
+           "Clinicians decide; the system moves facts",
+           "Where should a human always have to approve?"],
+      fr: ["Circuler entre privé, public, local ou national",
+           "Codé, bilingue, continu, dédoublonné",
+           "Les cliniciens décident ; le système transporte les faits",
+           "Où un humain doit-il toujours approuver ?"],
+      ar: ["التنقّل بين القطاع الخاص والعام، محلياً أو وطنياً",
+           "مُرمّز، ثنائي اللغة، متواصل، بلا تكرار",
+           "الأطباء يقرّرون؛ والنظام ينقل المعطيات",
+           "في أي مرحلة يجب أن يبقى القرار بشرياً دائماً؟"],
+    },
+    work: { en: "Public reporting (Ecofin Agency, 22 July 2026): Sahetna.tn completed its final technical phase after a cybersecurity audit reviewed on 10 June 2026; over 15,000 health identifiers issued, with universal coverage targeted by end of 2026, plus a newborn auto-registration pilot.",
+            fr: "Informations publiques (Ecofin Agency, 22 juillet 2026) : Sahetna.tn a achevé sa phase technique finale après un audit de cybersécurité examiné le 10 juin 2026 ; plus de 15 000 identifiants émis, couverture universelle visée fin 2026, et un pilote d'enregistrement des naissances.",
+            ar: "معطيات عامة (وكالة إيكوفين، ٢٢ جويلية ٢٠٢٦): أكملت Sahetna.tn مرحلتها التقنية الأخيرة بعد تدقيق أمني روجع في ١٠ جوان ٢٠٢٦؛ أُصدر أكثر من ١٥٠٠٠ معرّف صحي، مع استهداف التغطية الشاملة بنهاية ٢٠٢٦، وتجربة لتسجيل المواليد." },
+    you: { en: "Goals, review, decisions", fr: "Objectifs, revue, décisions", ar: "الأهداف والمراجعة والقرارات" },
+    ai: { en: "Moves and codes the record", fr: "Transporte et code le dossier", ar: "ينقل الملف ويُرمّزه" },
+    guard: { en: "Approval gates where they matter", fr: "Des points d'approbation là où ils comptent", ar: "نقاط موافقة حيث تكون مهمة" } },
+];
+
+const LAST = STOPS.length - 1, INS_STOP = 2, CODING_STOP = 3, RAILS_STOP = 4, PORTAL = 5;
+const AUTONOMY = [0, 1, 2, 4, 5, 6, 7];
+
+let lang = (() => {
+  try { const s = localStorage.getItem("pr-lang"); if (LANGS.includes(s)) return s; } catch (e) {}
+  const n = (navigator.language || "en").slice(0, 2);
+  return LANGS.includes(n) ? n : "en";
+})();
+const t = (obj) => (obj && (obj[lang] ?? obj.en)) || "";
+const isRTL = () => !!RTL[lang];
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (id) => document.getElementById(id);
+let current = 0, bulletIdx = 0, presenter = false;
+let stopStart = performance.now(), totalStart = performance.now();
+
+// ---------- UI ----------
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+let scene3D = { goTo() {}, beacon() {}, overview() {}, leaveIntro() {}, relang() {} };
+
+function applyLang() {
+  const u = UI[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = isRTL() ? "rtl" : "ltr";
+  try { localStorage.setItem("pr-lang", lang); } catch (e) {}
+  $("brandTitle").textContent = u.brand;
+  $("brandSub").textContent = u.sub;
+  $("brandSim").textContent = u.sim;
+  $("mLabHuman").textContent = u.human;
+  $("mLabAI").textContent = u.ai;
+  $("prev").textContent = u.prev;
+  $("next").textContent = u.next;
+  $("mPresent").textContent = u.present;
+  $("mNight").textContent = u.night;
+  $("mTimer").textContent = u.timer;
+  $("mOverview").textContent = u.overview;
+  $("tLabStop").textContent = u.thisStop;
+  $("tLabTotal").textContent = u.total;
+  $("tReset").textContent = u.resetTimers;
+  $("keysHelp").innerHTML = u.keys;
+  LANGS.forEach((l) => $("lang-" + l).setAttribute("aria-pressed", l === lang ? "true" : "false"));
+  buildChips();
+  renderCard(current);
+  scene3D.relang();
+}
+function setLang(l) { if (!LANGS.includes(l) || l === lang) return; lang = l; applyLang(); }
+function cycleLang() { setLang(LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length]); }
+
+const chipsEl = $("chips");
+function buildChips() {
+  chipsEl.innerHTML = "";
+  STOPS.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip" + (s.dest ? " dest" : ""); b.id = "chip-" + i;
+    b.setAttribute("aria-pressed", i === current ? "true" : "false");
+    const n = document.createElement("b"); n.textContent = s.n;
+    b.appendChild(n); b.appendChild(document.createTextNode(t(s.short)));
+    b.addEventListener("click", () => { scene3D.leaveIntro(); select(i); });
+    chipsEl.appendChild(b);
+  });
+}
+const meterEl = $("meter");
+for (let k = 0; k < 8; k++) { const c = document.createElement("div"); c.className = "cell"; meterEl.appendChild(c); }
+
+$("prev").addEventListener("click", () => select(current - 1));
+$("next").addEventListener("click", () => select(current + 1));
+$("mPresent").addEventListener("click", togglePresenter);
+$("mTimer").addEventListener("click", toggleTimer);
+$("mOverview").addEventListener("click", () => scene3D.overview());
+$("tReset").addEventListener("click", () => { totalStart = stopStart = performance.now(); });
+LANGS.forEach((l) => $("lang-" + l).addEventListener("click", () => setLang(l)));
+
+function togglePresenter() {
+  presenter = !presenter;
+  $("mPresent").setAttribute("aria-pressed", presenter);
+  if (presenter) bulletIdx = 0;
+  renderBullets(false);
+}
+function toggleTimer() {
+  $("timer").hidden = !$("timer").hidden;
+  $("mTimer").setAttribute("aria-pressed", !$("timer").hidden);
+}
+
+window.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === " " || k.startsWith("Arrow") || k === "PageDown" || k === "PageUp" || /^[0-6oO]$/.test(k)) scene3D.leaveIntro();
+  // In RTL the arrow keys follow reading order, so Left means "forward"
+  const fwd = isRTL() ? "ArrowLeft" : "ArrowRight", back = isRTL() ? "ArrowRight" : "ArrowLeft";
+  if (k === fwd || k === "PageDown") { e.preventDefault(); select(current + 1); }
+  else if (k === back || k === "PageUp") {
+    e.preventDefault();
+    if (presenter && bulletIdx > 0) setBullet(bulletIdx - 1); else select(current - 1);
+  }
+  else if (k === " ") { e.preventDefault(); nextPoint(); }
+  else if (k === "p" || k === "P") togglePresenter();
+  else if (k === "t" || k === "T") toggleTimer();
+  else if (k === "o" || k === "O") scene3D.overview();
+  else if (k === "h" || k === "H") $("card").classList.toggle("hidden-card");
+  else if (k === "c" || k === "C") toggleCompact();
+  else if (k === "n" || k === "N") setNight(!nightGoal, true);
+  else if (k === "l" || k === "L") cycleLang();
+  else if (k === "f" || k === "F") {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    else document.documentElement.requestFullscreen?.().catch(() => {});
+  }
+  else if (/^[0-6]$/.test(k)) select(+k);
+});
+
+function nextPoint() {
+  const s = STOPS[current];
+  if (bulletIdx < t(s.bullets).length - 1) setBullet(bulletIdx + 1);
+  else select(current + 1);
+}
+function setBullet(k) {
+  bulletIdx = k;
+  renderBullets(true);
+  scene3D.beacon(t(STOPS[current].bullets)[k], current);
+}
+function renderBullets(animateNew) {
+  const items = t(STOPS[current].bullets);
+  const els = $("items").querySelectorAll(".bullet");
+  els.forEach((el, j) => {
+    el.classList.toggle("active", j === bulletIdx);
+    el.classList.toggle("pending", presenter && j > bulletIdx);
+    if (animateNew && j === bulletIdx) { el.classList.remove("enter"); void el.offsetWidth; el.classList.add("enter"); }
+  });
+  $("steps").textContent = UI[lang].point(bulletIdx + 1, items.length);
+  $("now").textContent = `${bulletIdx + 1}. ${items[bulletIdx]}`;
+}
+
+function renderCard(i) {
+  const s = STOPS[i], u = UI[lang], items = t(s.bullets);
+  $("shield").textContent = s.n;
+  $("shield").classList.toggle("dest", !!s.dest);
+  $("eyebrow").innerHTML = `<span>${s.dest ? u.dest : u.level(s.n)} · ${fmt(s.budget)}</span>` +
+    (s.live ? `<span class="livebadge">${u.live}</span>` : "");
+  $("title").textContent = t(s.title);
+  $("tagline").textContent = t(s.tagline);
+  $("items").innerHTML = items.map((x, j) =>
+    `<li><button class="bullet enter" type="button" data-j="${j}" style="animation-delay:${j * 0.09}s"><i>${String(j + 1).padStart(2, "0")}</i><span></span></button></li>`).join("");
+  $("items").querySelectorAll(".bullet").forEach((b, j) => {
+    b.querySelector("span").textContent = items[j];
+    b.addEventListener("click", () => setBullet(+b.dataset.j));
+  });
+  $("work").innerHTML = `<strong></strong><span></span>`;
+  $("work").querySelector("strong").textContent = s.live ? u.inDemo : u.atWork;
+  $("work").querySelector("span").textContent = t(s.work);
+  $("roles").innerHTML = "";
+  [[u.you, "you", t(s.you)], [u.aiRole, "ai", t(s.ai)], [u.guard, "gd", t(s.guard)]].forEach(([k, cls, v]) => {
+    const dt = document.createElement("dt"); dt.className = cls; dt.textContent = k;
+    const dd = document.createElement("dd"); dd.textContent = v;
+    $("roles").append(dt, dd);
+  });
+  [...meterEl.children].forEach((c, k) => { c.className = "cell " + (k >= 7 - AUTONOMY[i] ? "ai" : "hu"); });
+  $("prev").disabled = i === 0;
+  $("next").disabled = i === LAST;
+  STOPS.forEach((_, j) => { const el = $("chip-" + j); if (el) el.setAttribute("aria-pressed", j === i ? "true" : "false"); });
+  const chip = $("chip-" + i);
+  if (chip) chip.scrollIntoView({ block: "nearest", inline: "center", behavior: reduceMotion ? "auto" : "smooth" });
+  renderBullets(false);
+}
+
+// ---------- Card: compact, drag, resize (remembered per viewer) ----------
+const card = $("card");
+const CARD_KEY = "patient-record-card-v1";
+let cardState = { compact: false, w: null, h: null, x: null, y: null };
+try { Object.assign(cardState, JSON.parse(localStorage.getItem(CARD_KEY) || "{}")); } catch (e) {}
+const saveCard = () => { try { localStorage.setItem(CARD_KEY, JSON.stringify(cardState)); } catch (e) {} };
+const isPhone = () => window.innerWidth <= 640;
+function applyCard() {
+  card.classList.toggle("compact", !!cardState.compact);
+  $("cCompact").textContent = cardState.compact ? "+" : "–";
+  $("cCompact").setAttribute("aria-pressed", !!cardState.compact);
+  if (isPhone()) { card.style.cssText = ""; return; }
+  card.style.setProperty("--card-w", cardState.w ? cardState.w + "px" : "350px");
+  card.style.height = cardState.h && !cardState.compact ? cardState.h + "px" : "";
+  card.style.maxHeight = cardState.h && !cardState.compact ? "none" : "";
+  if (cardState.x !== null && cardState.y !== null) {
+    const r = card.getBoundingClientRect();
+    const x = Math.min(Math.max(8, cardState.x), window.innerWidth - Math.min(r.width, 120));
+    const y = Math.min(Math.max(8, cardState.y), window.innerHeight - 48);
+    card.style.left = x + "px"; card.style.top = y + "px";
+    card.style.right = "auto"; card.style.bottom = "auto"; card.classList.add("moved");
+  } else { card.style.left = card.style.top = card.style.right = card.style.bottom = ""; card.classList.remove("moved"); }
+}
+let travelGuard = null;
+function cardTravel(on) {
+  clearTimeout(travelGuard);
+  card.classList.toggle("traveling", on);
+  if (on) { travelGuard = setTimeout(() => cardTravel(false), 7000); return; }
+  $("items").querySelectorAll(".bullet").forEach((el, j) => {
+    el.classList.remove("enter"); void el.offsetWidth; el.style.animationDelay = j * 0.09 + "s"; el.classList.add("enter");
+  });
+}
+function toggleCompact() { cardState.compact = !cardState.compact; saveCard(); applyCard(); }
+$("cCompact").addEventListener("click", toggleCompact);
+$("cReset").addEventListener("click", () => { cardState = { compact: false, w: null, h: null, x: null, y: null }; saveCard(); applyCard(); });
+window.addEventListener("resize", applyCard);
+
+(() => {
+  const head = card.querySelector(".card-head");
+  let start = null;
+  head.addEventListener("pointerdown", (e) => {
+    if (isPhone() || e.target.closest("button")) return;
+    const r = card.getBoundingClientRect();
+    start = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    head.setPointerCapture(e.pointerId); card.classList.add("dragging");
+  });
+  head.addEventListener("pointermove", (e) => {
+    if (!start) return;
+    cardState.x = e.clientX - start.dx; cardState.y = e.clientY - start.dy; applyCard();
+  });
+  const end = () => { if (!start) return; start = null; card.classList.remove("dragging"); saveCard(); };
+  head.addEventListener("pointerup", end); head.addEventListener("pointercancel", end);
+  head.addEventListener("dblclick", (e) => { if (!e.target.closest("button")) toggleCompact(); });
+})();
+
+(() => {
+  const grip = $("grip");
+  let start = null;
+  grip.addEventListener("pointerdown", (e) => {
+    const r = card.getBoundingClientRect();
+    start = { x: e.clientX, y: e.clientY, w: r.width, h: r.height, top: r.top, left: r.left };
+    grip.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  grip.addEventListener("pointermove", (e) => {
+    if (!start) return;
+    const dx = isRTL() ? start.x - e.clientX : e.clientX - start.x;
+    cardState.w = Math.round(Math.min(Math.max(260, start.w + dx), Math.min(620, window.innerWidth - 32)));
+    const h = Math.round(Math.max(150, start.h + e.clientY - start.y));
+    cardState.h = Math.min(h, window.innerHeight - start.top - 8);
+    if (cardState.x === null) { cardState.x = start.left; cardState.y = start.top; }
+    applyCard();
+  });
+  const end = () => { if (!start) return; start = null; saveCard(); };
+  grip.addEventListener("pointerup", end); grip.addEventListener("pointercancel", end);
+})();
+applyCard();
+
+// ---------- Day and night ----------
+let nightGoal = 0, nightUser = false;
+const sysDark = window.matchMedia("(prefers-color-scheme: dark)");
+function readTheme() { const th = document.documentElement.getAttribute("data-theme"); return th ? th === "dark" : sysDark.matches; }
+function setNight(on, fromUser) {
+  nightGoal = on ? 1 : 0;
+  if (fromUser) { nightUser = true; document.documentElement.setAttribute("data-theme", on ? "dark" : "light"); }
+  $("mNight").setAttribute("aria-pressed", on ? "true" : "false");
+}
+$("mNight").addEventListener("click", () => setNight(!nightGoal, true));
+if (sysDark.addEventListener) sysDark.addEventListener("change", () => { if (!nightUser) setNight(readTheme(), false); });
+new MutationObserver(() => { const on = readTheme(); if (on !== !!nightGoal) setNight(on, false); })
+  .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+setNight(readTheme(), false);
+
+function select(i) {
+  if (i < 0 || i >= STOPS.length) return;
+  current = i; bulletIdx = 0; stopStart = performance.now();
+  renderCard(i);
+  scene3D.goTo(i);
+}
+
+setInterval(() => {
+  if ($("timer").hidden) return;
+  const now = performance.now(), st = (now - stopStart) / 1000, tt = (now - totalStart) / 1000, b = STOPS[current].budget;
+  $("tStop").textContent = `${fmt(st)} / ${fmt(b)}`;
+  $("tStop").className = st > b + 120 ? "bad" : st > b + 60 ? "warn" : "";
+  $("tTotal").textContent = fmt(tt);
+  $("tTotal").className = tt > 1920 ? "bad" : tt > 1860 ? "warn" : "";
+}, 250);
+
+// ---------- 3D ----------
+function initScene() {
+  const canvas = $("scene");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.maxPolarAngle = Math.PI * 0.47;
+  controls.minDistance = 5; controls.maxDistance = 260;
+  const up = new THREE.Vector3(0, 1, 0);
+  const nightHooks = [], relangHooks = [];
+
+  const C = (h) => new THREE.Color(h);
+  const lambert = (color, extra = {}) => new THREE.MeshLambertMaterial(Object.assign({ color }, extra));
+  const smooth = (a, b, x) => { const u = Math.min(1, Math.max(0, (x - a) / (b - a))); return u * u * (3 - 2 * u); };
+  const m4 = new THREE.Object3D();
+  function rr(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  const glowTex = (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.25, "rgba(255,255,255,0.55)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
+  })();
+  function glow(color, size, opacity = 0.9) {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false }));
+    s.scale.set(size, size, 1); return s;
+  }
+
+  // --- Script-aware canvas text -------------------------------------------
+  // Arabic must render right-to-left with a Naskh face and shaped glyphs. Canvas2D
+  // does the shaping for us as long as we set direction/align correctly and do NOT
+  // reverse the string ourselves. Latin text keeps its own face and LTR flow.
+  const ARABIC_RE = /[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  function faceFor(text, weight, px) {
+    return ARABIC_RE.test(text)
+      ? `${weight} ${px}px "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif`
+      : `${weight} ${px}px Archivo, Arial, sans-serif`;
+  }
+  // Draw one line of text honouring its script direction.
+  function drawText(g, text, x, y, { rtl = null, align = null } = {}) {
+    const r = rtl === null ? ARABIC_RE.test(text) : rtl;
+    g.direction = r ? "rtl" : "ltr";
+    g.textAlign = align || (r ? "right" : "left");
+    g.fillText(text, x, y);
+    g.direction = "ltr"; g.textAlign = "left";
+  }
+  // A floating label sprite. Arabic strings are right-aligned inside the plate.
+  function label(text, { bg = "rgba(12,22,28,0.86)", fg = "#ffffff", h = 0.9, weight = 700, px = 54, accent = null } = {}) {
+    const c = document.createElement("canvas"), g = c.getContext("2d");
+    const font = faceFor(text, weight, px);
+    g.font = font;
+    const pad = 32, gutter = accent ? 22 : 0;
+    const w = Math.ceil(g.measureText(text).width) + pad * 2 + gutter;
+    c.width = Math.max(w, 48); c.height = Math.round(px * 1.78);
+    g.font = font;
+    g.fillStyle = bg; rr(g, 2, 2, c.width - 4, c.height - 4, c.height * 0.21); g.fill();
+    const ar = ARABIC_RE.test(text);
+    if (accent) {
+      g.fillStyle = accent;
+      // Accent bar sits on the reading-start edge
+      const ax = ar ? c.width - 26 : 16;
+      rr(g, ax, c.height * 0.23, 10, c.height * 0.54, 5); g.fill();
+    }
+    g.fillStyle = fg; g.textBaseline = "middle";
+    drawText(g, text, ar ? c.width - pad - gutter : pad + gutter, c.height / 2, { rtl: ar });
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+    s.scale.set(h * c.width / c.height, h, 1);
+    s.userData.dispose = () => { tex.dispose(); s.material.dispose(); };
+    return s;
+  }
+  // A label that rebuilds itself when the language changes.
+  function liveLabel(key, opts) {
+    let sprite = label(t(key), opts);
+    const holder = new THREE.Group(); holder.add(sprite);
+    relangHooks.push(() => {
+      holder.remove(sprite); sprite.userData.dispose();
+      sprite = label(t(key), opts); holder.add(sprite);
+    });
+    return holder;
+  }
+
+  // Sky
+  const skyU = { top: { value: C("#5f9fd0") }, horizon: { value: C("#dceaf0") }, sunCol: { value: C("#fff6e0") }, sunDir: { value: new THREE.Vector3(1, 0.5, -0.2) } };
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(520, 32, 16), new THREE.ShaderMaterial({
+    uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
+    vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+    fragmentShader: `uniform vec3 top; uniform vec3 horizon; uniform vec3 sunCol; uniform vec3 sunDir; varying vec3 vDir;
+      void main(){ vec3 d = normalize(vDir); float h = d.y;
+        vec3 c = mix(horizon, top, smoothstep(-0.02, 0.55, h));
+        c = mix(c, horizon * 0.82, smoothstep(0.0, -0.3, h));
+        float s = max(dot(d, normalize(sunDir)), 0.0);
+        c += sunCol * (pow(s, 900.0) * 3.0 + pow(s, 40.0) * 0.32 + pow(s, 6.0) * 0.12);
+        gl_FragColor = vec4(c, 1.0); }`,
+  }));
+  scene.add(sky);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x9a8a70, 0.9);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffffff, 0.85); scene.add(sun);
+  scene.fog = new THREE.Fog(0xdceaf0, 150, 480);
+
+  // --- Facility node graph -------------------------------------------------
+  // Generic facility TYPES, laid out coast (dense, private, well-resourced) to
+  // interior (sparse, public, remote). The gradient is the access argument.
+  // No real institution is named or implied.
+  const NODES = [
+    { id: "cabinet",  key: FACILITY.cabinet,  x: -46, z:  10, tier: 0 },
+    { id: "csb",      key: FACILITY.csb,      x: -16, z: -14, tier: 1 },
+    { id: "regional", key: FACILITY.regional, x:  20, z:  12, tier: 2 },
+    { id: "rural",    key: FACILITY.rural,    x:  34, z: -30, tier: 1, remote: true },
+    { id: "chu",      key: FACILITY.chu,      x:  58, z:  -4, tier: 3 },
+  ];
+  const NODE = {};
+  NODES.forEach((n) => { NODE[n.id] = n; });
+  // The national portal floats above the middle of the country, not on the ground
+  const PORTAL_POS = new THREE.Vector3(12, 26, -6);
+
+  // Terrain: coastal green through dry interior, with a ridge behind the remote site
+  const GW = 300, GD = 240;
+  const gGeo = new THREE.PlaneGeometry(GW, GD, 120, 96); gGeo.rotateX(-Math.PI / 2);
+  const gp = gGeo.attributes.position, gcol = [];
+  const tmpc = new THREE.Color();
+  const coastal = C("#7a9a5c"), inland = C("#c2ad7c"), dry = C("#d8bd8c"), rockC = C("#b08a5e"), seabedC = C("#c9bb99");
+  // A ridge between the remote dispensary and everything else: why transfer is hard
+  const RIDGE = { x: 40, z: -48, ang: -0.5, len: 56, half: 13, h: 17 };
+  const rca = Math.cos(RIDGE.ang), rsa = Math.sin(RIDGE.ang);
+  function ridgeH(x, z) {
+    const dx = x - RIDGE.x, dz = z - RIDGE.z;
+    const along = dx * rca + dz * rsa, across = -dx * rsa + dz * rca;
+    return RIDGE.h * smooth(RIDGE.len, RIDGE.len * 0.3, Math.abs(along))
+         * smooth(RIDGE.half, RIDGE.half * 0.18, Math.abs(across))
+         * (1 + 0.15 * Math.sin(along * 0.4));
+  }
+  // Shoreline on the -x edge: the Mediterranean behind the first facility
+  const shoreAt = (z) => -66 + 4 * Math.sin(z * 0.07) + 2.5 * Math.sin(z * 0.023 + 1);
+  const landAmt = (x, z) => smooth(shoreAt(z) - 6, shoreAt(z) + 7, x);
+  // Keep the ground flat under each facility so buildings do not float or sink
+  function padFlat(x, z) {
+    let m = 1e9;
+    for (const n of NODES) m = Math.min(m, Math.hypot(n.x - x, n.z - z));
+    return smooth(4, 13, m);
+  }
+  function heightAt(x, z) {
+    const land = landAmt(x, z), flat = padFlat(x, z);
+    const rolling = 2.2 + 1.6 * Math.sin(x * 0.05 + 0.4) * Math.cos(z * 0.06) + 0.9 * Math.sin(x * 0.11 + z * 0.08);
+    const h = (Math.max(0, rolling) * flat + 2.6 + ridgeH(x, z) * flat) * land - 2.6;
+    return { h, land };
+  }
+  for (let v = 0; v < gp.count; v++) {
+    const x = gp.getX(v), z = gp.getZ(v);
+    const { h, land } = heightAt(x, z);
+    gp.setY(v, h);
+    const grain = 0.5 + 0.5 * Math.sin(x * 0.2) * Math.cos(z * 0.17);
+    const aridity = smooth(-50, 30, x);
+    if (h < -0.12) tmpc.copy(seabedC);
+    else if (land < 0.97) tmpc.copy(C("#d8c79c"));
+    else {
+      tmpc.copy(coastal).lerp(inland, aridity).lerp(dry, aridity * grain * 0.7);
+      if (h > 6) tmpc.lerp(rockC, smooth(6, 12, h));
+    }
+    gcol.push(tmpc.r, tmpc.g, tmpc.b);
+  }
+  gGeo.setAttribute("color", new THREE.Float32BufferAttribute(gcol, 3));
+  gGeo.computeVertexNormals();
+  const groundMat = lambert(0xffffff, { vertexColors: true, flatShading: true });
+  scene.add(new THREE.Mesh(gGeo, groundMat));
+
+  // The sea, so "coastal" reads at a glance
+  const seaU = { time: { value: 0 }, deep: { value: C("#0c4a8e") }, shallow: { value: C("#2aa0bd") },
+    horizon: skyU.horizon, sunCol: skyU.sunCol, sunDir: skyU.sunDir,
+    fogColor: { value: C("#dceaf0") }, fogNear: { value: 150 }, fogFar: { value: 480 } };
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.ShaderMaterial({
+    uniforms: seaU,
+    vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: `uniform float time; uniform vec3 deep; uniform vec3 shallow; uniform vec3 horizon; uniform vec3 sunCol; uniform vec3 sunDir;
+      uniform vec3 fogColor; uniform float fogNear; uniform float fogFar; varying vec3 vW;
+      float wave(vec2 p){ return sin(p.x*0.3+time*1.0)*0.5 + sin(p.y*0.4-time*0.85)*0.4 + sin((p.x+p.y)*0.8+time*1.6)*0.18; }
+      void main(){
+        vec2 p = vW.xz; float e = 0.15;
+        float h0 = wave(p), hx = wave(p+vec2(e,0.0)), hz = wave(p+vec2(0.0,e));
+        vec3 n = normalize(vec3(-(hx-h0)/e*0.3, 1.0, -(hz-h0)/e*0.3));
+        vec3 v = normalize(cameraPosition - vW);
+        float fres = pow(1.0 - max(dot(n, v), 0.0), 3.0);
+        vec3 c = mix(deep, shallow, 0.35 + 0.22 * h0);
+        c = mix(c, horizon, fres * 0.85);
+        vec3 r = reflect(-v, n);
+        c += sunCol * pow(max(dot(r, normalize(sunDir)), 0.0), 120.0) * 1.6;
+        c = mix(c, fogColor, smoothstep(fogNear, fogFar, length(cameraPosition - vW)));
+        gl_FragColor = vec4(c, 1.0); }`,
+  }));
+  sea.rotation.x = -Math.PI / 2; sea.position.set(-330, -0.35, 0); scene.add(sea);
+
+  // Sparse dry scenery, denser toward the coast
+  const palms = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.1, 0.17, 3.2, 6), lambert(0xffffff, { flatShading: true }), 60);
+  const fronds = new THREE.InstancedMesh(new THREE.ConeGeometry(1.2, 0.7, 7, 1, true), lambert(0xffffff, { flatShading: true, side: THREE.DoubleSide }), 120);
+  const olives = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.85, 0), lambert(0xffffff, { flatShading: true }), 180);
+  const scrub = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.5, 0), lambert(0xffffff, { flatShading: true }), 240);
+  let seed = 11; const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let nP = 0, nF = 0, nO = 0, nS = 0, guard = 0;
+  while (guard++ < 24000 && (nO < 180 || nS < 240)) {
+    const x = -120 + rand() * 240, z = (rand() - 0.5) * 200;
+    let near = 1e9; for (const n of NODES) near = Math.min(near, Math.hypot(n.x - x, n.z - z));
+    if (near < 7) continue;
+    const { h, land } = heightAt(x, z);
+    if (land < 0.99 || h < 0.1) continue;
+    const aridity = smooth(-50, 20, x), sc = 0.6 + rand() * 0.8;
+    if (aridity < 0.3 && nP < 60 && rand() < 0.4) {
+      const ph = 2.4 + rand() * 1.4, rot = rand() * 6;
+      m4.position.set(x, h + ph / 2, z); m4.rotation.set(0, rot, 0); m4.scale.set(1, ph / 3.2, 1); m4.updateMatrix();
+      palms.setMatrixAt(nP, m4.matrix); palms.setColorAt(nP, tmpc.set("#8a6b43")); nP++;
+      for (let j = 0; j < 2 && nF < 120; j++) {
+        m4.position.set(x, h + ph - j * 0.3, z); m4.rotation.set(Math.PI, rot + j * 0.9, 0);
+        m4.scale.set(1 - j * 0.2, 1 + j * 0.4, 1 - j * 0.2); m4.updateMatrix();
+        fronds.setMatrixAt(nF, m4.matrix); fronds.setColorAt(nF, tmpc.set("#4e8f4a").lerp(C("#78b463"), rand())); nF++;
+      }
+    } else if (rand() > aridity * 0.85 && nO < 180) {
+      m4.position.set(x, h + 0.85 * sc, z); m4.rotation.set(rand() * 0.3, rand() * 6, 0); m4.scale.set(sc, sc * 0.85, sc); m4.updateMatrix();
+      olives.setMatrixAt(nO, m4.matrix); olives.setColorAt(nO, tmpc.set("#7f9469").lerp(C("#a4b389"), rand())); nO++;
+    } else if (nS < 240) {
+      m4.position.set(x, h + 0.22 * sc, z); m4.rotation.set(rand(), rand() * 6, rand()); m4.scale.set(sc * 1.2, sc * 0.6, sc * 1.2); m4.updateMatrix();
+      scrub.setMatrixAt(nS, m4.matrix); scrub.setColorAt(nS, tmpc.set("#b0a46a").lerp(C("#c9bd8a"), rand())); nS++;
+    }
+  }
+  palms.count = nP; fronds.count = nF; olives.count = nO; scrub.count = nS;
+  scene.add(palms, fronds, olives, scrub);
+  const floraTinted = [palms, fronds, olives, scrub];
+
+  // --- Facility buildings --------------------------------------------------
+  // Scale encodes tier: a private cabinet is one room, a university hospital is a block.
+  const wallM = lambert("#e9e3d6", { flatShading: true });
+  const roofM = lambert("#1f6b7a", { flatShading: true });
+  const roofPubM = lambert("#2f7d52", { flatShading: true });
+  const winM = new THREE.MeshBasicMaterial({ color: "#ffd98a" });
+  const screenOffM = lambert("#4a5560");
+  const screenOnM = new THREE.MeshLambertMaterial({ color: "#2aa0bd", emissive: "#14596b", emissiveIntensity: 0.8 });
+  const crossM = lambert("#c23a2b", { emissive: "#5a0f08", emissiveIntensity: 0.3 });
+
+  function medCross(size = 0.5) {
+    const g = new THREE.Group();
+    const a = new THREE.Mesh(new THREE.BoxGeometry(size, size * 0.32, 0.08), crossM);
+    const b = new THREE.Mesh(new THREE.BoxGeometry(size * 0.32, size, 0.08), crossM);
+    g.add(a, b); return g;
+  }
+
+  const facilities = {};
+  NODES.forEach((n) => {
+    const g = new THREE.Group();
+    const { h } = heightAt(n.x, n.z);
+    g.position.set(n.x, h, n.z);
+    // Footprint and height grow with tier
+    const tiers = [
+      { w: 3.2, d: 2.6, hh: 1.9, blocks: 1 },
+      { w: 4.2, d: 3.2, hh: 2.3, blocks: 2 },
+      { w: 6.0, d: 4.2, hh: 3.4, blocks: 3 },
+      { w: 7.6, d: 5.0, hh: 4.6, blocks: 4 },
+    ][n.tier];
+    const pub = n.tier >= 1;
+    for (let b = 0; b < tiers.blocks; b++) {
+      const bw = tiers.w * (1 - b * 0.16), bh = tiers.hh * (1 - b * 0.1);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, tiers.d * (1 - b * 0.12)), wallM);
+      body.position.set(b * 0.5 - tiers.blocks * 0.18, bh / 2, b * -0.9);
+      g.add(body);
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(bw + 0.25, 0.22, tiers.d * (1 - b * 0.12) + 0.25), pub ? roofPubM : roofM);
+      roof.position.set(body.position.x, bh + 0.1, body.position.z);
+      g.add(roof);
+      // Lit windows on the front face
+      for (let k = 0; k < Math.max(2, Math.round(bw)); k++) {
+        const w = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.26), winM);
+        w.position.set(body.position.x - bw / 2 + 0.45 + k * 0.6, bh * 0.55, body.position.z + tiers.d * (1 - b * 0.12) / 2 + 0.01);
+        g.add(w);
+      }
+    }
+    const cross = medCross(0.62);
+    cross.position.set(0, tiers.hh + 0.65, tiers.d / 2);
+    g.add(cross);
+    // A terminal screen per facility: dark at level 0, lit once the site is digital
+    const screen = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.62, 0.1), screenOffM);
+    screen.position.set(tiers.w / 2 + 0.2, 1.1, tiers.d / 2 - 0.3);
+    screen.rotation.y = -0.4; g.add(screen);
+    const screenGlow = glow("#5fd0e8", 2.0, 0); screenGlow.position.copy(screen.position); g.add(screenGlow);
+    // Facility label, rebuilt on language change
+    const lab = liveLabel(n.key, { h: 0.95, accent: pub ? "#2f7d52" : "#1f6b7a" });
+    lab.position.set(0, tiers.hh + 2.1, 0); g.add(lab);
+    scene.add(g);
+    facilities[n.id] = { g, screen, screenGlow, top: tiers.hh + 2.8, cross, node: n, y: h };
+  });
+
+  // --- National portal: a floating node above the country ------------------
+  const portal = (() => {
+    const g = new THREE.Group(); g.position.copy(PORTAL_POS); scene.add(g);
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.5, 1), lambert("#1f6b7a", { emissive: "#0c3c47", emissiveIntensity: 0.7, flatShading: true }));
+    g.add(core);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.1, 8, 48), lambert("#2aa0bd", { emissive: "#10505f", emissiveIntensity: 0.6 }));
+    ring.rotation.x = Math.PI / 2; g.add(ring);
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.06, 8, 48), lambert("#f0a830", { emissive: "#6a4200", emissiveIntensity: 0.5 }));
+    ring2.rotation.set(Math.PI / 2.4, 0.4, 0); g.add(ring2);
+    const gl = glow("#5fd0e8", 9, 0); g.add(gl);
+    const lab = liveLabel(FACILITY.national, { h: 1.5, accent: "#2aa0bd" });
+    lab.position.y = 4.6; g.add(lab);
+    g.visible = false;
+    return { g, core, ring, ring2, gl };
+  })();
+
+  // --- Data rails between facilities --------------------------------------
+  // Blue = deterministic plumbing, the same grammar the rest of the deck uses.
+  // Rails rise out of the ground as the capability lands.
+  const RAILS = [
+    ["cabinet", "csb"], ["csb", "regional"], ["regional", "chu"], ["rural", "regional"],
+  ];
+  const railMat = lambert("#2a6fa8", { emissive: "#0d2f52", emissiveIntensity: 0.6 });
+  const railSegs = [];
+  RAILS.forEach(([a, b], ri) => {
+    const A = facilities[a], B = facilities[b];
+    const from = new THREE.Vector3(A.node.x, A.y + 0.6, A.node.z);
+    const to = new THREE.Vector3(B.node.x, B.y + 0.6, B.node.z);
+    const steps = 22;
+    const pts = [];
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const x = from.x + (to.x - from.x) * f, z = from.z + (to.z - from.z) * f;
+      // Follow the ground, lifted a little, arcing over the ridge where needed
+      const gh = heightAt(x, z).h;
+      pts.push(new THREE.Vector3(x, Math.max(gh, 0) + 0.75 + Math.sin(f * Math.PI) * 1.1, z));
+    }
+    const curve = new THREE.CatmullRomCurve3(pts);
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 36, 0.09, 6, false), railMat);
+    tube.scale.y = 0.0001; tube.visible = false;
+    scene.add(tube);
+    railSegs.push({ tube, curve, a, b, s: 0, remote: A.node.remote || B.node.remote, i: ri });
+  });
+
+  // --- Consent gate on the rail into the regional hospital -----------------
+  const consent = (() => {
+    const A = facilities.csb, B = facilities.regional;
+    const mid = new THREE.Vector3((A.node.x + B.node.x) / 2, 0, (A.node.z + B.node.z) / 2);
+    mid.y = heightAt(mid.x, mid.z).h;
+    const g = new THREE.Group(); g.position.copy(mid);
+    g.rotation.y = Math.atan2(-(B.node.z - A.node.z), B.node.x - A.node.x);
+    scene.add(g);
+    const pierM = lambert("#2a6fa8");
+    [-1.7, 1.7].forEach((z) => {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2.4, 0.3), pierM); p.position.set(0, 1.2, z); g.add(p);
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.16, 0.42), lambert("#f0a830")); cap.position.set(0, 2.5, z); g.add(cap);
+    });
+    const pivot = new THREE.Group(); pivot.position.set(0, 1.5, 1.7); g.add(pivot);
+    const sc = document.createElement("canvas"); sc.width = 256; sc.height = 16; const sx = sc.getContext("2d");
+    for (let k = 0; k < 8; k++) { sx.fillStyle = k % 2 ? "#ffffff" : "#2a6fa8"; sx.fillRect(k * 32, 0, 32, 16); }
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 3.4), new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(sc) }));
+    arm.position.z = -1.7; pivot.add(arm);
+    const lab = liveLabel(SCENE.consent, { h: 0.85, accent: "#2a6fa8" });
+    lab.position.set(0, 3.5, 0); g.add(lab);
+    // Access log: a small stack of plates that grows each time a record passes
+    const logG = new THREE.Group(); logG.position.set(1.8, 0, -1.2); g.add(logG);
+    const logLab = liveLabel(SCENE.auditLog, { h: 0.6, accent: "#6c4bb6" });
+    logLab.position.y = 2.6; logG.add(logLab);
+    const plateM = lambert("#6c4bb6", { emissive: "#2a1a50", emissiveIntensity: 0.5 });
+    const plates = [];
+    for (let k = 0; k < 10; k++) {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.07, 0.7), plateM);
+      p.position.set(0, 0.1 + k * 0.1, 0); p.visible = false; logG.add(p); plates.push(p);
+    }
+    g.visible = false;
+    return { g, pivot, plates, written: 0, lift: 0 };
+  })();
+
+  // --- The hero: the record itself ----------------------------------------
+  // Four forms, crossfaded by maturity:
+  //   paper   — a manila carnet the patient carries
+  //   folder  — a folder with one glowing page and a clipped health-ID token
+  //   cards   — structured cards, each with an ICD-10 chip on its spine
+  //   token   — a luminous identifier that needs no paper at all
+  const record = (() => {
+    const g = new THREE.Group(); scene.add(g);
+
+    // paper carnet
+    const paper = new THREE.Group(); g.add(paper);
+    const manila = lambert("#d8c48e", { flatShading: true });
+    const cover = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.05, 0.86), manila); paper.add(cover);
+    for (let k = 0; k < 3; k++) {
+      const sheet = new THREE.Mesh(new THREE.BoxGeometry(0.56 - k * 0.03, 0.012, 0.8 - k * 0.03), lambert("#f6f2e6"));
+      sheet.position.set(0.01 * k, 0.03 + k * 0.014, 0.01 * k);
+      sheet.rotation.y = (k - 1) * 0.05; paper.add(sheet);
+    }
+    const bentCorner = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.014, 0.14), lambert("#e8dcbc"));
+    bentCorner.position.set(0.22, 0.062, 0.33); bentCorner.rotation.set(0, 0.5, 0.25); paper.add(bentCorner);
+
+    // folder with a glowing page
+    const folder = new THREE.Group(); g.add(folder);
+    const fCover = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.06, 0.9), lambert("#b9c8d2", { flatShading: true })); folder.add(fCover);
+    const pageM = new THREE.MeshLambertMaterial({ color: "#ffffff", emissive: "#2aa0bd", emissiveIntensity: 0.55 });
+    const page = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.02, 0.82), pageM); page.position.y = 0.05; folder.add(page);
+    const pageGlow = glow("#5fd0e8", 1.5, 0.5); pageGlow.position.y = 0.16; folder.add(pageGlow);
+
+    // structured cards with code chips
+    const cards = new THREE.Group(); g.add(cards);
+    const cardM = lambert("#f4f8fa", { flatShading: true });
+    const chipM = lambert("#6c4bb6", { emissive: "#2d1a5e", emissiveIntensity: 0.6 });
+    const cardStack = [];
+    for (let k = 0; k < 4; k++) {
+      const cg = new THREE.Group(); cg.position.y = k * 0.1;
+      const c = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.05, 0.88), cardM); cg.add(c);
+      const chip = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.055, 0.3), chipM); chip.position.set(-0.29, 0.005, -0.25); cg.add(chip);
+      cards.add(cg); cardStack.push(cg);
+    }
+
+    // identifier token: a hex chip with an engraved rim
+    const token = new THREE.Group(); g.add(token);
+    const tokM = new THREE.MeshLambertMaterial({ color: "#2aa0bd", emissive: "#1b7d94", emissiveIntensity: 0.9, flatShading: true });
+    const hex = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.12, 6), tokM); token.add(hex);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.035, 6, 6), lambert("#f0a830", { emissive: "#6a4200", emissiveIntensity: 0.6 }));
+    rim.rotation.x = Math.PI / 2; token.add(rim);
+    const tokGlow = glow("#7fe4f8", 2.6, 0.85); token.add(tokGlow);
+    // A small health-ID token that clips onto the folder from level 2 onward
+    const clip = new THREE.Group(); folder.add(clip);
+    const clipHex = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.06, 6), tokM);
+    clipHex.position.set(0.24, 0.1, -0.3); clip.add(clipHex);
+    const clipGlow = glow("#7fe4f8", 0.9, 0.7); clipGlow.position.copy(clipHex.position); clip.add(clipGlow);
+
+    const forms = { paper, folder, cards, token };
+    // Which form belongs to which level
+    const FORM_AT = ["paper", "folder", "folder", "cards", "cards", "cards", "token"];
+    function setForm(level, snap) {
+      const want = FORM_AT[level];
+      Object.entries(forms).forEach(([k, grp]) => {
+        const on = k === want;
+        grp.userData.want = on ? 1 : 0;
+        if (snap) { grp.userData.s = on ? 1 : 0; grp.visible = on; grp.scale.setScalar(on ? 1 : 0.0001); }
+      });
+      clip.visible = level >= INS_STOP;
+    }
+    Object.values(forms).forEach((grp) => { grp.userData.s = 0; grp.userData.want = 0; });
+    setForm(0, true);
+    function update(dt, time) {
+      Object.values(forms).forEach((grp) => {
+        const d = grp.userData;
+        d.s += (d.want - d.s) * Math.min(1, dt * 5);
+        grp.visible = d.s > 0.02;
+        if (grp.visible) grp.scale.setScalar(Math.max(0.0001, d.s));
+      });
+      pageGlow.material.opacity = 0.35 + Math.sin(time * 3) * 0.15;
+      tokGlow.material.opacity = 0.65 + Math.sin(time * 2.4) * 0.2;
+      token.rotation.y = time * 0.9;
+      rim.rotation.z = time * 1.4;
+      cardStack.forEach((c, k) => { c.position.y = k * 0.1 + Math.sin(time * 1.6 + k * 0.7) * 0.02; });
+      g.rotation.y += dt * 0.25;
+    }
+    return { g, setForm, update, forms };
+  })();
+
+  // --- The patient ---------------------------------------------------------
+  function makePerson(bodyCol = "#2f7d52", scale = 1) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.26, 0.8, 10), lambert(bodyCol));
+    body.position.y = 0.4; g.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 12), lambert("#d9ab84"));
+    head.position.y = 0.98; g.add(head);
+    const arms = [-0.24, 0.24].map((x) => {
+      const pv = new THREE.Group(); pv.position.set(x, 0.75, 0);
+      const a = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.42, 0.11), lambert(bodyCol));
+      a.position.y = -0.21; pv.add(a); g.add(pv); return pv;
+    });
+    const legs = [-0.1, 0.1].map((x) => {
+      const pv = new THREE.Group(); pv.position.set(x, 0.4, 0);
+      const l = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.42, 0.12), lambert("#3a4650"));
+      l.position.y = -0.21; pv.add(l); g.add(pv); return pv;
+    });
+    g.userData = { arms, legs };
+    g.scale.setScalar(scale);
+    return g;
+  }
+  const patient = makePerson("#2f7d52", 1.15); scene.add(patient);
+  const patientLab = liveLabel(SCENE.patient, { h: 0.6, accent: "#2f7d52" });
+  patientLab.position.y = 1.9; patient.add(patientLab);
+
+  // A clinician stands at each facility door
+  const clinicians = {};
+  NODES.forEach((n) => {
+    const c = makePerson("#1f6b7a", 1.0);
+    const f = facilities[n.id];
+    c.position.set(n.x + 1.6, f.y, n.z + 1.9);
+    c.rotation.y = -0.5;
+    scene.add(c);
+    clinicians[n.id] = c;
+  });
+
+  // --- The coding beat: free text to confirmed ICD-10 ----------------------
+  // Note renders in the viewer's language (RTL for Arabic). Candidate codes
+  // crystallize amber with confidence rings; the clinician confirms exactly one,
+  // which turns green. The CODE never changes with language — only its label.
+  const coding = (() => {
+    const anchor = facilities[NODES[0].id];
+    const g = new THREE.Group();
+    g.position.set(anchor.node.x, anchor.y, anchor.node.z);
+    scene.add(g);
+
+    // Note sprite: a sheet of free text, wrapped, in the active language
+    function noteTexture(text) {
+      const W = 760, H = 300;
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const x = c.getContext("2d");
+      x.fillStyle = "#fbf9f2"; rr(x, 4, 4, W - 8, H - 8, 18); x.fill();
+      x.strokeStyle = "#c8bfa8"; x.lineWidth = 3; rr(x, 12, 12, W - 24, H - 24, 14); x.stroke();
+      const ar = ARABIC_RE.test(text);
+      // Ruled lines, like a note pad
+      x.strokeStyle = "rgba(90,110,120,0.16)"; x.lineWidth = 2;
+      for (let k = 1; k < 5; k++) { x.beginPath(); x.moveTo(34, 60 + k * 48); x.lineTo(W - 34, 60 + k * 48); x.stroke(); }
+      x.font = faceFor(text, 400, 34);
+      x.fillStyle = "#1d2b33"; x.textBaseline = "middle";
+      // Word wrap honouring direction
+      const words = text.split(/\s+/), lines = [];
+      let line = "";
+      for (const w of words) {
+        const trial = line ? line + " " + w : w;
+        if (x.measureText(trial).width > W - 80 && line) { lines.push(line); line = w; } else line = trial;
+      }
+      if (line) lines.push(line);
+      const startX = ar ? W - 40 : 40;
+      lines.slice(0, 5).forEach((ln, k) => drawText(x, ln, startX, 62 + k * 48, { rtl: ar }));
+      // A small language tag in the corner
+      x.font = `500 22px "IBM Plex Mono", monospace`;
+      x.fillStyle = "#6b7f8a";
+      drawText(x, ar ? "AR" : (lang === "fr" ? "FR" : "EN"), ar ? 40 : W - 40, H - 34, { rtl: false, align: ar ? "left" : "right" });
+      const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4; return tex;
+    }
+    let noteTex = noteTexture(t(CODING[0].note));
+    const note = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.34),
+      new THREE.MeshBasicMaterial({ map: noteTex, transparent: true, side: THREE.DoubleSide }));
+    note.position.set(0, 3.4, 2.2); g.add(note);
+
+    // Code chips: a plate with the invariant code and its language-dependent label
+    function chipTexture(code, labelText, state) {
+      const W = 620, H = 180;
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const x = c.getContext("2d");
+      const bg = state === "ok" ? "#11603f" : state === "off" ? "#4a4536" : "#6d4a08";
+      const edge = state === "ok" ? "#5fdc9a" : state === "off" ? "#8a8470" : "#f0a830";
+      x.fillStyle = bg; rr(x, 4, 4, W - 8, H - 8, 20); x.fill();
+      x.strokeStyle = edge; x.lineWidth = 5; rr(x, 12, 12, W - 24, H - 24, 15); x.stroke();
+      // Invariant code, always LTR, always mono — this is the interlingua
+      x.font = `700 62px "IBM Plex Mono", monospace`;
+      x.fillStyle = "#ffffff"; x.textBaseline = "middle"; x.direction = "ltr"; x.textAlign = "left";
+      x.fillText(code, 28, 54);
+      // Localized label underneath
+      const ar = ARABIC_RE.test(labelText);
+      x.font = faceFor(labelText, 400, 30);
+      x.fillStyle = "rgba(255,255,255,0.88)";
+      let lab = labelText;
+      while (x.measureText(lab).width > W - 60 && lab.length > 6) lab = lab.slice(0, -2);
+      if (lab !== labelText) lab += "…";
+      drawText(x, lab, ar ? W - 28 : 28, 126, { rtl: ar });
+      const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4; return tex;
+    }
+    const chips = CODING[0].codes.map((cd, k) => {
+      const tex = chipTexture(cd.code, t(cd.label), "pending");
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.52),
+        new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, side: THREE.DoubleSide }));
+      m.position.set(0, 5.1 + k * 0.72, 2.2);
+      g.add(m);
+      // Confidence ring: fraction of a torus, so confidence is readable not decorative
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.05, 6, 28, Math.PI * 2 * cd.conf),
+        lambert("#f0a830", { emissive: "#6a4200", emissiveIntensity: 0.6 }));
+      ring.position.set(-1.25, m.position.y, 2.2); ring.visible = false; g.add(ring);
+      return { m, tex, ring, data: cd };
+    });
+    const confirmLab = liveLabel(SCENE.confirmed, { h: 0.62, accent: "#2f7d52" });
+    confirmLab.position.set(1.6, 5.1, 2.2); confirmLab.visible = false; g.add(confirmLab);
+
+    let caseIdx = 0, phase = 0, phaseT = 0;
+    function rebuild() {
+      // Language changed: redraw note and chip faces, keep the code text identical
+      noteTex.dispose();
+      noteTex = noteTexture(t(CODING[caseIdx].note));
+      note.material.map = noteTex; note.material.needsUpdate = true;
+      chips.forEach((ch, k) => {
+        const cd = CODING[caseIdx].codes[k];
+        ch.tex.dispose();
+        ch.tex = chipTexture(cd.code, t(cd.label), ch.state || "pending");
+        ch.m.material.map = ch.tex; ch.m.material.needsUpdate = true;
+      });
+    }
+    relangHooks.push(rebuild);
+
+    function setCase(i) {
+      caseIdx = i % CODING.length;
+      phase = 0; phaseT = 0;
+      chips.forEach((ch, k) => {
+        const cd = CODING[caseIdx].codes[k];
+        ch.data = cd; ch.state = "pending";
+        ch.tex.dispose(); ch.tex = chipTexture(cd.code, t(cd.label), "pending");
+        ch.m.material.map = ch.tex; ch.m.material.needsUpdate = true;
+        ch.m.material.opacity = 0;
+        ch.ring.visible = false;
+        ch.ring.geometry.dispose();
+        ch.ring.geometry = new THREE.TorusGeometry(0.26, 0.05, 6, 28, Math.PI * 2 * cd.conf);
+        ch.ring.material.color.set("#f0a830");
+      });
+      confirmLab.visible = false;
+      noteTex.dispose(); noteTex = noteTexture(t(CODING[caseIdx].note));
+      note.material.map = noteTex; note.material.needsUpdate = true;
+      note.material.opacity = 1;
+    }
+
+    // Phases: 0 note appears · 1 codes crystallize · 2 clinician confirms · 3 hold · then next case
+    function update(dt, active, time) {
+      g.visible = active || current === CODING_STOP;
+      if (!g.visible) return;
+      const sp = active ? 1 : 0.4;
+      phaseT += dt * sp;
+      note.position.y = 3.4 + Math.sin(time * 1.2) * 0.06;
+      if (phase === 0 && phaseT > 1.6) { phase = 1; phaseT = 0; }
+      else if (phase === 1) {
+        chips.forEach((ch, k) => {
+          const appear = smooth(k * 0.45, k * 0.45 + 0.6, phaseT);
+          ch.m.material.opacity = appear;
+          ch.ring.visible = appear > 0.3;
+          ch.ring.rotation.z = -Math.PI / 2;
+          ch.ring.scale.setScalar(appear);
+        });
+        if (phaseT > 2.4) { phase = 2; phaseT = 0; }
+      } else if (phase === 2) {
+        // The clinician reaches up; the chosen code goes green, the others fade out
+        const c = clinicians[NODES[0].id];
+        if (c) c.userData.arms[0].rotation.x = -2.2 * smooth(0, 0.5, phaseT);
+        if (phaseT > 0.55) {
+          chips.forEach((ch) => {
+            const want = ch.data.pick ? "ok" : "off";
+            if (ch.state !== want) {
+              ch.state = want;
+              ch.tex.dispose(); ch.tex = chipTexture(ch.data.code, t(ch.data.label), want);
+              ch.m.material.map = ch.tex; ch.m.material.needsUpdate = true;
+              ch.ring.material.color.set(want === "ok" ? "#5fdc9a" : "#8a8470");
+            }
+            if (!ch.data.pick) ch.m.material.opacity = Math.max(0.18, ch.m.material.opacity - dt * 0.6);
+          });
+          const picked = chips.find((ch) => ch.data.pick);
+          confirmLab.visible = true;
+          confirmLab.position.y = picked ? picked.m.position.y : 5.1;
+        }
+        if (phaseT > 2.6) { phase = 3; phaseT = 0; }
+      } else if (phase === 3) {
+        const c = clinicians[NODES[0].id];
+        if (c) c.userData.arms[0].rotation.x *= 0.9;
+        if (phaseT > 2.2 && active) setCase(caseIdx + 1);
+      }
+    }
+    setCase(0);
+    return { g, update, setCase };
+  })();
+
+  // --- Replication: packets, acknowledgements, offline queue ---------------
+  // A packet is a write in flight. It is not "done" until an ACK comes back the
+  // other way. The remote site loses connectivity on a cycle, queues its writes
+  // in a visible buffer, then drains when the link returns.
+  const packets = [];
+  const packetGeo = new THREE.BoxGeometry(0.3, 0.22, 0.3);
+  const packetM = lambert("#f0a830", { emissive: "#7a4a00", emissiveIntensity: 0.7 });
+  const ackM = lambert("#5fdc9a", { emissive: "#0f4a2a", emissiveIntensity: 0.7 });
+  for (let k = 0; k < 26; k++) {
+    const m = new THREE.Mesh(packetGeo, packetM.clone());
+    m.visible = false; scene.add(m);
+    packets.push({ m, seg: null, f: 0, dir: 1, kind: "write", live: false, speed: 0.35 });
+  }
+  function launch(segIdx, kind, dir) {
+    const p = packets.find((q) => !q.live);
+    if (!p) return null;
+    p.seg = railSegs[segIdx]; p.f = dir > 0 ? 0 : 1; p.dir = dir; p.kind = kind; p.live = true;
+    p.speed = kind === "ack" ? 0.55 : 0.32 + Math.random() * 0.1;
+    p.m.material = kind === "ack" ? ackM.clone() : packetM.clone();
+    p.m.visible = true; p.m.scale.setScalar(kind === "ack" ? 0.7 : 1);
+    return p;
+  }
+
+  // Offline queue above the remote dispensary
+  const queue = (() => {
+    const f = facilities.rural;
+    const g = new THREE.Group(); g.position.set(f.node.x, f.y + 3.4, f.node.z); scene.add(g);
+    const qM = lambert("#f0a830", { emissive: "#7a4a00", emissiveIntensity: 0.6 });
+    const boxes = [];
+    for (let k = 0; k < 7; k++) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.2, 0.26), qM);
+      m.position.set((k % 4) * 0.34 - 0.5, Math.floor(k / 4) * 0.28, 0);
+      m.visible = false; g.add(m); boxes.push(m);
+    }
+    const labQ = liveLabel(SCENE.queued, { h: 0.68, accent: "#f0a830" });
+    labQ.position.y = 1.3; g.add(labQ);
+    const labS = liveLabel(SCENE.synced, { h: 0.68, accent: "#5fdc9a" });
+    labS.position.y = 1.3; labS.visible = false; g.add(labS);
+    g.visible = false;
+    return { g, boxes, labQ, labS, depth: 0, online: true, timer: 0 };
+  })();
+
+  // Duplicate merge: two record ghosts converge into one at the health-ID stop
+  const merge = (() => {
+    const f = facilities.csb;
+    const g = new THREE.Group(); g.position.set(f.node.x, f.y + 3.2, f.node.z); scene.add(g);
+    const ghostM = () => new THREE.MeshLambertMaterial({ color: "#b9c8d2", emissive: "#2a4450", emissiveIntensity: 0.5, transparent: true, opacity: 0.85 });
+    const a = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.06, 0.82), ghostM());
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.06, 0.82), ghostM());
+    g.add(a, b);
+    const one = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.08, 0.9),
+      new THREE.MeshLambertMaterial({ color: "#f4f8fa", emissive: "#1b7d94", emissiveIntensity: 0.7 }));
+    one.visible = false; g.add(one);
+    const gl = glow("#7fe4f8", 3.2, 0); g.add(gl);
+    const lab = liveLabel(SCENE.merged, { h: 0.72, accent: "#2aa0bd" });
+    lab.position.y = 1.5; lab.visible = false; g.add(lab);
+    g.visible = false;
+    let ph = 0;
+    function update(dt, active, time) {
+      if (!g.visible) return;
+      ph += dt * (active ? 1 : 0.4);
+      const cyc = ph % 7;
+      if (cyc < 3.2) {
+        // Two separate records, drifting apart
+        const sep = 0.75 + Math.sin(time * 1.1) * 0.08;
+        a.position.set(-sep, Math.sin(time * 1.3) * 0.05, 0); a.rotation.y = -0.25;
+        b.position.set(sep, Math.sin(time * 1.3 + 1.6) * 0.05, 0); b.rotation.y = 0.25;
+        a.visible = b.visible = true; one.visible = false; lab.visible = false;
+        a.material.opacity = b.material.opacity = 0.85;
+        gl.material.opacity = 0;
+      } else if (cyc < 4.6) {
+        // Converging
+        const f2 = smooth(3.2, 4.6, cyc);
+        a.position.x = -0.75 * (1 - f2); b.position.x = 0.75 * (1 - f2);
+        a.rotation.y = -0.25 * (1 - f2); b.rotation.y = 0.25 * (1 - f2);
+        a.material.opacity = b.material.opacity = 0.85 * (1 - f2);
+        gl.material.opacity = f2 * 0.8;
+        one.visible = f2 > 0.6; one.scale.setScalar(Math.max(0.0001, f2));
+      } else {
+        // One record, one identity
+        a.visible = b.visible = false;
+        one.visible = true; one.scale.setScalar(1);
+        one.position.y = Math.sin(time * 1.4) * 0.05;
+        gl.material.opacity = 0.5 + Math.sin(time * 2.5) * 0.15;
+        lab.visible = true;
+      }
+    }
+    return { g, update };
+  })();
+
+  // "Record arrived first" reveal at the destination
+  const ahead = (() => {
+    const f = facilities.chu;
+    const g = new THREE.Group(); g.position.set(f.node.x, f.y + 2.6, f.node.z + 2.4); scene.add(g);
+    const desk = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 1.0), lambert("#8d7a5c")); g.add(desk);
+    const sheet = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.05, 0.78),
+      new THREE.MeshLambertMaterial({ color: "#ffffff", emissive: "#2aa0bd", emissiveIntensity: 0.8 }));
+    sheet.position.y = 0.1; g.add(sheet);
+    const gl = glow("#7fe4f8", 4.2, 0.7); gl.position.y = 0.5; g.add(gl);
+    const lab = liveLabel(SCENE.recordAhead, { h: 0.9, accent: "#5fdc9a" });
+    lab.position.y = 1.7; g.add(lab);
+    g.visible = false;
+    return { g, gl, sheet };
+  })();
+
+  // Screens-off / no-record markers for the early levels
+  const noRecord = (() => {
+    const f = facilities.regional;
+    const holder = liveLabel(SCENE.noRecord, { h: 0.8, accent: "#c23a2b" });
+    holder.position.set(f.node.x, f.y + 4.4, f.node.z);
+    scene.add(holder);
+    holder.visible = false;
+    return holder;
+  })();
+  const islandMark = (() => {
+    const f = facilities.csb;
+    const holder = liveLabel(SCENE.island, { h: 0.75, accent: "#a85c00" });
+    holder.position.set(f.node.x, f.y + 4.4, f.node.z);
+    scene.add(holder);
+    holder.visible = false;
+    return holder;
+  })();
+  // Attribution for the public facts quoted on the final stop
+  const sourceLab = (() => {
+    const holder = liveLabel(SCENE.source, { h: 0.62, accent: "#6b7f8a", bg: "rgba(12,22,28,0.72)" });
+    holder.position.set(PORTAL_POS.x, PORTAL_POS.y - 6.5, PORTAL_POS.z);
+    scene.add(holder); holder.visible = false;
+    return holder;
+  })();
+
+  // --- The patient's route -------------------------------------------------
+  // The patient traverses the SAME facilities at every level. What changes is
+  // what is waiting for them when they arrive. That is the whole argument.
+  const ROUTE = ["cabinet", "csb", "regional", "rural", "chu"];
+  let legIdx = 0, legF = 0;
+  // Put the patient on final approach to a given facility, so selecting a stop always
+  // shows someone arriving there rather than mid-walk somewhere off screen.
+  function sendPatientTo(nodeId) {
+    const dest = ROUTE.indexOf(nodeId);
+    if (dest < 0) return;
+    legIdx = (dest - 1 + ROUTE.length) % ROUTE.length;
+    legF = 0.72;
+  }
+  const patientPos = new THREE.Vector3();
+  function legPoints(i) {
+    const a = NODE[ROUTE[i % ROUTE.length]], b = NODE[ROUTE[(i + 1) % ROUTE.length]];
+    return [a, b];
+  }
+  function updatePatient(dt, time) {
+    const [a, b] = legPoints(legIdx);
+    legF += dt * 0.045;
+    if (legF >= 1) { legF = 0; legIdx = (legIdx + 1) % ROUTE.length; }
+    const f = legF;
+    const x = a.x + (b.x - a.x) * f, z = a.z + (b.z - a.z) * f;
+    const gh = heightAt(x, z).h;
+    patientPos.set(x, gh, z);
+    patient.position.copy(patientPos);
+    patient.rotation.y = Math.atan2(-(b.z - a.z), b.x - a.x);
+    // Walk cycle, paused briefly at each arrival
+    const arriving = f > 0.9 || f < 0.1;
+    const sw = arriving ? 0 : Math.sin(time * 7) * 0.5;
+    patient.userData.legs[0].rotation.x = sw;
+    patient.userData.legs[1].rotation.x = -sw;
+    patient.userData.arms[0].rotation.x = -sw * 0.5;
+    patient.userData.arms[1].rotation.x = sw * 0.5;
+    // The record travels with the patient at low maturity, and ahead of them at high
+    const carried = current < RAILS_STOP;
+    const target = new THREE.Vector3();
+    if (current === LAST) {
+      // Already arrived: rest on the clinician's desk, which is the whole point
+      target.copy(ahead.g.position).add(new THREE.Vector3(0, 1.1, 0));
+    } else if (carried) {
+      // In hand, beside the patient
+      target.set(x + Math.cos(patient.rotation.y) * 0.1 + 0.45, gh + 1.0, z + 0.3);
+    } else {
+      // Running ahead down the rail toward the next facility
+      const lead = Math.min(1, f + 0.45);
+      const lx = a.x + (b.x - a.x) * lead, lz = a.z + (b.z - a.z) * lead;
+      target.set(lx, heightAt(lx, lz).h + 1.9, lz);
+    }
+    record.g.position.lerp(target, Math.min(1, dt * 2.2));
+  }
+
+  // --- Level staging -------------------------------------------------------
+  // One function decides what the whole scene shows for a given maturity level.
+  function stageLevel(i) {
+    record.setForm(i, false);
+    sendPatientTo(STOPS[i].node);
+    // Terminals light up from level 1
+    NODES.forEach((n) => {
+      const f = facilities[n.id];
+      const digital = i >= 1;
+      f.screen.material = digital ? screenOnM : screenOffM;
+      f.screenGlow.material.opacity = digital ? 0.5 : 0;
+    });
+    noRecord.visible = i === 0;
+    islandMark.visible = i === 1;
+    merge.g.visible = i === INS_STOP;
+    consent.g.visible = i >= RAILS_STOP;
+    queue.g.visible = i >= RAILS_STOP;
+    portal.g.visible = i >= PORTAL;
+    ahead.g.visible = i === LAST;
+    sourceLab.visible = i === LAST;
+    // Rails appear from the exchange level; the remote leg comes last
+    railSegs.forEach((r) => { r.want = i >= RAILS_STOP ? (r.remote && i < PORTAL ? 0.4 : 1) : 0; });
+  }
+
+  // --- Camera director -----------------------------------------------------
+  let mode = "frame";
+  const goalTarget = new THREE.Vector3(), goalCam = new THREE.Vector3();
+  function frameStop(i) {
+    const s = STOPS[i];
+    if (i === PORTAL) {
+      goalTarget.copy(PORTAL_POS); goalCam.set(PORTAL_POS.x - 26, PORTAL_POS.y + 12, PORTAL_POS.z + 30);
+      return;
+    }
+    if (i === LAST) {
+      const f = facilities.chu;
+      goalTarget.set(f.node.x, f.y + 3.5, f.node.z + 1.5);
+      goalCam.set(f.node.x - 14, f.y + 11, f.node.z + 19);
+      return;
+    }
+    if (i === CODING_STOP) {
+      // Tight on the note and the candidate codes: this beat has to be legible,
+      // so the camera sits close and level with the middle of the chip stack.
+      const f = facilities[NODES[0].id];
+      goalTarget.set(f.node.x, f.y + 4.9, f.node.z + 2.2);
+      goalCam.set(f.node.x - 1.2, f.y + 5.6, f.node.z + 9.2);
+      return;
+    }
+    if (i === RAILS_STOP) {
+      // Must contain three things at once: the consent gate near (2,-1), its access
+      // log beside it, and the offline queue above the remote site at (34,-30).
+      goalTarget.set(18, 3, -14);
+      goalCam.set(-7, 27, 25);
+      return;
+    }
+    const f = facilities[s.node] || facilities[NODES[0].id];
+    goalTarget.set(f.node.x, f.y + 2.6, f.node.z);
+    goalCam.set(f.node.x - 10, f.y + 8.5, f.node.z + 14);
+  }
+  scene3D.goTo = (i) => {
+    stageLevel(i);
+    if (i === CODING_STOP) coding.setCase(0);
+    frameStop(i);
+    $("mOverview").setAttribute("aria-pressed", "false");
+    if (reduceMotion) { controls.target.copy(goalTarget); camera.position.copy(goalCam); mode = "frame"; return; }
+    mode = "frame";
+    cardTravel(true);
+    setTimeout(() => cardTravel(false), 700);
+    if (pendingBeacon !== null) pendingBeacon = i;
+  };
+  scene3D.overview = () => {
+    mode = "frame";
+    goalTarget.set(8, 2, -6); goalCam.set(-18, 72, 76);
+    $("mOverview").setAttribute("aria-pressed", "true");
+  };
+  scene3D.leaveIntro = () => { if (mode === "intro") { mode = "frame"; frameStop(current); } };
+
+  // --- Beacon over the active facility ------------------------------------
+  let beaconSprite = null, beaconAge = 0, pendingBeacon = null;
+  function beaconAnchor(i) {
+    if (i === PORTAL) return PORTAL_POS.clone().add(new THREE.Vector3(0, 6, 0));
+    const f = facilities[STOPS[i].node] || facilities[NODES[0].id];
+    return new THREE.Vector3(f.node.x, f.y + f.top + 2.4, f.node.z);
+  }
+  scene3D.beacon = (text, i) => {
+    if (beaconSprite) { scene.remove(beaconSprite); beaconSprite.userData.dispose?.(); }
+    beaconSprite = label(text, { h: 1.0, accent: "#f0a830", weight: 600, px: 46, bg: "rgba(10,20,26,0.9)" });
+    const at = beaconAnchor(i);
+    beaconSprite.position.copy(at);
+    beaconSprite.userData.base = at.y;
+    beaconSprite.userData.sx = beaconSprite.scale.x;
+    beaconSprite.userData.sy = beaconSprite.scale.y;
+    beaconSprite.scale.set(0.001, 0.001, 1);
+    scene.add(beaconSprite); beaconAge = 0;
+  };
+  scene3D.relang = () => {
+    relangHooks.forEach((h) => h());
+    if (beaconSprite) scene3D.beacon(t(STOPS[current].bullets)[bulletIdx], current);
+  };
+
+  // --- Time of day: dawn at paper, full daylight at continuity ------------
+  const TOD = [
+    { top: "#2e3f63", hor: "#e8a56a", sun: "#ffb070", el: 0.08, hemi: 0.6, dir: 0.5, tint: "#d8c0a8" },
+    { top: "#4f86c0", hor: "#e6dcc0", sun: "#ffe8c0", el: 0.4, hemi: 0.85, dir: 0.8, tint: "#fff6e4" },
+    { top: "#5f9fd0", hor: "#dceaf0", sun: "#fff8e8", el: 0.9, hemi: 1.0, dir: 0.95, tint: "#ffffff" },
+  ];
+  let tod = 0, todGoal = 0, nf = 0;
+  const cA = new THREE.Color(), cB = new THREE.Color(), cTmp = new THREE.Color();
+  const lerpHex = (a, b, f, out) => out.copy(cA.set(a)).lerp(cB.set(b), f);
+  const NIGHT = { top: "#050c18", hor: "#16223c", moon: "#cdd8ff", tint: "#6c7aa6" };
+  function applyTOD() {
+    const x = tod * 2, k = Math.min(1, Math.floor(x)), f = x - k, a = TOD[k], b = TOD[Math.min(2, k + 1)];
+    const dark = smooth(0.15, 0.85, nf);
+    lerpHex(a.top, b.top, f, skyU.top.value).lerp(cTmp.set(NIGHT.top), dark);
+    lerpHex(a.hor, b.hor, f, skyU.horizon.value).lerp(cTmp.set(NIGHT.hor), dark);
+    const dayEl = a.el + (b.el - a.el) * f;
+    let el, az;
+    if (nf < 0.5) { const q = smooth(0, 0.5, nf); el = dayEl + (-0.22 - dayEl) * q; az = -0.4; lerpHex(a.sun, b.sun, f, skyU.sunCol.value).lerp(cTmp.set("#ff6a28"), q * 0.8); }
+    else { const q = smooth(0.5, 1, nf); el = -0.22 + 0.86 * q; az = 0.7; skyU.sunCol.value.set(NIGHT.moon).multiplyScalar(0.55 + 0.25 * q); }
+    skyU.sunDir.value.set(Math.cos(el) * Math.cos(az), Math.sin(el) + 0.02, Math.cos(el) * Math.sin(az)).normalize();
+    sun.position.copy(skyU.sunDir.value).multiplyScalar(100); sun.color.copy(skyU.sunCol.value);
+    const above = smooth(-0.12, 0.12, el);
+    sun.intensity = (nf < 0.5 ? (a.dir + (b.dir - a.dir) * f) : 0.4) * above;
+    hemi.intensity = (a.hemi + (b.hemi - a.hemi) * f) * (1 - dark) + 0.3 * dark;
+    hemi.color.copy(skyU.horizon.value).lerp(cB.set(nf > 0.5 ? "#8fa2d8" : "#ffffff"), 0.5);
+    scene.fog.color.copy(skyU.horizon.value); seaU.fogColor.value.copy(skyU.horizon.value);
+    lerpHex(a.tint, b.tint, f, groundMat.color).lerp(cTmp.set(NIGHT.tint), dark);
+    floraTinted.forEach((m) => m.material.color.copy(groundMat.color));
+    seaU.deep.value.set("#0c4a8e").lerp(cTmp.set("#04101f"), dark);
+    seaU.shallow.value.set("#2aa0bd").lerp(cTmp.set("#0b2b3c"), dark);
+    nightHooks.forEach((h) => h(nf));
+  }
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.fov = w < 640 ? 62 : 45; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+
+  // Opening shot: low on the patient and their paper carnet
+  {
+    const a = NODE[ROUTE[0]];
+    goalTarget.set(a.x, heightAt(a.x, a.z).h + 1.2, a.z + 1);
+    goalCam.set(a.x - 5, heightAt(a.x, a.z).h + 3.2, a.z + 8);
+    camera.position.set(a.x - 9, heightAt(a.x, a.z).h + 5, a.z + 14);
+    controls.target.copy(goalTarget);
+    mode = "intro";
+    if (reduceMotion) camera.position.copy(goalCam);
+  }
+  stageLevel(0);
+  applyTOD();
+  if (document.fonts) document.fonts.ready.then(() => scene3D.relang());
+
+  // --- Picking: click a facility or the portal to jump to its stop ---------
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  const pickables = [];
+  NODES.forEach((n) => {
+    const stopFor = STOPS.findIndex((s) => s.node === n.id);
+    if (stopFor < 0) return;
+    facilities[n.id].g.traverse((o) => { if (o.isMesh) { o.userData.stop = stopFor; pickables.push(o); } });
+  });
+  portal.g.traverse((o) => { if (o.isMesh) { o.userData.stop = PORTAL; pickables.push(o); } });
+  let down = null;
+  canvas.addEventListener("pointerdown", (e) => { down = [e.clientX, e.clientY]; });
+  canvas.addEventListener("pointerup", (e) => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(pickables, false)[0];
+    if (hit && hit.object.userData.stop !== undefined) { scene3D.leaveIntro(); select(hit.object.userData.stop); }
+  });
+  controls.addEventListener("start", () => { mode = "free"; $("mOverview").setAttribute("aria-pressed", "false"); });
+
+  // --- Animation loop ------------------------------------------------------
+  const clock = new THREE.Clock();
+  let time = 0, running = true, writeTick = 0, ackQueue = [];
+  document.addEventListener("visibilitychange", () => { running = !document.hidden; clock.getDelta(); });
+  const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3();
+
+  function frame(dt) {
+    time += dt;
+    const amb = reduceMotion ? 0.25 : 1;
+
+    // Camera easing
+    if (mode !== "free") {
+      const k = mode === "intro" ? 0.015 : 0.045;
+      controls.target.lerp(goalTarget, k);
+      camera.position.lerp(goalCam, k);
+      if (mode === "frame" && !reduceMotion) {
+        camera.position.x += Math.sin(time * 0.25) * 0.01;
+        camera.position.y += Math.sin(time * 0.35) * 0.006;
+      }
+    }
+
+    // Time of day tracks maturity: dawn at paper, full light at continuity
+    todGoal = current / LAST;
+    tod += (todGoal - tod) * Math.min(1, dt * 0.9);
+    nf += Math.sign(nightGoal - nf) * Math.min(Math.abs(nightGoal - nf), dt * 0.22);
+    applyTOD();
+
+    seaU.time.value = time * amb;
+    updatePatient(dt * amb, time * amb);
+    record.update(dt, time * amb);
+
+    // Rails grow in as capability lands
+    railSegs.forEach((r) => {
+      const want = r.want || 0;
+      r.s += (want - r.s) * Math.min(1, dt * 3);
+      r.tube.visible = r.s > 0.02;
+      r.tube.scale.y = Math.max(0.0001, r.s);
+      r.tube.material.opacity = 1;
+    });
+
+    // Consent gate: lifts when a record is cleared to move
+    if (consent.g.visible) {
+      const open = current >= RAILS_STOP ? (Math.sin(time * 0.5) > -0.2 ? 1 : 0) : 0;
+      consent.lift += (open - consent.lift) * Math.min(1, dt * 2);
+      consent.pivot.rotation.x = consent.lift * 1.3;
+      consent.plates.forEach((p, k) => {
+        p.visible = k < consent.written;
+        if (p.visible) p.material.emissiveIntensity = 0.4 + (k === consent.written - 1 ? Math.abs(Math.sin(time * 4)) * 0.5 : 0);
+      });
+    }
+
+    // Remote site connectivity cycles; writes queue while it is dark
+    if (queue.g.visible) {
+      queue.timer += dt * amb;
+      if (queue.timer > (queue.online ? 9 : 5)) { queue.timer = 0; queue.online = !queue.online; }
+      const f = facilities.rural;
+      f.screenGlow.material.opacity = queue.online ? 0.5 : 0.08;
+      queue.boxes.forEach((b, k) => {
+        b.visible = k < queue.depth;
+        if (b.visible) b.position.y = Math.floor(k / 4) * 0.28 + Math.sin(time * 2 + k) * 0.02;
+      });
+      queue.labQ.visible = !queue.online && queue.depth > 0;
+      queue.labS.visible = queue.online && queue.depth === 0;
+    }
+
+    // Write traffic along the rails, with acknowledgements coming back
+    if (current >= RAILS_STOP) {
+      writeTick += dt * amb;
+      if (writeTick > 1.15) {
+        writeTick = 0;
+        const segIdx = Math.floor(Math.random() * railSegs.length);
+        const seg = railSegs[segIdx];
+        if (seg.remote && !queue.online) {
+          // Offline: the write cannot leave, so it stacks up in the buffer
+          queue.depth = Math.min(queue.boxes.length, queue.depth + 1);
+        } else if (seg.s > 0.5) {
+          launch(segIdx, "write", 1);
+          if (seg.remote && queue.depth > 0) queue.depth = Math.max(0, queue.depth - 1);
+        }
+      }
+      // Drain the backlog quickly once the link returns
+      if (queue.online && queue.depth > 0 && Math.random() < dt * 2.2) {
+        const remoteIdx = railSegs.findIndex((r) => r.remote);
+        if (remoteIdx >= 0 && railSegs[remoteIdx].s > 0.5) { launch(remoteIdx, "write", 1); queue.depth--; }
+      }
+    }
+    packets.forEach((p) => {
+      if (!p.live) return;
+      p.f += dt * p.speed * p.dir * amb;
+      const done = p.dir > 0 ? p.f >= 1 : p.f <= 0;
+      const f = Math.min(1, Math.max(0, p.f));
+      p.seg.curve.getPointAt(f, tmpV);
+      p.m.position.copy(tmpV);
+      p.m.rotation.y += dt * 3;
+      if (done) {
+        p.live = false; p.m.visible = false;
+        // A write is only complete once the far side acknowledges it
+        if (p.kind === "write") {
+          ackQueue.push({ seg: p.seg, at: time + 0.35 });
+          consent.written = Math.min(consent.plates.length, consent.written + 1);
+          if (consent.written >= consent.plates.length) consent.written = 1;
+        }
+      }
+    });
+    ackQueue = ackQueue.filter((q) => {
+      if (time < q.at) return true;
+      const idx = railSegs.indexOf(q.seg);
+      if (idx >= 0) launch(idx, "ack", -1);
+      return false;
+    });
+
+    // Per-level set pieces
+    merge.update(dt * amb, current === INS_STOP, time * amb);
+    coding.update(dt * amb, current === CODING_STOP, time * amb);
+
+    if (portal.g.visible) {
+      portal.core.rotation.y = time * 0.5;
+      portal.ring.rotation.z = time * 0.7;
+      portal.ring2.rotation.z = -time * 0.5;
+      portal.gl.material.opacity = (current >= PORTAL ? 0.45 : 0) + Math.sin(time * 2) * 0.1;
+      // Records rising from facilities into the national portal
+      if (current >= PORTAL && Math.random() < dt * 1.6) {
+        const n = NODES[Math.floor(Math.random() * NODES.length)];
+        const p = packets.find((q) => !q.live);
+        if (p) {
+          p.live = true; p.kind = "portal"; p.m.visible = true; p.m.material = ackM.clone();
+          p.m.scale.setScalar(0.6);
+          p.seg = { curve: new THREE.CatmullRomCurve3([
+            new THREE.Vector3(n.x, facilities[n.id].y + 2, n.z),
+            new THREE.Vector3((n.x + PORTAL_POS.x) / 2, PORTAL_POS.y * 0.6, (n.z + PORTAL_POS.z) / 2),
+            PORTAL_POS.clone(),
+          ]) };
+          p.f = 0; p.dir = 1; p.speed = 0.5;
+        }
+      }
+    }
+
+    if (ahead.g.visible) {
+      ahead.gl.material.opacity = 0.5 + Math.sin(time * 2.2) * 0.2;
+      ahead.sheet.position.y = 0.1 + Math.sin(time * 1.5) * 0.03;
+    }
+
+    // Clinicians shift their weight; the one at the coding stop is handled there
+    Object.entries(clinicians).forEach(([id, c], k) => {
+      if (id === NODES[0].id && current === CODING_STOP) return;
+      c.rotation.y = -0.5 + Math.sin(time * 0.6 + k) * 0.3;
+      c.userData.arms[0].rotation.x *= 0.92;
+    });
+
+    // Beacon pop-in
+    if (beaconSprite) {
+      beaconAge += dt;
+      const e = Math.min(1, beaconAge / 0.6), over = 1 + Math.sin(e * Math.PI) * 0.12;
+      const s = reduceMotion ? 1 : (1 - Math.pow(1 - e, 3)) * over;
+      beaconSprite.scale.set(beaconSprite.userData.sx * s, beaconSprite.userData.sy * s, 1);
+      beaconSprite.position.y = beaconSprite.userData.base + Math.sin(time * 1.6) * 0.12;
+    }
+
+    sky.position.copy(camera.position);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  renderer.setAnimationLoop(() => {
+    if (!running) return;
+    frame(Math.min(clock.getDelta(), 0.1));
+  });
+}
+
+try { initScene(); }
+catch (err) {
+  const d = document.createElement("div");
+  d.className = "err";
+  d.textContent = UI[lang].webglFail;
+  document.getElementById("app").appendChild(d);
+}
+applyLang();
+select(0);
+</script>
+</body></html>

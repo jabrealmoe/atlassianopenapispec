@@ -1,0 +1,1810 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AI Enablement Road Trip · Tunis to Gafsa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: full-screen 3D road trip; stop chips along the top, a stop card docked bottom-left (bottom sheet on phones), keys bottom-right. */
+:root {
+  --sky: #ece2cd;
+  --panel: rgba(253, 249, 240, 0.94);
+  --fg: #231c12;
+  --muted: #6b5c47;
+  --line: #d6c7ab;
+  --sign: #8a5a1f;
+  --sign-ink: #fdf6e6;
+  --amber: #a85c00;
+  --amber-fill: #f0a830;
+  --guard: #2a6fa8;
+  --human: #2f7d52;
+  --live: #c23a2b;
+  --cell-off: #e0d4bb;
+  --font-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sky: #0e1416; --panel: rgba(16, 23, 20, 0.92); --fg: #e6eee8; --muted: #9db0a4; --line: #2c3a32;
+    --sign: #23855a; --sign-ink: #ffffff; --amber: #f5bf52; --amber-fill: #f5bf52; --guard: #78b2f0;
+    --human: #72d39b; --live: #ff6b5b; --cell-off: #26332c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --sky: #0e1416; --panel: rgba(16, 23, 20, 0.92); --fg: #e6eee8; --muted: #9db0a4; --line: #2c3a32;
+  --sign: #23855a; --sign-ink: #ffffff; --amber: #f5bf52; --amber-fill: #f5bf52; --guard: #78b2f0;
+  --human: #72d39b; --live: #ff6b5b; --cell-off: #26332c;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--sky); color: var(--fg); font-family: var(--font-body); overflow: hidden; }
+#app { position: relative; height: 100%; }
+canvas#scene { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+canvas#scene:active { cursor: grabbing; }
+
+.topbar {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding-block: 14px 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 900; font-size: 1.35rem; letter-spacing: -0.01em; text-wrap: balance;
+  background: var(--panel); padding: 4px 10px; border-radius: 6px; }
+.brand span { font-size: 0.82rem; color: var(--fg); background: var(--panel); padding: 3px 8px; border-radius: 5px; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; pointer-events: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--fg);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.04em;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; gap: 6px; align-items: center;
+}
+.chip b { font-family: var(--font-mono); font-weight: 500; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); border-color: var(--sign); }
+.chip[aria-pressed="true"] b { color: var(--sign-ink); opacity: 0.8; }
+.chip.dest { border-color: var(--amber); }
+.chip:focus-visible, .btn:focus-visible, .bullet:focus-visible { outline: 2px solid var(--amber-fill); outline-offset: 2px; }
+
+.card {
+  position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(var(--card-w, 340px), calc(100% - 32px)); max-height: 54%;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s;
+}
+.card.moved { transition: opacity .3s; }
+.card.traveling { opacity: 0.08; pointer-events: none; transform: translateY(12px) scale(0.98); transition: opacity .35s, transform .35s; }
+.card-head { cursor: grab; user-select: none; touch-action: none; }
+.card.dragging .card-head { cursor: grabbing; }
+.card-tools { margin-left: auto; display: flex; gap: 4px; align-items: flex-start; }
+.icon-btn { width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid var(--line); background: transparent; color: var(--fg);
+  border-radius: 5px; font: 700 0.9rem/1 var(--font-mono); cursor: pointer; padding: 0; }
+.icon-btn:hover { border-color: var(--sign); color: var(--sign); }
+.icon-btn:focus-visible { outline: 2px solid var(--amber-fill); outline-offset: 2px; }
+.now { display: none; margin: 2px 0 0; font-size: 0.82rem; line-height: 1.35; color: var(--amber); font-weight: 600; }
+.card.compact { max-height: none; }
+.card.compact .meter, .card.compact .card-body, .card.compact .tagline { display: none; }
+.card.compact .now { display: block; }
+.card.compact .card-head { border-bottom: 0; padding-block: 10px; }
+.card.compact .shield { width: 40px; font-size: 1.3rem; }
+.card.compact .card h2, .card.compact h2 { font-size: 1rem; }
+.card.compact .card-foot { padding-block: 6px 8px; }
+.card.compact .grip { display: none; }
+.grip { position: absolute; right: 0; bottom: 0; width: 18px; height: 18px; cursor: nwse-resize; touch-action: none;
+  background: linear-gradient(135deg, transparent 50%, var(--line) 50%, var(--line) 58%, transparent 58%, transparent 70%, var(--line) 70%, var(--line) 78%, transparent 78%); }
+.card.hidden-card { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
+.card-head { display: flex; gap: 12px; align-items: stretch; padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
+.shield {
+  flex: 0 0 auto; width: 52px; background: var(--sign); color: var(--sign-ink); border-radius: 6px;
+  display: grid; place-items: center; font-family: var(--font-display); font-weight: 900; font-size: 1.7rem;
+  border: 2px solid var(--sign-ink); outline: 2px solid var(--sign);
+}
+.shield.dest { background: var(--amber-fill); color: #1a1a1a; outline-color: var(--amber-fill); }
+.head-text { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.livebadge { color: var(--live); font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+.livebadge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--live); animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.card h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.2; text-wrap: balance; }
+.tagline { margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
+
+.meter { padding: 10px 16px 2px; display: flex; flex-direction: column; gap: 5px; }
+.meter-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; }
+.cell { height: 7px; border-radius: 2px; background: var(--cell-off); transition: background .4s; }
+.cell.ai { background: var(--amber-fill); }
+.cell.hu { background: var(--human); }
+.meter-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+.card-body { padding: 8px 16px 6px; overflow-y: auto; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.items { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.bullet {
+  width: 100%; text-align: left; display: flex; gap: 9px; align-items: flex-start;
+  background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 5px 7px;
+  font: inherit; font-size: 0.9rem; line-height: 1.4; color: var(--fg); cursor: pointer;
+  transition: opacity .35s, background .3s, border-color .3s, transform .35s;
+}
+.bullet i { flex: 0 0 auto; font-style: normal; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); padding-top: 2px; }
+.bullet.active { background: color-mix(in srgb, var(--amber-fill) 16%, transparent); border-color: color-mix(in srgb, var(--amber-fill) 55%, transparent); transform: translateX(3px); }
+.bullet.active i { color: var(--amber); }
+.bullet.pending { opacity: 0.22; }
+.bullet.enter { animation: slideIn .5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; } }
+.work { padding: 9px 11px; border-radius: 6px; border: 1px dashed var(--line); font-size: 0.85rem; line-height: 1.45; }
+.work strong { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.7rem; color: var(--sign); display: block; margin-bottom: 2px; }
+.roles { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 0.82rem; line-height: 1.4; }
+.roles dt { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; }
+.roles dd { margin: 0; min-width: 0; }
+.roles .you { color: var(--human); } .roles .ai { color: var(--amber); } .roles .gd { color: var(--guard); }
+.card-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 16px 12px; border-top: 1px solid var(--line); }
+.steps { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn {
+  border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 6px;
+  padding: 7px 12px; font-family: var(--font-display); font-weight: 700; font-size: 0.8rem; cursor: pointer;
+}
+.btn:hover:not(:disabled) { border-color: var(--sign); color: var(--sign); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+.hud { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: none; }
+.keys { font-size: 0.72rem; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; line-height: 1.6; text-align: right; }
+.keys kbd { font-family: var(--font-mono); font-size: 0.68rem; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+.modes { display: flex; gap: 6px; pointer-events: auto; }
+.modes .btn { background: var(--panel); font-size: 0.74rem; padding: 5px 9px; }
+.modes .btn[aria-pressed="true"] { border-color: var(--amber-fill); color: var(--amber); }
+.timer { pointer-events: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: auto auto; gap: 2px 14px; font-variant-numeric: tabular-nums; }
+.timer span { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; color: var(--muted); letter-spacing: .06em; align-self: center; }
+.timer b { font-family: var(--font-display); font-size: 1.1rem; text-align: right; }
+.timer b.warn { color: var(--amber); } .timer b.bad { color: var(--live); }
+.timer button { grid-column: 1 / -1; margin-top: 4px; }
+.err { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
+@media (max-width: 760px) { .keys { display: none; } }
+@media (max-width: 640px) {
+  .card { left: 0; right: 0; bottom: 0; width: 100%; max-height: 52%; border-radius: 12px 12px 0 0; border-left: 0; border-right: 0; border-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .grip { display: none; }
+  .card-head { cursor: default; }
+  .card-head, .card-body, .card-foot, .meter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .hud { bottom: auto; top: calc(96px + env(safe-area-inset-top, 0px)); }
+  .brand span { display: none; }
+}
+</style>
+
+<div id="app">
+  <canvas id="scene" aria-label="3D road trip with seven stops, from the Tunis shoreline to the GTRI Factory in the desert outside Gafsa"></canvas>
+  <div class="topbar">
+    <div class="brand"><h1>The AI Enablement Road Trip</h1><span>Tunis to Gafsa · from a chat window to a fully autonomous multi-agent factory</span></div>
+    <div class="chips" id="chips" role="toolbar" aria-label="Stops"></div>
+  </div>
+
+  <section class="card" id="card" aria-live="polite">
+    <div class="card-head">
+      <div class="shield" id="shield">0</div>
+      <div class="head-text">
+        <div class="eyebrow" id="eyebrow"></div>
+        <h2 id="title"></h2>
+        <p class="tagline" id="tagline"></p>
+        <p class="now" id="now"></p>
+      </div>
+      <div class="card-tools">
+        <button class="icon-btn" id="cCompact" type="button" aria-pressed="false" aria-label="Collapse card" title="Collapse (C)">–</button>
+        <button class="icon-btn" id="cReset" type="button" aria-label="Reset card size and position" title="Reset size and position">↺</button>
+      </div>
+    </div>
+    <div class="meter" aria-label="Who is steering">
+      <div class="meter-row" id="meter"></div>
+      <div class="meter-labels"><span>Human steers</span><span>Agents steer</span></div>
+    </div>
+    <div class="card-body">
+      <ul class="items" id="items"></ul>
+      <div class="work" id="work"></div>
+      <dl class="roles" id="roles"></dl>
+    </div>
+    <div class="card-foot">
+      <button class="btn" id="prev" type="button">← Previous</button>
+      <span class="steps" id="steps"></span>
+      <button class="btn" id="next" type="button">Next →</button>
+    </div>
+    <div class="grip" id="grip" title="Drag to resize"></div>
+  </section>
+
+  <div class="hud">
+    <div class="timer" id="timer" hidden>
+      <span>This stop</span><b id="tStop">0:00</b>
+      <span>Total / 30:00</span><b id="tTotal">0:00</b>
+      <button class="btn" id="tReset" type="button">Reset timers</button>
+    </div>
+    <div class="modes">
+      <button class="btn" id="mPresent" type="button" aria-pressed="false">Presenter</button>
+      <button class="btn" id="mNight" type="button" aria-pressed="false">Night</button>
+      <button class="btn" id="mTimer" type="button" aria-pressed="false">Timer</button>
+      <button class="btn" id="mOverview" type="button" aria-pressed="false">Overview</button>
+    </div>
+    <div class="keys">
+      <kbd>→</kbd> <kbd>←</kbd> stops · <kbd>Space</kbd> next point<br>
+      <kbd>P</kbd> presenter · <kbd>T</kbd> timer · <kbd>O</kbd> overview · <kbd>N</kbd> night<br>
+      <kbd>C</kbd> compact · <kbd>H</kbd> hide · <kbd>F</kbd> fullscreen · <kbd>0</kbd>–<kbd>6</kbd> jump
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ---------- Content: seven stops from chat to autonomous multi-agent workflows ----------
+const STOPS = [
+  { n: 0, short: "Chat", title: "Chat: ask a question", budget: 150, beats: "Stop 0", t: 0.035,
+    tagline: "You ask, it answers. One conversation at a time.",
+    bullets: ["Draft, summarize and explain on demand", "Probabilistic: the same question can get different answers", "Knows the world, not our Jira", "Nothing happens until you copy it somewhere"],
+    work: "Paste a Jira Data Center error into a chat and ask what it means.",
+    you: "Type every prompt, judge every answer", ai: "Suggests words", guard: "Your own judgment" },
+  { n: 1, short: "Copilot", title: "Copilot: AI inside your tools", budget: 150, beats: "Stop 1", t: 0.18,
+    tagline: "AI shows up where you already work.",
+    bullets: ["Code suggestions in the IDE", "Summaries of long Jira threads and Confluence pages", "Still one person, one suggestion at a time", "You accept or reject every change"],
+    work: "Summarize a 60-comment Jira ticket before stand-up.",
+    you: "Accept, edit or reject", ai: "Suggests in context", guard: "Nothing changes without your click" },
+  { n: 2, short: "Tools", title: "Tools: AI that can act", budget: 180, beats: "Stop 2", t: 0.33,
+    tagline: "Agency: it picks its next step and uses tools to take it.",
+    bullets: ["MCP plugs it into Jira, Confluence and GitLab", "It answers from our runbooks and cites them", "It chooses which tool to call next", "Guardrails: validation, approval and logging"],
+    work: "The agent searches Jira, reads a Confluence runbook and checks a GitLab commit on its own.",
+    you: "Set the goal, approve actions", ai: "Plans and calls tools", guard: "Read-only by default, every call logged" },
+  { n: 3, short: "Agent", title: "Agent workflow: AI that triages", budget: 480, beats: "Stop 3", t: 0.49, live: true,
+    tagline: "A whole workflow, start to finish, with a person at the gate.",
+    bullets: ["Search history: has anyone seen this before?", "Find a likely root cause in GitLab", "Route and prioritize: team, urgency, issue type", "Draft the Confluence article for approval"],
+    work: "Live demo: a real ticket from our Data Center queue, triaged and documented by Hermes Agent.",
+    you: "Approve the draft", ai: "Runs the whole workflow", guard: "Drafts only, confidence shown, human sign-off" },
+  { n: 4, short: "Memory", title: "Memory: AI that remembers and learns", budget: 240, beats: "Stop 4", t: 0.65,
+    tagline: "Every task leaves knowledge behind.",
+    bullets: ["Memory that persists across sessions", "Skills: procedures it saves and improves", "LLM Wiki: linked pages that compound", "The links between things are the memory"],
+    work: "Hermes Agent turns each triage into a linked wiki page and a reusable skill. Atlassian's Teamwork Graph bets on the same idea in Cloud.",
+    you: "Curate what it keeps", ai: "Remembers, links, improves", guard: "Shared, reviewable memory in Confluence" },
+  { n: 5, short: "Kanban", title: "Kanban: a team of agents", budget: 300, beats: "Stop 5", t: 0.81,
+    tagline: "Named agents pull cards across one shared board.",
+    bullets: ["Each agent is a named profile with one job", "An orchestrator splits big cards into child tasks", "Cards flow: triage, ready, running, review, done", "Blocked or ready for review? A person steps in"],
+    work: "Hermes Agent's Kanban board: one triage card becomes tasks for an investigator, a fixer and a writer, with a person approving in Review.",
+    you: "Review and unblock cards", ai: "Claim, work and hand off cards", guard: "Dependencies, a review column, a rule-following dispatcher" },
+  { n: 6, short: "Destination", title: "The GTRI Factory", budget: 300, beats: "Stop 6 + Q&A", t: 0.985, dest: true,
+    tagline: "Fully autonomous multi-agent workflows, with humans in the control room.",
+    bullets: ["Agents run the line end to end", "Humans set goals, review and decide", "One shared board and memory: no cubbyholes", "Questions: where should a human always approve?"],
+    work: "Deciding together what software that decides, and builds, should do.",
+    you: "Goals, review, decisions", ai: "Builds, and builds, and builds", guard: "Approval gates where it matters" },
+];
+const LAST = STOPS.length - 1, TOOLS = 2, AGENT = 3, KANBAN = 5;
+const AUTONOMY = [0, 1, 3, 4, 5, 6, 7];
+const DRONES_AT = [0, 0, 1, 1, 2, 6, 16];
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (id) => document.getElementById(id);
+let current = 0, bulletIdx = 0, presenter = false;
+let stopStart = performance.now(), totalStart = performance.now();
+
+// ---------- UI ----------
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const chipsEl = $("chips");
+STOPS.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chip" + (s.dest ? " dest" : ""); b.id = "chip-" + i;
+  b.innerHTML = `<b>${s.n}</b>${s.short}`;
+  b.addEventListener("click", () => { scene3D.leaveIntro(); select(i); });
+  chipsEl.appendChild(b);
+});
+const meterEl = $("meter");
+for (let k = 0; k < 8; k++) { const c = document.createElement("div"); c.className = "cell"; meterEl.appendChild(c); }
+
+$("prev").addEventListener("click", () => select(current - 1));
+$("next").addEventListener("click", () => select(current + 1));
+$("mPresent").addEventListener("click", togglePresenter);
+$("mTimer").addEventListener("click", toggleTimer);
+$("mOverview").addEventListener("click", () => scene3D.overview());
+$("tReset").addEventListener("click", () => { totalStart = stopStart = performance.now(); });
+
+function togglePresenter() {
+  presenter = !presenter;
+  $("mPresent").setAttribute("aria-pressed", presenter);
+  if (presenter) bulletIdx = 0;
+  renderBullets(false);
+}
+function toggleTimer() {
+  $("timer").hidden = !$("timer").hidden;
+  $("mTimer").setAttribute("aria-pressed", !$("timer").hidden);
+}
+
+window.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === " " || k.startsWith("Arrow") || k === "PageDown" || k === "PageUp" || /^[0-6oO]$/.test(k)) scene3D.leaveIntro();
+  if (k === "ArrowRight" || k === "PageDown") { e.preventDefault(); select(current + 1); }
+  else if (k === "ArrowLeft" || k === "PageUp") {
+    e.preventDefault();
+    if (presenter && bulletIdx > 0) setBullet(bulletIdx - 1); else select(current - 1);
+  }
+  else if (k === " ") { e.preventDefault(); nextPoint(); }
+  else if (k === "p" || k === "P") togglePresenter();
+  else if (k === "t" || k === "T") toggleTimer();
+  else if (k === "o" || k === "O") scene3D.overview();
+  else if (k === "h" || k === "H") $("card").classList.toggle("hidden-card");
+  else if (k === "c" || k === "C") toggleCompact();
+  else if (k === "n" || k === "N") setNight(!nightGoal, true);
+  else if (k === "f" || k === "F") {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    else document.documentElement.requestFullscreen?.().catch(() => {});
+  }
+  else if (/^[0-6]$/.test(k)) select(+k);
+});
+
+function nextPoint() {
+  const s = STOPS[current];
+  if (bulletIdx < s.bullets.length - 1) setBullet(bulletIdx + 1);
+  else select(current + 1);
+}
+function setBullet(k) {
+  bulletIdx = k;
+  renderBullets(true);
+  scene3D.beacon(STOPS[current].bullets[k], current);
+}
+
+function renderBullets(animateNew) {
+  const s = STOPS[current];
+  const els = $("items").querySelectorAll(".bullet");
+  els.forEach((el, j) => {
+    el.classList.toggle("active", j === bulletIdx);
+    el.classList.toggle("pending", presenter && j > bulletIdx);
+    if (animateNew && j === bulletIdx) { el.classList.remove("enter"); void el.offsetWidth; el.classList.add("enter"); }
+  });
+  $("steps").textContent = `Point ${bulletIdx + 1} of ${s.bullets.length}`;
+  $("now").textContent = `${bulletIdx + 1}. ${s.bullets[bulletIdx]}`;
+}
+
+function renderCard(i) {
+  const s = STOPS[i];
+  $("shield").textContent = s.n;
+  $("shield").classList.toggle("dest", !!s.dest);
+  $("eyebrow").innerHTML = `<span>${s.dest ? "Destination" : "Level " + s.n} · ${fmt(s.budget)}</span>` +
+    (s.live ? `<span class="livebadge">Live demo</span>` : "");
+  $("title").textContent = s.title;
+  $("tagline").textContent = s.tagline;
+  $("items").innerHTML = s.bullets.map((t, j) =>
+    `<li><button class="bullet enter" type="button" data-j="${j}" style="animation-delay:${j * 0.09}s"><i>${String(j + 1).padStart(2, "0")}</i><span>${t}</span></button></li>`).join("");
+  $("items").querySelectorAll(".bullet").forEach((b) => b.addEventListener("click", () => setBullet(+b.dataset.j)));
+  $("work").innerHTML = `<strong>${s.live ? "In tomorrow's demo" : "At work"}</strong>${s.work}`;
+  $("roles").innerHTML = `<dt class="you">You</dt><dd>${s.you}</dd><dt class="ai">AI</dt><dd>${s.ai}</dd><dt class="gd">Guardrail</dt><dd>${s.guard}</dd>`;
+  [...meterEl.children].forEach((c, k) => { c.className = "cell " + (k >= 7 - AUTONOMY[i] ? "ai" : "hu"); });
+  $("prev").disabled = i === 0;
+  $("next").disabled = i === STOPS.length - 1;
+  STOPS.forEach((_, j) => $("chip-" + j).setAttribute("aria-pressed", j === i ? "true" : "false"));
+  $("chip-" + i).scrollIntoView({ block: "nearest", inline: "center", behavior: reduceMotion ? "auto" : "smooth" });
+  renderBullets(false);
+}
+
+// ---------- Card: compact mode, drag to move, drag corner to resize (remembered per viewer) ----------
+const card = $("card");
+const CARD_KEY = "roadtrip-card-v1";
+let cardState = { compact: false, w: null, h: null, x: null, y: null };
+try { Object.assign(cardState, JSON.parse(localStorage.getItem(CARD_KEY) || "{}")); } catch (e) {}
+const saveCard = () => { try { localStorage.setItem(CARD_KEY, JSON.stringify(cardState)); } catch (e) {} };
+const isPhone = () => window.innerWidth <= 640;
+function applyCard() {
+  card.classList.toggle("compact", !!cardState.compact);
+  $("cCompact").textContent = cardState.compact ? "+" : "–";
+  $("cCompact").setAttribute("aria-pressed", !!cardState.compact);
+  $("cCompact").setAttribute("aria-label", cardState.compact ? "Expand card" : "Collapse card");
+  if (isPhone()) { card.style.cssText = ""; return; }
+  card.style.setProperty("--card-w", cardState.w ? cardState.w + "px" : "340px");
+  card.style.height = cardState.h && !cardState.compact ? cardState.h + "px" : "";
+  card.style.maxHeight = cardState.h && !cardState.compact ? "none" : "";
+  if (cardState.x !== null && cardState.y !== null) {
+    const r = card.getBoundingClientRect();
+    const x = Math.min(Math.max(8, cardState.x), window.innerWidth - Math.min(r.width, 120));
+    const y = Math.min(Math.max(8, cardState.y), window.innerHeight - 48);
+    card.style.left = x + "px"; card.style.top = y + "px"; card.style.bottom = "auto"; card.classList.add("moved");
+  } else { card.style.left = ""; card.style.top = ""; card.style.bottom = ""; card.classList.remove("moved"); }
+}
+let travelGuard = null;
+function cardTravel(on) {
+  clearTimeout(travelGuard);
+  card.classList.toggle("traveling", on);
+  if (on) { travelGuard = setTimeout(() => cardTravel(false), 7000); return; }
+  $("items").querySelectorAll(".bullet").forEach((el, j) => {
+    el.classList.remove("enter"); void el.offsetWidth; el.style.animationDelay = j * 0.09 + "s"; el.classList.add("enter");
+  });
+}
+function toggleCompact() { cardState.compact = !cardState.compact; saveCard(); applyCard(); }
+$("cCompact").addEventListener("click", toggleCompact);
+$("cReset").addEventListener("click", () => { cardState = { compact: false, w: null, h: null, x: null, y: null }; saveCard(); applyCard(); });
+window.addEventListener("resize", applyCard);
+
+// Drag the card by its header
+(() => {
+  const head = card.querySelector(".card-head");
+  let start = null;
+  head.addEventListener("pointerdown", (e) => {
+    if (isPhone() || e.target.closest("button")) return;
+    const r = card.getBoundingClientRect();
+    start = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    head.setPointerCapture(e.pointerId); card.classList.add("dragging");
+  });
+  head.addEventListener("pointermove", (e) => {
+    if (!start) return;
+    cardState.x = e.clientX - start.dx; cardState.y = e.clientY - start.dy; applyCard();
+  });
+  const end = () => { if (!start) return; start = null; card.classList.remove("dragging"); saveCard(); };
+  head.addEventListener("pointerup", end); head.addEventListener("pointercancel", end);
+  head.addEventListener("dblclick", (e) => { if (!e.target.closest("button")) toggleCompact(); });
+})();
+
+// Resize from the bottom-right corner
+(() => {
+  const grip = $("grip");
+  let start = null;
+  grip.addEventListener("pointerdown", (e) => {
+    const r = card.getBoundingClientRect();
+    start = { x: e.clientX, y: e.clientY, w: r.width, h: r.height, top: r.top };
+    grip.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  grip.addEventListener("pointermove", (e) => {
+    if (!start) return;
+    cardState.w = Math.round(Math.min(Math.max(260, start.w + e.clientX - start.x), Math.min(620, window.innerWidth - 32)));
+    const h = Math.round(Math.max(150, start.h + e.clientY - start.y));
+    cardState.h = Math.min(h, window.innerHeight - start.top - 8);
+    // Pin the top edge while resizing so the card grows downward/rightward
+    if (cardState.x === null) { cardState.x = card.getBoundingClientRect().left; cardState.y = start.top; }
+    applyCard();
+  });
+  const end = () => { if (!start) return; start = null; saveCard(); };
+  grip.addEventListener("pointerup", end); grip.addEventListener("pointercancel", end);
+})();
+applyCard();
+
+// ---------- Day and night: follows the viewer's theme, or the Night button / N key ----------
+let nightGoal = 0, nightUser = false;
+const sysDark = window.matchMedia("(prefers-color-scheme: dark)");
+function readTheme() { const t = document.documentElement.getAttribute("data-theme"); return t ? t === "dark" : sysDark.matches; }
+function setNight(on, fromUser) {
+  nightGoal = on ? 1 : 0;
+  if (fromUser) { nightUser = true; document.documentElement.setAttribute("data-theme", on ? "dark" : "light"); }
+  $("mNight").setAttribute("aria-pressed", on ? "true" : "false");
+}
+$("mNight").addEventListener("click", () => setNight(!nightGoal, true));
+if (sysDark.addEventListener) sysDark.addEventListener("change", () => { if (!nightUser) setNight(readTheme(), false); });
+new MutationObserver(() => { const on = readTheme(); if (on !== !!nightGoal) setNight(on, false); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+setNight(readTheme(), false);
+
+let scene3D = { goTo() {}, beacon() {}, overview() {}, leaveIntro() {} };
+function select(i) {
+  if (i < 0 || i >= STOPS.length) return;
+  current = i; bulletIdx = 0; stopStart = performance.now();
+  renderCard(i);
+  scene3D.goTo(i);
+}
+
+setInterval(() => {
+  if ($("timer").hidden) return;
+  const now = performance.now(), st = (now - stopStart) / 1000, tt = (now - totalStart) / 1000, b = STOPS[current].budget;
+  $("tStop").textContent = `${fmt(st)} / ${fmt(b)}`;
+  $("tStop").className = st > b + 120 ? "bad" : st > b + 60 ? "warn" : "";
+  $("tTotal").textContent = fmt(tt);
+  $("tTotal").className = tt > 1920 ? "bad" : tt > 1860 ? "warn" : "";
+}, 250);
+
+function token(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+// ---------- 3D ----------
+function initScene() {
+  const canvas = $("scene");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.maxPolarAngle = Math.PI * 0.47;
+  controls.minDistance = 6; controls.maxDistance = 220;
+  const up = new THREE.Vector3(0, 1, 0);
+  const nightHooks = [];
+
+  // Helpers
+  const C = (h) => new THREE.Color(h);
+  const lambert = (color, extra = {}) => new THREE.MeshLambertMaterial(Object.assign({ color }, extra));
+  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  function rr(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  const glowTex = (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.25, "rgba(255,255,255,0.55)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
+  })();
+  function glow(color, size, opacity = 0.9) {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false }));
+    s.scale.set(size, size, 1); return s;
+  }
+  function label(text, { bg = "rgba(16,24,20,0.86)", fg = "#ffffff", h = 0.9, font = "700 54px Archivo, Arial, sans-serif", accent = null } = {}) {
+    const c = document.createElement("canvas"); const g = c.getContext("2d");
+    g.font = font; const w = Math.ceil(g.measureText(text).width) + 64 + (accent ? 22 : 0);
+    c.width = w; c.height = 96; g.font = font;
+    g.fillStyle = bg; rr(g, 2, 2, w - 4, 92, 20); g.fill();
+    if (accent) { g.fillStyle = accent; rr(g, 16, 22, 10, 52, 5); g.fill(); }
+    g.fillStyle = fg; g.textBaseline = "middle"; g.fillText(text, 32 + (accent ? 22 : 0), 50);
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+    s.scale.set(h * w / 96, h, 1); return s;
+  }
+
+  // Sky dome with a moving sun (morning at the start, sunset at the destination)
+  const skyU = { top: { value: C("#5d9fd6") }, horizon: { value: C("#cfe6ee") }, sunCol: { value: C("#fff6e0") }, sunDir: { value: new THREE.Vector3(1, 0.6, -0.2) } };
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(500, 32, 16), new THREE.ShaderMaterial({
+    uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
+    vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+    fragmentShader: `uniform vec3 top; uniform vec3 horizon; uniform vec3 sunCol; uniform vec3 sunDir; varying vec3 vDir;
+      void main(){ vec3 d = normalize(vDir); float h = d.y;
+        vec3 c = mix(horizon, top, smoothstep(-0.02, 0.55, h));
+        c = mix(c, horizon * 0.8, smoothstep(0.0, -0.3, h));
+        float s = max(dot(d, normalize(sunDir)), 0.0);
+        c += sunCol * (pow(s, 900.0) * 3.0 + pow(s, 40.0) * 0.35 + pow(s, 6.0) * 0.14);
+        gl_FragColor = vec4(c, 1.0); }`,
+  }));
+  scene.add(sky);
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xa98355, 0.9); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffffff, 0.8); scene.add(sun);
+  scene.fog = new THREE.Fog(0xcfe6ee, 120, 430);
+
+  // Ocean with animated waves and sun glitter: deep blue offshore, turquoise in the shallows
+  const seaU = { time: { value: 0 }, deep: { value: C("#0a3f8a") }, shallow: { value: C("#27a8c4") },
+    horizon: skyU.horizon, sunCol: skyU.sunCol, sunDir: skyU.sunDir, fogColor: { value: C("#cfe6ee") }, fogNear: { value: 120 }, fogFar: { value: 430 } };
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1400), new THREE.ShaderMaterial({
+    uniforms: seaU,
+    vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: `uniform float time; uniform vec3 deep; uniform vec3 shallow; uniform vec3 horizon; uniform vec3 sunCol; uniform vec3 sunDir;
+      uniform vec3 fogColor; uniform float fogNear; uniform float fogFar; varying vec3 vW;
+      float wave(vec2 p){ return sin(p.x*0.35+time*1.1)*0.5 + sin(p.y*0.42-time*0.9)*0.4 + sin((p.x+p.y)*0.9+time*1.7)*0.18 + sin((p.x*1.7-p.y*1.3)+time*2.3)*0.1; }
+      void main(){
+        vec2 p = vW.xz; float e = 0.15;
+        float h0 = wave(p), hx = wave(p+vec2(e,0.0)), hz = wave(p+vec2(0.0,e));
+        vec3 n = normalize(vec3(-(hx-h0)/e*0.3, 1.0, -(hz-h0)/e*0.3));
+        vec3 v = normalize(cameraPosition - vW);
+        float fres = pow(1.0 - max(dot(n, v), 0.0), 3.0);
+        vec3 c = mix(deep, shallow, 0.35 + 0.22 * h0);
+        c = mix(c, horizon, fres * 0.85);
+        vec3 r = reflect(-v, n);
+        c += sunCol * pow(max(dot(r, normalize(sunDir)), 0.0), 120.0) * 1.7;
+        c = mix(c, fogColor, smoothstep(fogNear, fogFar, length(cameraPosition - vW)));
+        gl_FragColor = vec4(c, 1.0); }`,
+  }));
+  sea.rotation.x = -Math.PI / 2; sea.position.y = -0.3; scene.add(sea);
+
+  // Route: Tunis to Gafsa. The Mediterranean (Gulf of Tunis) lies behind the start at -x.
+  // The road runs south-west inland through the Tell's pine and olive country, out across
+  // the pre-Saharan steppe, and ends at the GTRI Factory on a jebel table above Gafsa.
+  const HILL = { x: 66, z: 0, h: 6.5 };
+  const hillH = (x, z) => HILL.h * smooth(30, 9, Math.hypot(x - HILL.x, z - HILL.z));
+  const pts = [];
+  for (let k = 0; k <= 18; k++) {
+    const taper = Math.min(1, (18 - k) / 4);
+    const x = -72 + k * (129 / 18), z = (Math.sin(k * 0.75) * 10 + Math.cos(k * 0.33) * 5) * taper;
+    pts.push(new THREE.Vector3(x, hillH(x, z), z));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const roadSamples = curve.getSpacedPoints(240);
+  const CITADEL = new THREE.Vector3(HILL.x, HILL.h, HILL.z);
+
+  // Landmark anchors: opposite side of the road from each sign
+  const anchors = STOPS.map((s, i) => {
+    const p = curve.getPointAt(s.t), tan = curve.getTangentAt(s.t);
+    const side = new THREE.Vector3().crossVectors(tan, up).normalize();
+    const sgn = i % 2 ? -1 : 1;
+    return { p, tan, side, sgn, sign: p.clone().addScaledVector(side, 3.4 * sgn), mark: i === LAST ? CITADEL.clone() : p.clone().addScaledVector(side, -9.5 * sgn) };
+  });
+
+  const distRoad = (x, z) => { let m = 1e9; for (const s of roadSamples) { const d = (s.x - x) ** 2 + (s.z - z) ** 2; if (d < m) m = d; } return Math.sqrt(m); };
+  const distMarks = (x, z) => { let m = 1e9; anchors.forEach((a, i) => { const d = Math.hypot(a.mark.x - x, a.mark.z - z) - (i === LAST ? 6 : (i === KANBAN ? 3 : 0)); if (d < m) m = d; }); return m; };
+  function landAmt(x, z) {
+    // The Gulf of Tunis shoreline runs north-south behind the first stop, so the sea sits
+    // behind the Jeep at Tunis and falls away as the route heads inland toward Gafsa.
+    const shore = -80 + 5 * Math.sin(z * 0.07) + 3 * Math.sin(z * 0.023 + 1);
+    const a = smooth(shore - 7, shore + 7, x);
+    const prom = smooth(34, 26, Math.hypot(x - CITADEL.x, z - CITADEL.z));
+    return Math.max(a, prom);
+  }
+  function hills(x, z) {
+    const h = 3.2 + 2.4 * Math.sin(x * 0.045 + 0.5) * Math.cos(z * 0.055) + 1.5 * Math.sin(x * 0.1 + z * 0.08) + 0.7 * Math.sin(z * 0.19 - x * 0.04);
+    return Math.max(0, h) + Math.max(0, Math.abs(z) - 45) * 0.16;
+  }
+  // Jebel Orbata: the limestone anticline that dominates Gafsa, topping out around 1,165 m.
+  // It runs north-east to south-west, so it is modeled as a long tapered ridge with steep
+  // flanks and a serrated crest rather than a cone, and the ground mesh genuinely climbs it.
+  const ORBATA = { x: 103, z: -27, ang: -0.62, len: 48, half: 15, h: 28 };
+  const orbataCA = Math.cos(ORBATA.ang), orbataSA = Math.sin(ORBATA.ang);
+  function orbataH(x, z) {
+    const dx = x - ORBATA.x, dz = z - ORBATA.z;
+    const along = dx * orbataCA + dz * orbataSA, across = -dx * orbataSA + dz * orbataCA;
+    const spine = smooth(ORBATA.len, ORBATA.len * 0.3, Math.abs(along));
+    const flank = smooth(ORBATA.half, ORBATA.half * 0.16, Math.abs(across));
+    const crest = 1 + 0.17 * Math.sin(along * 0.42) + 0.09 * Math.sin(along * 0.95 + 1.3);
+    return ORBATA.h * spine * flank * crest;
+  }
+  // A lower foothill shoulder on the far side of the massif, the way the plain steps up to it.
+  // Kept well clear of the road corridor and the factory hill: the road ribbon takes its
+  // height from hillH() alone, so relief under the route would bury it.
+  const orbataFoot = (x, z) => 7 * smooth(30, 11, Math.hypot(x - 108, z - 6));
+  function heightAt(x, z, dR) {
+    const land = Math.max(landAmt(x, z), smooth(8, 4, dR));
+    const flat = Math.min(smooth(3, 12, dR), smooth(5, 11, distMarks(x, z)));
+    const relief = hillH(x, z) + orbataH(x, z) + orbataFoot(x, z);
+    return { h: -3.2 + (hills(x, z) * flat + 3.2 + relief) * land, land };
+  }
+
+  // Ground: three bands along +x — the Tunis shoreline, the Tell's pine and olive country,
+  // then the pale ochre of the pre-Saharan steppe around Gafsa
+  const GW = 420, GD = 320;
+  const gGeo = new THREE.PlaneGeometry(GW, GD, 140, 106); gGeo.rotateX(-Math.PI / 2); gGeo.translate(-35, 0, 0);
+  const gp = gGeo.attributes.position, gcol = [];
+  const seabed = C("#c9bb99"), wetSand = C("#d3c19a"), beachSand = C("#ece0bd"),
+        maquisA = C("#6d8a4e"), maquisB = C("#8da45c"), groveFloor = C("#7d8a57"),
+        dryGrass = C("#c2b478"), steppeA = C("#dcc08a"), steppeB = C("#cda96e"),
+        gypsum = C("#e6dcc0"), jebelRock = C("#b2905f"), tmpc = new THREE.Color();
+  // 0 = Gulf of Tunis shoreline, 1 = the Tell (pine and olive), 2 = pre-Saharan steppe.
+  // Tuned so stops 0-1 sit on the coast, 2-3 in the trees, and 4-6 out on the steppe.
+  const biome = (x) => smooth(-55, -20, x) + smooth(-12, 24, x);
+  for (let v = 0; v < gp.count; v++) {
+    const x = gp.getX(v), z = gp.getZ(v), dR = distRoad(x, z);
+    const { h, land } = heightAt(x, z, dR);
+    gp.setY(v, h);
+    const b = biome(x), grain = 0.5 + 0.5 * Math.sin(x * 0.21) * Math.cos(z * 0.17);
+    if (h < -0.15) tmpc.copy(seabed);
+    else if (land < 0.97) tmpc.copy(wetSand).lerp(beachSand, land);
+    else if (b < 0.45) tmpc.copy(beachSand).lerp(maquisA, smooth(0.08, 0.45, b) * grain);
+    else if (b < 1.35) tmpc.copy(maquisA).lerp(maquisB, grain).lerp(groveFloor, smooth(0.5, 1.0, b) * 0.6);
+    else {
+      tmpc.copy(dryGrass).lerp(steppeA, smooth(1.35, 1.75, b));
+      tmpc.lerp(steppeB, grain * 0.55);
+      // Pale gypsum crusts and bare limestone on the jebel slopes above Gafsa
+      if (h > 7.5) tmpc.lerp(jebelRock, smooth(7.5, 11, h));
+      if (h > 11) tmpc.lerp(gypsum, smooth(11, 15, h) * 0.75);
+    }
+    gcol.push(tmpc.r, tmpc.g, tmpc.b);
+  }
+  gGeo.setAttribute("color", new THREE.Float32BufferAttribute(gcol, 3));
+  gGeo.computeVertexNormals();
+  const groundMat = lambert(0xffffff, { vertexColors: true, flatShading: true });
+  scene.add(new THREE.Mesh(gGeo, groundMat));
+
+  // Jebel Orbata label, sitting on the real crest of the modeled ridge. Sized for the
+  // distance it is normally viewed from — the massif sits ~100 units off the destination camera.
+  {
+    const crest = orbataH(ORBATA.x, ORBATA.z) + orbataFoot(ORBATA.x, ORBATA.z) - 3.2;
+    const l = label("Jebel Orbata · 1,165 m", { h: 5.2, accent: "#b2905f", bg: "rgba(36,28,18,0.86)" });
+    l.position.set(ORBATA.x, crest + 11, ORBATA.z);
+    scene.add(l);
+  }
+
+  // Far scenery: the dry limestone escarpments of the Gafsa jebels inland, with the hazy
+  // headlands of the Gulf of Tunis out behind the beach
+  const mesaM = lambert("#b08a5c", { flatShading: true }), mesaTopM = lambert("#94703f", { flatShading: true });
+  const headlandM = lambert("#8e9aa0", { flatShading: true });
+  for (let k = 0; k < 16; k++) {
+    const x = -200 + k * 22 + Math.sin(k * 3.1) * 8, z = -150 - Math.cos(k * 1.7) * 14;
+    if (x > 60) continue;
+    if (x < -70) {
+      // Gulf of Tunis end: low hazy headlands toward Cap Bon, not peaks
+      const hgt = 10 + Math.sin(k * 2.3) * 4, r = 26 + (k % 4) * 6;
+      const m = new THREE.Mesh(new THREE.ConeGeometry(r, hgt, 6), headlandM);
+      m.position.set(x, hgt / 2 - 4, z); m.rotation.y = k; scene.add(m);
+      continue;
+    }
+    // Jebel ridges: broad flat-topped limestone tables with the odd narrow spur
+    const hgt = 20 + Math.sin(k * 2.3) * 8 + (k % 3) * 5, r = 16 + (k % 4) * 7;
+    const butte = k % 4 === 1;
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(butte ? r * 0.38 : r * 0.82, r, hgt, butte ? 7 : 9), mesaM);
+    body.position.set(x, hgt / 2 - 3, z); body.rotation.y = k; scene.add(body);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(butte ? r * 0.4 : r * 0.84, butte ? r * 0.38 : r * 0.82, hgt * 0.07, butte ? 7 : 9), mesaTopM);
+    cap.position.set(x, hgt - 3 + hgt * 0.02, z); cap.rotation.y = k; scene.add(cap);
+  }
+
+  // Road ribbon + dashes
+  const N = 420, W = 1.8, rpos = [], ridx = [];
+  for (let i = 0; i <= N; i++) {
+    const t = i / N, p = curve.getPointAt(t), tan = curve.getTangentAt(t);
+    const side = new THREE.Vector3().crossVectors(tan, up).normalize().multiplyScalar(W);
+    rpos.push(p.x + side.x, p.y + 0.15, p.z + side.z, p.x - side.x, p.y + 0.15, p.z - side.z);
+    if (i < N) { const a = i * 2; ridx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  }
+  const roadGeo = new THREE.BufferGeometry();
+  roadGeo.setAttribute("position", new THREE.Float32BufferAttribute(rpos, 3)); roadGeo.setIndex(ridx); roadGeo.computeVertexNormals();
+  scene.add(new THREE.Mesh(roadGeo, lambert("#3b4044", { side: THREE.DoubleSide })));
+  const m4 = new THREE.Object3D();
+  const DASHES = 130, dashes = new THREE.InstancedMesh(new THREE.BoxGeometry(0.9, 0.02, 0.12), new THREE.MeshBasicMaterial({ color: "#f4f1e6" }), DASHES);
+  for (let i = 0; i < DASHES; i++) {
+    const t = (i + 0.5) / DASHES, p = curve.getPointAt(t), tan = curve.getTangentAt(t);
+    m4.position.set(p.x, p.y + 0.17, p.z); m4.rotation.set(0, Math.atan2(-tan.z, tan.x), 0); m4.scale.set(1, 1, 1); m4.updateMatrix(); dashes.setMatrixAt(i, m4.matrix);
+  }
+  scene.add(dashes);
+
+  // Guardrails: deterministic rails that appear once the agent can act (stop 3 onward)
+  const railStart = STOPS[TOOLS].t - 0.02, railMat = lambert("#3d8fd8", { emissive: "#163f73" });
+  const posts = [];
+  for (let t = railStart; t < 0.975; t += 0.0062) [-1, 1].forEach((sd) => {
+    const p = curve.getPointAt(t), tan = curve.getTangentAt(t);
+    const side = new THREE.Vector3().crossVectors(tan, up).normalize().multiplyScalar(2.35 * sd);
+    posts.push({ t, sd, p: p.clone().add(side), ang: Math.atan2(-tan.z, tan.x), s: 0 });
+  });
+  const postMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.12, 0.7, 0.12), railMat, posts.length);
+  const railMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.12, 0.06), railMat, posts.length);
+  scene.add(postMesh, railMesh);
+  const nextOf = posts.map((p, i) => posts.findIndex((q, j) => j > i && q.sd === p.sd));
+  let revealT = -1;
+  function updateRails(dt) {
+    posts.forEach((p, i) => {
+      const target = p.t <= revealT ? 1 : 0;
+      p.s += (target - p.s) * Math.min(1, dt * 5);
+      const s = Math.max(p.s, 0.0001);
+      m4.position.set(p.p.x, p.p.y + 0.35 * s, p.p.z); m4.rotation.set(0, p.ang, 0); m4.scale.set(1, s, 1); m4.updateMatrix(); postMesh.setMatrixAt(i, m4.matrix);
+      const n = nextOf[i];
+      if (n > 0) {
+        const q = posts[n], dx = q.p.x - p.p.x, dz = q.p.z - p.p.z, len = Math.hypot(dx, dz);
+        const rs = Math.min(p.s, q.s);
+        m4.position.set((p.p.x + q.p.x) / 2, (p.p.y + q.p.y) / 2 + 0.58 * Math.max(rs, 0.0001), (p.p.z + q.p.z) / 2); m4.rotation.set(0, Math.atan2(-dz, dx), 0);
+        m4.scale.set(len * Math.max(rs, 0.0001), 1, 1);
+      } else m4.scale.set(0.0001, 0.0001, 0.0001);
+      m4.updateMatrix(); railMesh.setMatrixAt(i, m4.matrix);
+    });
+    postMesh.instanceMatrix.needsUpdate = true; railMesh.instanceMatrix.needsUpdate = true;
+  }
+
+  // Flora in three bands along the Tunis → Gafsa route, all instanced, kept off the road,
+  // away from the stops and out of the water:
+  //   coast   — date palms and tamarisk scrub along the Gulf of Tunis
+  //   Tell    — Aleppo pine and olive groves through the hills
+  //   steppe  — prickly pear, esparto tussocks, acacia and limestone rubble near Gafsa
+  const FLORA = 300;
+  const palmTrunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.13, 0.22, 4.2, 7), lambert(0xffffff, { flatShading: true }), 110);
+  const palmFronds = new THREE.InstancedMesh(new THREE.ConeGeometry(1.5, 0.9, 7, 1, true), lambert(0xffffff, { flatShading: true, side: THREE.DoubleSide }), 110 * 2);
+  const pines = new THREE.InstancedMesh(new THREE.ConeGeometry(0.7, 2.3, 6), lambert(0xffffff, { flatShading: true }), FLORA);
+  const olives = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.9, 0), lambert(0xffffff, { flatShading: true }), FLORA);
+  const oliveTrunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.1, 0.16, 0.9, 6), lambert(0xffffff, { flatShading: true }), FLORA);
+  // Prickly pear: flattened pads, not a columnar cactus
+  const pearPads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.5, 8, 6), lambert(0xffffff, { flatShading: true }), 420);
+  const acaciaTrunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.07, 0.13, 1.5, 6), lambert(0xffffff, { flatShading: true }), 70);
+  const acaciaCrowns = new THREE.InstancedMesh(new THREE.ConeGeometry(1.25, 0.45, 7), lambert(0xffffff, { flatShading: true, side: THREE.DoubleSide }), 70);
+  const brush = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.55, 0), lambert(0xffffff, { flatShading: true }), 300);
+  const boulders = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(0.8, 0), lambert(0xffffff, { flatShading: true }), 140);
+  let seed = 7; const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let nPalm = 0, nFrond = 0, np = 0, nOl = 0, nPad = 0, nAc = 0, nBr = 0, nBo = 0, guard = 0;
+  const palmTrunkC = C("#8a6b43"), frondC = C("#4e8f4a"), pearC = C("#6f9458"),
+        esparto = C("#b3a76a"), acaciaC = C("#7e8f52"), boulderC = C("#b59a74");
+  while (guard++ < 46000 && (np < FLORA || nPad < 420 || nBr < 300)) {
+    const x = -150 + rand() * 236, z = (rand() - 0.5) * 170;
+    const dR = distRoad(x, z); if (dR < 4.2 || distMarks(x, z) < 7) continue;
+    const { h, land } = heightAt(x, z, dR); if (land < 0.99 || h < 0.1) continue;
+    const b = biome(x), sc = 0.6 + rand() * 1.0;
+
+    if (b < 0.5) {
+      // Gulf of Tunis: date palms along the shore road, tamarisk scrub between them
+      if (nPalm < 110 && rand() < 0.72) {
+        const ph = 3.2 + rand() * 2.2, lean = (rand() - 0.5) * 0.22, rot = rand() * 6;
+        m4.position.set(x, h + ph / 2, z); m4.rotation.set(lean, rot, lean * 0.6); m4.scale.set(1, ph / 4.2, 1); m4.updateMatrix();
+        palmTrunks.setMatrixAt(nPalm, m4.matrix); palmTrunks.setColorAt(nPalm, tmpc.copy(palmTrunkC).lerp(C("#a88657"), rand())); nPalm++;
+        for (let j = 0; j < 2 && nFrond < palmFronds.count; j++) {
+          m4.position.set(x + Math.sin(lean) * ph, h + ph + (j ? -0.34 : 0), z + Math.sin(lean * 0.6) * ph);
+          m4.rotation.set(Math.PI + (0.5 + j * 0.45) * 0.12, rot + j * 0.8, 0);
+          m4.scale.set(1 - j * 0.2, 1 + j * 0.55, 1 - j * 0.2); m4.updateMatrix();
+          palmFronds.setMatrixAt(nFrond, m4.matrix); palmFronds.setColorAt(nFrond, tmpc.copy(frondC).lerp(C("#7cb463"), rand())); nFrond++;
+        }
+      } else if (nBr < 300) {
+        m4.position.set(x, h + 0.3, z); m4.rotation.set(rand(), rand() * 6, 0); m4.scale.set(1.1, 0.6, 1.1); m4.updateMatrix();
+        brush.setMatrixAt(nBr, m4.matrix); brush.setColorAt(nBr, tmpc.set("#7f9c5a").lerp(C("#aebd7c"), rand())); nBr++;
+      }
+    } else if (b < 1.4) {
+      // The Tell: Aleppo pine on the ridges, olive groves on the slopes
+      if (rand() < 0.45 && np < FLORA) {
+        m4.position.set(x, h + 1.1 * sc, z); m4.rotation.set(0, rand() * 6, 0); m4.scale.set(sc, sc, sc); m4.updateMatrix();
+        pines.setMatrixAt(np, m4.matrix); pines.setColorAt(np, tmpc.set("#36694a").lerp(C("#55884d"), rand())); np++;
+      } else if (nOl < FLORA) {
+        // Olive: a short pale trunk under a silvery, uneven crown
+        m4.position.set(x, h + 0.45 * sc, z); m4.rotation.set(0, rand() * 6, 0); m4.scale.set(sc, sc, sc); m4.updateMatrix();
+        oliveTrunks.setMatrixAt(nOl, m4.matrix); oliveTrunks.setColorAt(nOl, tmpc.set("#8a7a5e").lerp(C("#a2906c"), rand()));
+        m4.position.set(x, h + 1.15 * sc, z); m4.rotation.set(rand() * 0.4, rand() * 6, rand() * 0.4);
+        m4.scale.set(sc * 1.05, sc * 0.82, sc * 1.05); m4.updateMatrix();
+        olives.setMatrixAt(nOl, m4.matrix); olives.setColorAt(nOl, tmpc.set("#7f9469").lerp(C("#a8b68c"), rand())); nOl++;
+      }
+    } else {
+      // Pre-Saharan steppe around Gafsa: prickly pear clumps, esparto, acacia, rubble
+      const roll = rand();
+      if (roll < 0.26 && nPad < 420) {
+        // One clump = a few flattened pads fanned at different angles
+        const rot = rand() * 6, pads = 3 + Math.floor(rand() * 3);
+        for (let j = 0; j < pads && nPad < 420; j++) {
+          const a = rot + j * 1.1, lift = 0.45 + j * 0.42;
+          m4.position.set(x + Math.cos(a) * 0.22 * j, h + lift, z + Math.sin(a) * 0.22 * j);
+          m4.rotation.set(0, a, (rand() - 0.5) * 0.5);
+          m4.scale.set(0.95 - j * 0.07, 1.25 - j * 0.08, 0.16); m4.updateMatrix();
+          pearPads.setMatrixAt(nPad, m4.matrix); pearPads.setColorAt(nPad, tmpc.copy(pearC).lerp(C("#8fae6c"), rand())); nPad++;
+        }
+      } else if (roll < 0.36 && nAc < 70) {
+        // Acacia: thin trunk, wide flat umbrella crown
+        const th = 1.3 + rand() * 0.9, rot = rand() * 6;
+        m4.position.set(x, h + th / 2, z); m4.rotation.set(0, rot, 0); m4.scale.set(1, th / 1.5, 1); m4.updateMatrix();
+        acaciaTrunks.setMatrixAt(nAc, m4.matrix); acaciaTrunks.setColorAt(nAc, tmpc.set("#7b6648").lerp(C("#9a8460"), rand()));
+        m4.position.set(x, h + th + 0.18, z); m4.rotation.set(Math.PI, rot, 0); m4.scale.set(1 + rand() * 0.3, 1, 1 + rand() * 0.3); m4.updateMatrix();
+        acaciaCrowns.setMatrixAt(nAc, m4.matrix); acaciaCrowns.setColorAt(nAc, tmpc.copy(acaciaC).lerp(C("#98a865"), rand())); nAc++;
+      } else if (roll < 0.76 && nBr < 300) {
+        // Esparto / alfa grass tussocks: low, pale, everywhere
+        m4.position.set(x, h + 0.26 * sc, z); m4.rotation.set(rand(), rand() * 6, rand()); m4.scale.set(sc * 1.25, sc * 0.6, sc * 1.25); m4.updateMatrix();
+        brush.setMatrixAt(nBr, m4.matrix); brush.setColorAt(nBr, tmpc.copy(esparto).lerp(C("#cdbf86"), rand())); nBr++;
+      } else if (nBo < 140) {
+        m4.position.set(x, h + 0.35 * sc, z); m4.rotation.set(rand() * 6, rand() * 6, rand() * 6); m4.scale.set(sc, sc * 0.72, sc * 1.15); m4.updateMatrix();
+        boulders.setMatrixAt(nBo, m4.matrix); boulders.setColorAt(nBo, tmpc.copy(boulderC).lerp(C("#9c8259"), rand())); nBo++;
+      }
+    }
+  }
+  palmTrunks.count = nPalm; palmFronds.count = nFrond; pines.count = np;
+  olives.count = nOl; oliveTrunks.count = nOl; pearPads.count = nPad;
+  acaciaTrunks.count = nAc; acaciaCrowns.count = nAc; brush.count = nBr; boulders.count = nBo;
+  scene.add(palmTrunks, palmFronds, pines, olives, oliveTrunks, pearPads, acaciaTrunks, acaciaCrowns, brush, boulders);
+  // Flora tinted by time of day along with the ground
+  const floraTinted = [palmTrunks, palmFronds, pines, olives, oliveTrunks, pearPads, acaciaTrunks, acaciaCrowns, brush, boulders];
+
+  // Clouds
+  const cloudMat = lambert("#ffffff", { flatShading: true, emissive: "#000000" });
+  const clouds = [];
+  for (let k = 0; k < 12; k++) {
+    const g = new THREE.Group();
+    for (let j = 0; j < 5; j++) { const s = new THREE.Mesh(new THREE.IcosahedronGeometry(2.4 + rand() * 2, 1), cloudMat); s.position.set(j * 2.6 - 5, rand() * 1.4, rand() * 2.5); s.scale.y = 0.65; g.add(s); }
+    g.position.set(-160 + rand() * 320, 30 + rand() * 18, -110 + rand() * 150); clouds.push({ g, v: 0.6 + rand() * 0.8 }); scene.add(g);
+  }
+
+  // Birds along the route: gulls on the Gulf of Tunis, swallows and hoopoe over the Tell,
+  // ravens and Egyptian vultures out on the steppe toward Gafsa
+  const birdFlock = [];
+  function makeBird({ body, wing, tip, beak, size }) {
+    const g = new THREE.Group();
+    const bm = lambert(body), wm = new THREE.MeshLambertMaterial({ color: wing, side: THREE.DoubleSide }), tm = new THREE.MeshLambertMaterial({ color: tip, side: THREE.DoubleSide });
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), bm); b.scale.set(1.9, 0.85, 0.85); g.add(b);
+    const h = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), bm); h.position.set(0.3, 0.06, 0); g.add(h);
+    const bk = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.12, 6), lambert(beak)); bk.rotation.z = -Math.PI / 2; bk.position.set(0.43, 0.05, 0); g.add(bk);
+    const tailGeo = new THREE.BufferGeometry(); tailGeo.setAttribute("position", new THREE.Float32BufferAttribute([-0.25, 0, 0, -0.5, 0, 0.12, -0.5, 0, -0.12], 3)); tailGeo.computeVertexNormals();
+    g.add(new THREE.Mesh(tailGeo, wm));
+    const wingGeo = new THREE.BufferGeometry(); wingGeo.setAttribute("position", new THREE.Float32BufferAttribute([0.12, 0, 0, -0.14, 0, 0, -0.06, 0, 0.55, 0.06, 0, 0.5], 3)); wingGeo.setIndex([0, 1, 2, 0, 2, 3]); wingGeo.computeVertexNormals();
+    const tipGeo = new THREE.BufferGeometry(); tipGeo.setAttribute("position", new THREE.Float32BufferAttribute([0.06, 0, 0.5, -0.06, 0, 0.55, -0.02, 0, 0.82], 3)); tipGeo.computeVertexNormals();
+    const mk = (sz) => { const pv = new THREE.Group(); pv.add(new THREE.Mesh(wingGeo, wm), new THREE.Mesh(tipGeo, tm)); pv.scale.z = sz; g.add(pv); return pv; };
+    const l = mk(1), r = mk(-1);
+    g.scale.setScalar(size);
+    return { g, l, r };
+  }
+  const BIRD_TYPES = {
+    gull: { body: "#f4f4f1", wing: "#cfd5da", tip: "#2b2b2b", beak: "#f0c23a", size: 1.7 },
+    swallow: { body: "#4a3a2e", wing: "#2f2721", tip: "#1d1915", beak: "#2a2a2a", size: 0.8 },
+    kestrel: { body: "#b07a44", wing: "#8e5f32", tip: "#2b1d10", beak: "#e0b23a", size: 1.9 },
+    vulture: { body: "#efe7d2", wing: "#d8cdb2", tip: "#1d1a16", beak: "#e8b65a", size: 2.6 },
+    raven: { body: "#1b1a20", wing: "#121117", tip: "#0b0a0e", beak: "#2a2a2a", size: 1.5 },
+    hoopoe: { body: "#d79a52", wing: "#f2efe4", tip: "#1d1a16", beak: "#3a3026", size: 1.1 },
+    beeeater: { body: "#1f9ab5", wing: "#c98a2e", tip: "#2a5e2a", beak: "#201c18", size: 0.95 },
+  };
+  function addBird(type, path, flap) { const b = makeBird(BIRD_TYPES[type]); b.g.userData.base = BIRD_TYPES[type].size; scene.add(b.g); birdFlock.push({ g: b.g, l: b.l, r: b.r, path, flap }); }
+  // Yellow-legged gulls working the surf line on the Gulf of Tunis
+  for (let k = 0; k < 12; k++) {
+    const rx = 16 + rand() * 22, rz = 12 + rand() * 20, h = 13 + rand() * 11, sp = 0.1 + rand() * 0.1, ph = rand() * 6, dir = rand() < 0.5 ? 1 : -1;
+    addBird("gull", (t) => { const a = dir * t * sp + ph; return new THREE.Vector3(-80 + Math.cos(a) * rx, h + Math.sin(a * 1.7 + ph) * 1.8, 4 + Math.sin(a) * rz); },
+      (t) => (Math.sin(t * 0.5 + ph) > 0.55 ? Math.sin(t * 7 + ph) * 0.6 : 0.12));
+  }
+  // Swallow flocks over the Tell — they breed across northern Tunisia
+  [[-30, 10, 0], [4, 11, 1]].forEach(([cx, h, fph]) => {
+    for (let k = 0; k < 9; k++) {
+      const ox = (rand() - 0.5) * 2.4, oy = (rand() - 0.5) * 1.2, oz = (rand() - 0.5) * 2.4, lag = k * 0.06, ph = rand() * 6;
+      addBird("swallow", (t) => { const u = t - lag; return new THREE.Vector3(cx + Math.sin(u * 0.17 + fph * 3) * 22 + ox + Math.sin(t * 2 + ph) * 0.3, h + Math.sin(u * 0.5 + fph) * 2 + oy, Math.sin(u * 0.23 + fph) * 22 + oz); },
+        (t) => Math.sin(t * 16 + ph) * 0.7);
+    }
+  });
+  // Hoopoe and bee-eaters through the olive groves, brown-necked ravens out on the steppe
+  [["hoopoe", -34, 11], ["beeeater", -20, -9], ["beeeater", -8, -10], ["hoopoe", 6, 12], ["raven", 26, -9], ["raven", 44, 11]].forEach(([type, cx, cz]) => {
+    const ph = rand() * 6, sp = 0.35 + rand() * 0.2;
+    addBird(type, (t) => { const a = t * sp + ph; return new THREE.Vector3(cx + Math.cos(a) * 6, 4.5 + Math.sin(a * 2) * 1.4 + Math.abs(Math.sin(a * 3)) * 0.8, cz + Math.sin(a) * 4.5); },
+      (t) => Math.sin(t * 12 + ph) * 0.65);
+  });
+  // Egyptian vultures riding thermals over the steppe, a kestrel back over the Tell
+  [["vulture", 30, -10, 30], ["vulture", 58, 14, 34], ["kestrel", -26, -12, 28]].forEach(([type, cx, cz, h]) => {
+    const ph = rand() * 6, rad = 20 + rand() * 8;
+    addBird(type, (t) => { const a = t * 0.07 + ph; return new THREE.Vector3(cx + Math.cos(a) * rad, h + Math.sin(a * 3) * 1.5, cz + Math.sin(a) * rad); },
+      (t) => (Math.sin(t * 0.3 + ph) > 0.86 ? Math.sin(t * 4) * 0.3 : 0.2));
+  });
+  function updateBirds(t) {
+    birdFlock.forEach((b) => {
+      const p = b.path(t), q = b.path(t + 0.05);
+      b.g.position.copy(p);
+      const dx = q.x - p.x, dz = q.z - p.z, dy = q.y - p.y;
+      b.g.rotation.set(0, Math.atan2(-dz, dx), Math.atan2(dy, Math.hypot(dx, dz)) * 0.6, "YZX");
+      const f = b.flap(t); b.l.rotation.x = -f; b.r.rotation.x = f;
+    });
+  }
+
+  // Airborne dust: fine sand lifted off the steppe, and a dry haze toward Gafsa
+  const DUST = 900, dustGeo = new THREE.BufferGeometry(), dustPos = new Float32Array(DUST * 3), dustBase = [];
+  for (let k = 0; k < DUST; k++) { const x = -80 + rand() * 160, y = 0.5 + rand() * 14, z = -30 + rand() * 60; dustBase.push([x, y, z, rand() * 6]); }
+  dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
+  const dustMat = new THREE.PointsMaterial({ size: 0.18, map: glowTex, color: "#fff2c8", transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false });
+  scene.add(new THREE.Points(dustGeo, dustMat));
+
+  // ---------- Road signs ----------
+  const postMat = lambert("#8a9298");
+  const signs = [];
+  function signTexture(s, active) {
+    const c = document.createElement("canvas"); c.width = 256; c.height = 300; const g = c.getContext("2d");
+    const bg = active ? "#f2b33d" : s.dest ? "#7a3d8f" : "#1d6b45", ink = active ? "#1a1a1a" : "#ffffff";
+    g.fillStyle = bg; rr(g, 6, 6, 244, 288, 24); g.fill();
+    g.strokeStyle = ink; g.lineWidth = 8; rr(g, 18, 18, 220, 264, 16); g.stroke();
+    g.fillStyle = ink; g.textAlign = "center";
+    g.font = "900 104px Archivo, Arial, sans-serif"; g.fillText(s.dest ? "★" : s.n, 128, 132);
+    g.font = "700 30px Archivo, Arial, sans-serif";
+    const words = s.short.toUpperCase();
+    g.fillText(words.length > 12 ? words.slice(0, 12) : words, 128, 196);
+    g.font = "500 20px 'IBM Plex Mono', monospace"; g.fillText(s.dest ? "DESTINATION" : "LEVEL " + s.n, 128, 248);
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4; return tex;
+  }
+  STOPS.forEach((s, i) => {
+    if (i === LAST) return;
+    const b = anchors[i].sign;
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 3, 8), postMat); post.position.set(b.x, 1.5, b.z); scene.add(post);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: signTexture(s, false) }));
+    sp.scale.set(2.4, 2.8, 1); sp.position.set(b.x, 4.2, b.z); sp.userData.i = i; scene.add(sp); signs[i] = sp;
+  });
+
+  // ---------- Landmarks ----------
+  const landmarks = [];
+  function place(i, g, faceRoad = true) {
+    const a = anchors[i]; g.position.copy(a.mark);
+    if (faceRoad) g.lookAt(a.p.x, 0, a.p.z);
+    scene.add(g); return g;
+  }
+  const amberMat = lambert("#f2b33d", { emissive: "#7a4a00" });
+  const greenMat = lambert("#5fbf7f", { emissive: "#164d2c" });
+  function person(mat = greenMat) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.3, 0.9, 10), mat); body.position.y = 0.45; g.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 14, 12), lambert("#e0b896")); head.position.y = 1.08; g.add(head);
+    return g;
+  }
+
+  // 0 · Chat: a roadside café on the Tunis shore road, a conversation floating above it
+  (() => {
+    const g = new THREE.Group();
+    const b = new THREE.Mesh(new THREE.BoxGeometry(4, 2.2, 2.6), lambert("#eadfcf")); b.position.y = 1.1; g.add(b);
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(4.3, 0.3, 2.9), lambert("#c9573f")); roof.position.y = 2.35; g.add(roof);
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.8), new THREE.MeshBasicMaterial({ color: "#ffd98a" })); win.position.set(0, 1.3, 1.31); g.add(win);
+    const bub = (col, x, y) => {
+      const bg = new THREE.Group();
+      const s = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), lambert(col, { emissive: col, emissiveIntensity: 0.15 })); s.scale.set(1.5, 0.85, 0.35); bg.add(s);
+      const tail = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.6, 8), lambert(col)); tail.position.set(x > 0 ? -0.8 : 0.8, -0.85, 0); tail.rotation.z = x > 0 ? -0.5 : 0.5; tail.rotation.x = Math.PI; bg.add(tail);
+      bg.position.set(x, y, 0); g.add(bg); return bg;
+    };
+    const q = bub("#ffffff", -1.2, 4.3), a = bub("#f2b33d", 1.3, 6.1);
+    const dots = [0, 1, 2].map((k) => { const d = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), lambert("#3a2a10")); d.position.set(-0.45 + k * 0.45, 0, 0.36); a.add(d); return d; });
+    place(0, g);
+    landmarks[0] = { g, top: 7.6, update(t, act) {
+      q.position.y = 4.3 + Math.sin(t * 1.4) * 0.15; a.position.y = 6.1 + Math.sin(t * 1.4 + 1.5) * 0.15;
+      dots.forEach((d, k) => d.position.y = Math.max(0, Math.sin(t * 6 - k * 0.9)) * 0.22);
+      const pulse = act ? 1 + Math.max(0, Math.sin(t * 2)) * 0.06 : 1; a.scale.setScalar(pulse);
+    } };
+  })();
+
+  // 1 · Copilot: a billboard screen with scrolling code and a sparkle
+  (() => {
+    const g = new THREE.Group();
+    [-1.3, 1.3].forEach((x) => { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3, 8), postMat); p.position.set(x, 1.5, 0); g.add(p); });
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(4.2, 2.6, 0.2), lambert("#20262c")); frame.position.y = 4.1; g.add(frame);
+    const c = document.createElement("canvas"); c.width = 256; c.height = 512; const x = c.getContext("2d");
+    x.fillStyle = "#0f1a22"; x.fillRect(0, 0, 256, 512);
+    const cols = ["#7fb7ff", "#f2b33d", "#8ad49f", "#e6e6e6", "#c792ea"];
+    for (let r = 0; r < 32; r++) { let cx = 12 + (r % 5) * 10; for (let w = 0; w < 3; w++) { const len = 20 + ((r * 7 + w * 13) % 60); x.fillStyle = cols[(r + w) % 5]; x.fillRect(cx, 10 + r * 16, len, 7); cx += len + 8; } }
+    const tex = new THREE.CanvasTexture(c); tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(1, 0.45);
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(3.9, 2.3), new THREE.MeshBasicMaterial({ map: tex })); screen.position.set(0, 4.1, 0.11); g.add(screen);
+    const ghost = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.16), new THREE.MeshBasicMaterial({ color: "#f2b33d", transparent: true, opacity: 0.8 })); ghost.position.set(0.2, 3.6, 0.13); g.add(ghost);
+    const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.55), amberMat); star.position.set(2.6, 5.7, 0.4); g.add(star);
+    const sg = glow("#ffcf6a", 3.2, 0.7); sg.position.copy(star.position); g.add(sg);
+    place(1, g);
+    landmarks[1] = { g, top: 7.4, update(t, act, dt) {
+      tex.offset.y -= dt * (act ? 0.08 : 0.03);
+      ghost.material.opacity = 0.35 + Math.abs(Math.sin(t * 2.2)) * 0.6; ghost.scale.x = 0.6 + Math.abs(Math.sin(t * 0.8)) * 0.6;
+      star.rotation.y = t * 1.6; star.rotation.z = t * 0.7; star.position.y = 5.7 + Math.sin(t * 2) * 0.25; sg.position.y = star.position.y;
+      sg.material.opacity = 0.5 + Math.sin(t * 3) * 0.25;
+    } };
+  })();
+
+  // 2 · Tools: an MCP hub wired to Jira, Confluence and GitLab
+  (() => {
+    const g = new THREE.Group();
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.2, 1.6, 20), lambert("#38444e")); hub.position.y = 0.8; g.add(hub);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.09, 8, 40), amberMat); ring.rotation.x = Math.PI / 2; ring.position.y = 1.65; g.add(ring);
+    const core = glow("#ffbf4a", 3, 0.8); core.position.y = 2.2; g.add(core);
+    const mcp = label("MCP", { h: 0.8, accent: "#f2b33d" }); mcp.position.y = 3.2; g.add(mcp);
+    const tools = [["Jira", "#2f7fd1"], ["Confluence", "#49b0d8"], ["GitLab", "#e2643a"]];
+    const orbs = [], pulses = [];
+    tools.forEach(([name, col], k) => {
+      const a = k * (Math.PI * 2 / 3) + 0.4, x = Math.cos(a) * 3.6, z = Math.sin(a) * 3.6;
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.4, 8), postMat); post.position.set(x, 1.2, z); g.add(post);
+      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.6, 1), lambert(col, { emissive: col, emissiveIntensity: 0.35, flatShading: true })); orb.position.set(x, 2.9, z); g.add(orb); orbs.push(orb);
+      const l = label(name, { h: 0.55 }); l.position.set(x, 4, z); g.add(l);
+      const from = new THREE.Vector3(x, 2.9, z), to = new THREE.Vector3(0, 1.9, 0);
+      const len = from.distanceTo(to), wire = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, len, 6), lambert("#f2b33d", { emissive: "#5a3600" }));
+      wire.position.copy(from).add(to).multiplyScalar(0.5); wire.lookAt(to); wire.rotateX(Math.PI / 2); g.add(wire);
+      for (let j = 0; j < 2; j++) { const p = glow(col, 0.7, 1); g.add(p); pulses.push({ p, from, to, off: j * 0.5 + k * 0.17 }); }
+    });
+    place(TOOLS, g);
+    landmarks[TOOLS] = { g, top: 5.2, update(t, act) {
+      ring.rotation.z = t * 1.2; orbs.forEach((o, k) => { o.rotation.y = t * (0.6 + k * 0.2); o.position.y = 2.9 + Math.sin(t * 1.6 + k) * 0.15; });
+      pulses.forEach((q) => { const f = (t * (act ? 0.7 : 0.35) + q.off) % 1; q.p.position.lerpVectors(q.from, q.to, f); q.p.material.opacity = Math.sin(f * Math.PI); });
+      core.material.opacity = 0.6 + Math.sin(t * 4) * 0.2;
+    } };
+  })();
+
+  // 3 · Agent workflow: the triage checkpoint (live demo). The gate spans the road.
+  let gateArm, gateUp = 0;
+  (() => {
+    const a = anchors[AGENT], g = new THREE.Group();
+    const gateT = STOPS[AGENT].t + 0.012, gp = curve.getPointAt(gateT), tan = curve.getTangentAt(gateT);
+    g.position.copy(gp); g.rotation.y = Math.atan2(-tan.z, tan.x);
+    // local axes: +x along road, +z = left side
+    const s = -a.sgn; // booth goes on the landmark side
+    const booth = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.4, 2), lambert("#e9edf0")); booth.position.set(0, 1.2, 3.8 * s); g.add(booth);
+    const glass = new THREE.Mesh(new THREE.BoxGeometry(2.25, 0.9, 2.05), new THREE.MeshLambertMaterial({ color: "#7fc4e8", transparent: true, opacity: 0.6, emissive: "#1c4f6a" })); glass.position.set(0, 1.7, 3.8 * s); g.add(glass);
+    const broof = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.25, 2.6), lambert("#1f63b0")); broof.position.set(0, 2.55, 3.8 * s); g.add(broof);
+    const pivot = new THREE.Group(); pivot.position.set(0, 1.05, 2.5 * s); g.add(pivot);
+    const pst = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.05, 0.3), lambert("#1f63b0")); pst.position.set(0, -0.52, 2.5 * s); g.add(pst);
+    const sc = document.createElement("canvas"); sc.width = 256; sc.height = 16; const sx = sc.getContext("2d");
+    for (let k = 0; k < 8; k++) { sx.fillStyle = k % 2 ? "#ffffff" : "#1f63b0"; sx.fillRect(k * 32, 0, 32, 16); }
+    gateArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 4.6), new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(sc) }));
+    gateArm.position.z = -2.3 * s; pivot.add(gateArm); g.userData.pivot = pivot; g.userData.s = s;
+    const human = person(); human.position.set(1.6, 0, 3.4 * s); g.add(human);
+    const live = label("LIVE DEMO", { h: 0.85, bg: "rgba(194,58,43,0.92)" }); live.position.set(0, 4.6, 3.8 * s); g.add(live);
+    const tickets = [];
+    for (let k = 0; k < 6; k++) { const tk = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.05, 0.6), lambert("#f2b33d", { emissive: "#6a4200" })); g.add(tk); tickets.push(tk); }
+    const draft = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.05), new THREE.MeshLambertMaterial({ color: "#ffffff", emissive: "#2a3a2f", side: THREE.DoubleSide })); draft.position.set(1.6, 2, 3.4 * s); g.add(draft);
+    const dg = glow("#7fe0a4", 1.8, 0.6); dg.position.copy(draft.position); g.add(dg);
+    scene.add(g);
+    landmarks[AGENT] = { g, top: 5.4, focus: g.position.clone().add(new THREE.Vector3(0, 0, 0)), update(t, act, dt) {
+      tickets.forEach((tk, k) => {
+        const f = (t * 0.22 + k / 6) % 1;
+        const start = new THREE.Vector3(-1.4, 5.5 + k * 0.05, 3.8 * s), end = new THREE.Vector3(0, 1.7, 3.8 * s);
+        if (f < 0.6) tk.position.set(-1.4 + Math.sin(t + k) * 0.1, 3.2 + k * 0.18 + Math.sin(t * 2 + k) * 0.05, 3.8 * s + 1.2 * s);
+        else { tk.position.lerpVectors(new THREE.Vector3(-1.4, 3.2 + k * 0.18, 5 * s), end, (f - 0.6) / 0.4); }
+        tk.rotation.y = Math.sin(t + k) * 0.3;
+      });
+      const target = act ? 1 : 0; gateUp += (target - gateUp) * Math.min(1, dt * 1.6);
+      pivot.rotation.x = gateUp * 1.35 * s;
+      live.material.opacity = act ? 0.75 + Math.sin(t * 5) * 0.25 : 0.55;
+      draft.position.y = 2 + Math.sin(t * 1.8) * 0.12; draft.rotation.y = Math.sin(t * 0.9) * 0.6; dg.position.y = draft.position.y;
+      human.rotation.y = Math.sin(t * 0.7) * 0.5;
+    } };
+  })();
+
+  // 4 · Memory: a floating knowledge graph with Hermes at the center
+  (() => {
+    const g = new THREE.Group();
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.8, 0.8, 8), lambert("#cfc5b1", { flatShading: true })); plinth.position.y = 0.4; g.add(plinth);
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.6, 4, 12, 1, true), new THREE.MeshBasicMaterial({ color: "#f2b33d", transparent: true, opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 2.8; g.add(beam);
+    const graph = new THREE.Group(); graph.position.y = 6.2; g.add(graph);
+    const nodes = [], colors = ["#2f7fd1", "#49b0d8", "#e2643a", "#5fbf7f"];
+    for (let k = 0; k < 28; k++) {
+      const v = new THREE.Vector3(rand() - 0.5, (rand() - 0.5) * 0.7, rand() - 0.5).normalize().multiplyScalar(1.6 + rand() * 1.4);
+      const col = colors[k % 4];
+      const m = new THREE.Mesh(k % 4 === 0 ? new THREE.BoxGeometry(0.28, 0.28, 0.28) : new THREE.SphereGeometry(0.15, 10, 8), lambert(col, { emissive: col, emissiveIntensity: 0.4 }));
+      m.position.copy(v); graph.add(m); nodes.push(m);
+    }
+    const hermes = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 1), amberMat); graph.add(hermes);
+    const hg = glow("#ffbf4a", 3.4, 0.85); graph.add(hg);
+    const wingGeo = new THREE.BufferGeometry(); wingGeo.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, 1.1, 0.5, 0, 0.9, -0.1, 0, 0, 0, 0, 0.9, -0.1, 0, 0.6, -0.4, 0], 3));
+    const wMat = new THREE.MeshBasicMaterial({ color: "#ffe2a0", side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+    const wl = new THREE.Mesh(wingGeo, wMat), wr = new THREE.Mesh(wingGeo, wMat); wr.scale.x = -1; wl.position.x = 0.35; wr.position.x = -0.35; graph.add(wl, wr);
+    const edgePos = [], edges = [];
+    nodes.forEach((n, i) => {
+      const near = nodes.map((m, j) => [j, n.position.distanceTo(m.position)]).filter(([j]) => j !== i).sort((a, b) => a[1] - b[1]).slice(0, 2);
+      near.forEach(([j]) => { edgePos.push(n.position.x, n.position.y, n.position.z, nodes[j].position.x, nodes[j].position.y, nodes[j].position.z); edges.push([n.position, nodes[j].position]); });
+      if (i % 3 === 0) { edgePos.push(0, 0, 0, n.position.x, n.position.y, n.position.z); edges.push([new THREE.Vector3(), n.position]); }
+    });
+    const eg = new THREE.BufferGeometry(); eg.setAttribute("position", new THREE.Float32BufferAttribute(edgePos, 3));
+    const lines = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: "#ffd68a", transparent: true, opacity: 0.45 })); graph.add(lines);
+    const pulses = []; for (let k = 0; k < 10; k++) { const p = glow("#fff0c0", 0.5, 1); graph.add(p); pulses.push({ p, e: edges[(k * 7) % edges.length], off: k / 10 }); }
+    const l = label("Hermes Agent", { h: 0.7, accent: "#f2b33d" }); l.position.y = 10; g.add(l);
+    place(4, g);
+    landmarks[4] = { g, top: 10.8, update(t, act) {
+      graph.rotation.y = t * (act ? 0.35 : 0.15); graph.position.y = 6.2 + Math.sin(t * 0.9) * 0.2;
+      wl.rotation.y = Math.sin(t * 4) * 0.5; wr.rotation.y = -Math.sin(t * 4) * 0.5;
+      hermes.rotation.y = t; hg.material.opacity = 0.65 + Math.sin(t * 3) * 0.2;
+      lines.material.opacity = act ? 0.55 + Math.sin(t * 2) * 0.15 : 0.35;
+      pulses.forEach((q, k) => { const f = (t * 0.5 + q.off) % 1; if (f < 0.02) q.e = edges[Math.floor(rand() * edges.length)]; q.p.position.lerpVectors(q.e[0], q.e[1], f); q.p.material.opacity = Math.sin(f * Math.PI); });
+      nodes.forEach((n, k) => n.scale.setScalar(1 + Math.sin(t * 2 + k) * 0.15));
+    } };
+  })();
+
+  // Drone factory (used for followers, the workshop and the destination)
+  const rotorMat = new THREE.MeshBasicMaterial({ color: "#dfe6ea", transparent: true, opacity: 0.55 });
+  function makeDrone(scale = 1) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), amberMat); body.scale.y = 0.55; g.add(body);
+    const rotors = [];
+    [[0.32, 0.32], [-0.32, 0.32], [0.32, -0.32], [-0.32, -0.32]].forEach(([x, z]) => {
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 0.46), lambert("#3a4148")); arm.position.set(x / 2, 0, z / 2); arm.rotation.y = Math.atan2(x, z); g.add(arm);
+      const r = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.01, 12), rotorMat); r.position.set(x, 0.06, z); g.add(r); rotors.push(r);
+    });
+    const gl = glow("#ffbf4a", 0.9, 0.6); gl.position.y = -0.12; g.add(gl);
+    g.scale.setScalar(scale); g.userData.rotors = rotors; return g;
+  }
+
+  // 5 · Kanban: Hermes agents pulling cards across one shared board, with a person reviewing and unblocking
+  (() => {
+    const g = new THREE.Group();
+    const COLS = ["Triage", "Ready", "Running", "Review", "Done"], CW = 2.3, X0 = -2 * CW;
+    const board = new THREE.Mesh(new THREE.BoxGeometry(12.2, 6.4, 0.25), lambert("#1f262d")); board.position.set(0, 4.0, -0.2); g.add(board);
+    [-5.6, 5.6].forEach((x) => { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.25, 1.2, 0.25), postMat); leg.position.set(x, 0.6, -0.2); g.add(leg); });
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(12.5, 0.18, 0.35), amberMat); frame.position.set(0, 7.25, -0.15); g.add(frame);
+    const bg = glow("#ffbf4a", 16, 0.12); bg.position.set(0, 4, -0.6); g.add(bg);
+    COLS.forEach((n, c) => {
+      const x = X0 + c * CW;
+      const l = label(n, { h: 0.42, bg: "rgba(255,255,255,0.10)" }); l.position.set(x, 6.65, 0.12); g.add(l);
+      if (c) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.03, 5.6, 0.05), lambert("#3a4550")); d.position.set(x - CW / 2, 3.75, -0.05); g.add(d); }
+    });
+    const title = label("Hermes Kanban", { h: 0.75, accent: "#f2b33d" }); title.position.set(0, 8.3, 0); g.add(title);
+    const STATE_COL = ["#8fa3b5", "#4f8fd8", "#f2b33d", "#7fe0a4", "#3a6d9a"];
+    const cardGeo = new THREE.BoxGeometry(1.9, 0.5, 0.08);
+    const slotPos = (c, s) => new THREE.Vector3(X0 + c * CW, 5.9 - 0.66 * (Math.min(s, 6) + 1), 0.06);
+    const cards = [];
+    for (let k = 0; k < 11; k++) {
+      const m = new THREE.Mesh(cardGeo, lambert(STATE_COL[0], { emissive: "#000000" })); g.add(m);
+      const col = k < 3 ? 0 : k < 5 ? 1 : k < 7 ? 2 : k < 9 ? 3 : 4;
+      m.position.copy(slotPos(col, k % 2));
+      cards.push({ m, col, entered: -k * 0.4, move: null, blocked: false });
+    }
+    const colorCard = (cd) => {
+      cd.m.material.color.set(cd.blocked ? "#e0533f" : STATE_COL[cd.col]);
+      cd.m.material.emissive.set(cd.blocked ? "#6a1408" : cd.col === 2 ? "#5a3600" : cd.col === 3 ? "#0f4a2a" : "#000000");
+      cd.m.material.emissiveIntensity = 1;
+    };
+    cards.forEach(colorCard);
+    const human = person(); human.position.set(X0 + 3 * CW + 0.4, 0, 1.5); g.add(human);
+    const hl = label("You: review + unblock", { h: 0.38, accent: "#5fbf7f" }); hl.position.set(human.position.x, 2.1, 1.5); g.add(hl);
+    const ds = [0, 1, 2].map((k) => { const d = makeDrone(1.1); d.position.set(-4 + k * 4, 8, 1.2); g.add(d); return { d, busy: null }; });
+    let tick = 0, simT = 0, unblock = null;
+    const tmpV = new THREE.Vector3();
+    function advance() {
+      cards.filter((c) => !c.move && c.col === 4 && simT - c.entered > 2.2).forEach((c) => { c.move = { kind: "ship", from: c.m.position.clone(), p: 0 }; });
+      const cand = cards.filter((c) => !c.move && !c.blocked && c.col < 4 && simT - c.entered > 1.4).sort((a, b) => a.entered - b.entered);
+      const cd = cand[0]; if (!cd) return;
+      const free = ds.find((x) => !x.busy);
+      cd.move = { kind: "step", from: cd.m.position.clone(), to: null, toCol: cd.col + 1, p: 0, drone: free || null };
+      if (free) free.busy = cd;
+    }
+    place(KANBAN, g);
+    landmarks[KANBAN] = { g, top: 8.7, update(t, act, dt) {
+      const speed = act ? 1 : 0.45;
+      simT += dt * speed; tick += dt * speed;
+      if (tick > 1.0) { tick = 0; advance(); }
+      const slots = [0, 0, 0, 0, 0];
+      cards.filter((c) => !c.move).sort((a, b) => a.entered - b.entered).forEach((c) => {
+        const target = slotPos(c.col, slots[c.col]++);
+        c.m.position.lerp(target, Math.min(1, dt * 6)); c.m.rotation.z *= 0.9;
+      });
+      cards.forEach((c) => {
+        const mv = c.move; if (!mv) return;
+        mv.p += dt * speed * (mv.kind === "ship" ? 0.55 : 0.85);
+        const e = Math.min(1, mv.p), ee = e * e * (3 - 2 * e);
+        if (mv.kind === "step") {
+          if (!mv.to) mv.to = slotPos(mv.toCol, slots[mv.toCol]);
+          c.m.position.lerpVectors(mv.from, mv.to, ee);
+          c.m.position.y += Math.sin(ee * Math.PI) * 1.1; c.m.position.z = 0.06 + Math.sin(ee * Math.PI) * 0.9;
+          c.m.rotation.z = Math.sin(ee * Math.PI) * 0.15;
+          if (mv.drone) mv.drone.d.position.set(c.m.position.x, c.m.position.y + 0.55, c.m.position.z + 0.1);
+          if (e >= 1) {
+            if (mv.drone) mv.drone.busy = null;
+            c.col = mv.toCol; c.entered = simT; c.move = null;
+            if (c.col === 2 && rand() < 0.3) c.blocked = true;
+            colorCard(c);
+          }
+        } else {
+          c.m.position.set(mv.from.x + ee * 5, mv.from.y - ee * 4.6, mv.from.z + ee * 7);
+          c.m.scale.setScalar(1 - ee * 0.6);
+          if (e >= 1) { c.col = 0; c.entered = simT; c.move = null; c.m.scale.setScalar(1); c.m.position.copy(slotPos(0, 4)).add(new THREE.Vector3(0, 1.5, 0.6)); colorCard(c); }
+        }
+      });
+      const blocked = cards.find((c) => c.blocked && !c.move);
+      if (blocked) {
+        if (!unblock || unblock.card !== blocked) unblock = { card: blocked, t: 0 };
+        unblock.t += dt * speed;
+        blocked.m.material.emissiveIntensity = 1 + Math.sin(t * 10) * 0.8;
+        human.rotation.y = Math.atan2(blocked.m.position.x - human.position.x, blocked.m.position.z - human.position.z) * 0.6;
+        if (unblock.t > 2.6) { blocked.blocked = false; colorCard(blocked); unblock = null; }
+      } else human.rotation.y = Math.sin(t * 0.6) * 0.4;
+      ds.forEach((x, k) => {
+        if (!x.busy) { tmpV.set(-4 + k * 4, 7.9 + Math.sin(t * 1.5 + k) * 0.25, 1.2); x.d.position.lerp(tmpV, Math.min(1, dt * 2)); }
+        x.d.userData.rotors.forEach((r) => r.rotation.y = t * 40);
+      });
+    } };
+  })();
+
+  // 6 · Destination: the GTRI Factory on a jebel table above Gafsa, at sunset
+  const destDrones = [];
+  let beamPivot;
+  (() => {
+    const g = new THREE.Group(); g.position.copy(CITADEL);
+    const plat = new THREE.Mesh(new THREE.CylinderGeometry(8.6, 9.8, 1.8, 40), lambert("#cdbfa3", { flatShading: true })); plat.position.y = -0.75; g.add(plat);
+    const winC = document.createElement("canvas"); winC.width = 64; winC.height = 128; const wx = winC.getContext("2d");
+    wx.fillStyle = "#1e2b38"; wx.fillRect(0, 0, 64, 128);
+    for (let r = 0; r < 16; r++) for (let c = 0; c < 4; c++) { wx.fillStyle = (r * 3 + c * 5) % 7 < 4 ? "#ffcf7a" : "#3a4c5e"; wx.fillRect(6 + c * 14, 4 + r * 8, 9, 5); }
+    const winTex = new THREE.CanvasTexture(winC);
+    const towerMat = new THREE.MeshLambertMaterial({ map: winTex, emissive: "#ffffff", emissiveMap: winTex, emissiveIntensity: 0.55 });
+    nightHooks.push((n) => { towerMat.emissiveIntensity = 0.55 + n * 0.8; });
+    const towers = [[-4, -3.2, 9], [-4.8, 1.6, 6], [-1.6, 4.8, 7.5], [2.4, 5.2, 5.5], [4.4, -4, 8], [0.4, -5.4, 6.5]];
+    towers.forEach(([x, z, h]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(2.0, h, 2.0), towerMat); m.position.set(x, h / 2 + 0.15, z); g.add(m);
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 2.2), lambert("#f2b33d", { emissive: "#7a4a00" })); cap.position.set(x, h + 0.4, z); g.add(cap); });
+    // Control tower with the human control room
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.3, 14, 16), lambert("#e7e2d6")); shaft.position.y = 7.3; g.add(shaft);
+    const room = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.1, 2, 20), new THREE.MeshLambertMaterial({ color: "#8fe0b0", transparent: true, opacity: 0.55, emissive: "#2f9a5c", emissiveIntensity: 0.6 })); room.position.y = 15.2; g.add(room);
+    const rroof = new THREE.Mesh(new THREE.ConeGeometry(2.9, 1.2, 20), lambert("#e7e2d6")); rroof.position.y = 16.8; g.add(rroof);
+    const people = [0, 1, 2].map((k) => { const p = person(); p.scale.setScalar(0.8); const a = k * 2.1; p.position.set(Math.cos(a) * 1.3, 14.2, Math.sin(a) * 1.3); g.add(p); return p; });
+    const rg = glow("#8ff0b8", 8, 0.45); rg.position.y = 15.2; g.add(rg);
+    const ctl = label("Control room", { h: 0.8, accent: "#5fbf7f" }); ctl.position.y = 18.4; g.add(ctl);
+    // Lines from the control room down to the floor: goals, review, decisions
+    ["Goals", "Review", "Decisions"].forEach((n, k) => {
+      const a = k * 2.1 + 0.5, end = new THREE.Vector3(Math.cos(a) * 6.2, 0.6, Math.sin(a) * 6.2), start = new THREE.Vector3(0, 14.2, 0);
+      const len = start.distanceTo(end), w = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, len, 6), new THREE.MeshBasicMaterial({ color: "#7fe0a4", transparent: true, opacity: 0.55 }));
+      w.position.copy(start).add(end).multiplyScalar(0.5); w.lookAt(end); w.rotateX(Math.PI / 2); g.add(w);
+      const l = label(n, { h: 0.5, accent: "#5fbf7f" }); l.position.copy(end).lerp(start, 0.35); l.position.y += 0.5; g.add(l);
+    });
+    // Conveyor ring of glowing work orders
+    const belt = new THREE.Mesh(new THREE.TorusGeometry(7.7, 0.32, 6, 80), lambert("#3d8fd8", { emissive: "#163f73" })); belt.rotation.x = Math.PI / 2; belt.position.y = 0.45; g.add(belt);
+    const cubes = new THREE.InstancedMesh(new THREE.BoxGeometry(0.45, 0.35, 0.45), lambert("#f2b33d", { emissive: "#9a5d00" }), 30); g.add(cubes);
+    // Water tower on the rim, with an aircraft beacon that sweeps the desert at night
+    const lh = new THREE.Group(); lh.position.set(9, -0.5, 8.5); g.add(lh);
+    const legM = lambert("#8d7a5c", { flatShading: true });
+    [[0.95, 0.95], [0.95, -0.95], [-0.95, 0.95], [-0.95, -0.95]].forEach(([lx, lz]) => {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 6.2, 6), legM);
+      leg.position.set(lx, 3.1, lz); leg.rotation.z = -lx * 0.06; leg.rotation.x = lz * 0.06; lh.add(leg);
+    });
+    [2.1, 4.3].forEach((by) => {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.05, 5, 4), legM);
+      ring.rotation.x = Math.PI / 2; ring.rotation.y = Math.PI / 4; ring.position.y = by; lh.add(ring);
+    });
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.75, 2.6, 16), lambert("#d8cdb4", { flatShading: true })); tank.position.y = 7.5; lh.add(tank);
+    const tankTop = new THREE.Mesh(new THREE.ConeGeometry(1.8, 1.0, 16), lambert("#9c8a68", { flatShading: true })); tankTop.position.y = 9.3; lh.add(tankTop);
+    const tankBot = new THREE.Mesh(new THREE.ConeGeometry(1.78, 0.9, 16), lambert("#9c8a68", { flatShading: true })); tankBot.rotation.x = Math.PI; tankBot.position.y = 5.75; lh.add(tankBot);
+    // "GTRI" banded around the tank
+    const tc = document.createElement("canvas"); tc.width = 512; tc.height = 128; const tx = tc.getContext("2d");
+    tx.fillStyle = "#d8cdb4"; tx.fillRect(0, 0, 512, 128);
+    tx.fillStyle = "#8a5a1f"; tx.fillRect(0, 10, 512, 6); tx.fillRect(0, 112, 512, 6);
+    tx.fillStyle = "#23303f"; tx.font = "900 62px Archivo, Arial, sans-serif"; tx.textAlign = "center"; tx.textBaseline = "middle";
+    for (let k = 0; k < 2; k++) tx.fillText("GTRI", 128 + k * 256, 64);
+    const bandTex = new THREE.CanvasTexture(tc); bandTex.anisotropy = 4;
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(1.77, 1.77, 1.5, 16, 1, true), new THREE.MeshLambertMaterial({ map: bandTex, side: THREE.DoubleSide }));
+    band.position.y = 7.5; lh.add(band);
+    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 2.4, 6), legM); mast.position.y = 10.6; lh.add(mast);
+    const lamp = glow("#ffd9a0", 2.6, 1); lamp.position.y = 11.9; lh.add(lamp);
+    beamPivot = new THREE.Group(); beamPivot.position.y = 11.9; lh.add(beamPivot);
+    const beam = new THREE.Mesh(new THREE.ConeGeometry(1.8, 24, 20, 1, true), new THREE.MeshBasicMaterial({ color: "#ffe0ac", transparent: true, opacity: 0.1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    nightHooks.push((n) => { beam.material.opacity = 0.1 + n * 0.22; });
+    beam.rotation.z = Math.PI / 2; beam.position.x = 12; beamPivot.add(beam);
+    const sign = label("THE GTRI FACTORY", { h: 1.3, accent: "#f2b33d" }); sign.position.set(-9.5, 5.2, 0); g.add(sign);
+    for (let k = 0; k < DRONES_AT[LAST]; k++) { const d = makeDrone(1); d.visible = false; scene.add(d); destDrones.push(d); }
+    scene.add(g);
+    landmarks[LAST] = { g, top: 19, update(t, act) {
+      for (let k = 0; k < 30; k++) { const a = t * 0.25 + k * (Math.PI * 2 / 30); m4.position.set(Math.cos(a) * 7.7, 0.8, Math.sin(a) * 7.7); m4.rotation.set(0, -a, 0); m4.scale.set(1, 1, 1); m4.updateMatrix(); cubes.setMatrixAt(k, m4.matrix); }
+      cubes.instanceMatrix.needsUpdate = true;
+      beamPivot.rotation.y = t * 0.6;
+      rg.material.opacity = 0.35 + Math.sin(t * 1.5) * 0.12;
+      people.forEach((p, k) => p.rotation.y = t * 0.3 + k);
+      lamp.material.opacity = 0.8 + Math.sin(t * 6) * 0.2;
+    } };
+  })();
+
+  const extras = [];
+
+  // ---------- Factory security: a gate on the climb, guards posted and on patrol ----------
+  const navyM = lambert("#14254a"), goldM = lambert("#b3a369", { emissive: "#3a3015" }), skinM = lambert("#c99a74");
+  function makeGuard() {
+    const g = new THREE.Group();
+    const legs = [-0.09, 0.09].map((x) => { const pv = new THREE.Group(); pv.position.set(x, 0.5, 0); const l = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.5, 0.13), navyM); l.position.y = -0.25; pv.add(l); g.add(pv); return pv; });
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.5, 0.24), navyM); torso.position.y = 0.76; g.add(torso);
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.06, 0.26), goldM); belt.position.y = 0.53; g.add(belt);
+    const badge = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.08, 0.02), goldM); badge.position.set(-0.1, 0.88, 0.13); g.add(badge);
+    const arms = [-0.25, 0.25].map((x) => { const pv = new THREE.Group(); pv.position.set(x, 0.98, 0); const a = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.46, 0.12), navyM); a.position.y = -0.23; pv.add(a); g.add(pv); return pv; });
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 10), skinM); head.position.y = 1.15; g.add(head);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.08, 14), navyM); cap.position.y = 1.27; g.add(cap);
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.153, 0.153, 0.025, 14), goldM); band.position.y = 1.245; g.add(band);
+    const brim = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.12), navyM); brim.position.set(0, 1.235, 0.13); g.add(brim);
+    g.userData = { legs, arms }; g.scale.setScalar(1.25);
+    return g;
+  }
+  (() => {
+    const gt = 0.955, gp = curve.getPointAt(gt), tan = curve.getTangentAt(gt);
+    const g = new THREE.Group(); g.position.copy(gp); g.rotation.y = Math.atan2(-tan.z, tan.x); scene.add(g);
+    [-2.6, 2.6].forEach((z) => {
+      const pil = new THREE.Mesh(new THREE.BoxGeometry(0.5, 3.4, 0.5), navyM); pil.position.set(0, 0.9, z); g.add(pil);
+      const cp = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.22, 0.62), goldM); cp.position.set(0, 2.7, z); g.add(cp);
+      const lamp = glow("#ffe7a8", 1.4, 0.8); lamp.position.set(0, 3.05, z); g.add(lamp);
+    });
+    const booth = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.6, 1.4), lambert("#e9edf0")); booth.position.set(-1.6, 0.7, 3.9); g.add(booth);
+    const broof = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.2, 1.8), navyM); broof.position.set(-1.6, 2.1, 3.9); g.add(broof);
+    const bwin = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.6), new THREE.MeshBasicMaterial({ color: "#ffd98a" })); bwin.position.set(-0.79, 1.3, 3.9); bwin.rotation.y = Math.PI / 2; g.add(bwin);
+    const pivot = new THREE.Group(); pivot.position.set(0, 1.1, 2.6); g.add(pivot);
+    const sc = document.createElement("canvas"); sc.width = 256; sc.height = 16; const sx = sc.getContext("2d");
+    for (let k = 0; k < 8; k++) { sx.fillStyle = k % 2 ? "#b3a369" : "#14254a"; sx.fillRect(k * 32, 0, 32, 16); }
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 5.0), new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(sc) })); arm.position.z = -2.5; pivot.add(arm);
+    const sl = label("Security", { h: 0.6, accent: "#b3a369" }); sl.position.set(-1.6, 3.1, 3.9); g.add(sl);
+    const posted = [3.2, -3.2].map((z) => { const gd = makeGuard(); gd.position.set(0.9, 0, z); gd.rotation.y = -Math.PI / 2; g.add(gd); return gd; });
+    // Guards on patrol around the factory hilltop, and two at the entrance
+    const patrol = [0, 1, 2].map(() => { const gd = makeGuard(); scene.add(gd); return gd; });
+    const door = [1.6, -1.6].map((z) => { const gd = makeGuard(); gd.position.set(CITADEL.x - 8.9, CITADEL.y + 0.15, CITADEL.z + z); gd.rotation.y = -Math.PI / 2; scene.add(gd); return gd; });
+    let lift = 0;
+    extras.push({ update(t, dt) {
+      const open = carT > 0.93 || current === LAST ? 1 : 0;
+      lift += (open - lift) * Math.min(1, dt * 1.5);
+      pivot.rotation.x = lift * 1.35;
+      posted.forEach((gd, k) => {
+        gd.rotation.y = -Math.PI / 2 + Math.sin(t * 0.5 + k * 2) * 0.25;
+        gd.userData.arms[k].rotation.x = lift > 0.5 && k === 0 ? -2.6 + Math.sin(t * 6) * 0.35 : 0;
+      });
+      patrol.forEach((gd, k) => {
+        const a = t * 0.18 + k * 2.1, r = 7.9;
+        gd.position.set(CITADEL.x + Math.cos(a) * r, CITADEL.y + 0.15, CITADEL.z + Math.sin(a) * r);
+        gd.rotation.y = Math.atan2(-Math.sin(a), Math.cos(a));
+        const sw = Math.sin(t * 5 + k) * 0.5;
+        gd.userData.legs[0].rotation.x = sw; gd.userData.legs[1].rotation.x = -sw;
+        gd.userData.arms[0].rotation.x = -sw * 0.6; gd.userData.arms[1].rotation.x = sw * 0.6;
+      });
+      door.forEach((gd, k) => { gd.rotation.y = -Math.PI / 2 + Math.sin(t * 0.4 + k * 3) * 0.3; });
+    } });
+  })();
+
+  // ---------- Single-engine plane, circling over whichever stop is active ----------
+  // Flies the same wandering lissajous the scene used before: an orbit whose center eases
+  // toward the active landmark, so the plane drifts along with the presentation.
+  (() => {
+    const g = new THREE.Group(); scene.add(g);
+    const skinM = lambert("#eef1f4", { flatShading: true });
+    const trimM = lambert("#1f63b0", { flatShading: true });
+    const metalM = lambert("#8c959c", { flatShading: true });
+    const glassM = new THREE.MeshLambertMaterial({ color: "#2b3946", transparent: true, opacity: 0.55 });
+
+    // Fuselage: nose at +z so the group can simply lookAt the next path point
+    const fus = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.2, 4.0, 12), skinM);
+    fus.rotation.x = Math.PI / 2; g.add(fus);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.34, 0.75, 12), skinM);
+    nose.rotation.x = Math.PI / 2; nose.position.z = 2.35; g.add(nose);
+    const cowl = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.34, 0.5, 12), trimM);
+    cowl.rotation.x = Math.PI / 2; cowl.position.z = 1.95; g.add(cowl);
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.44, 1.5), glassM);
+    cabin.position.set(0, 0.26, 0.75); g.add(cabin);
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.1, 3.0), trimM);
+    [-0.34, 0.34].forEach((x) => { const s = stripe.clone(); s.position.set(x, -0.04, -0.2); g.add(s); });
+
+    // High wing with lift struts, the way a light single sits
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.12, 1.15), skinM);
+    wing.position.set(0, 0.5, 0.45); g.add(wing);
+    [-1, 1].forEach((sd) => {
+      const tipTrim = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.14, 1.1), trimM);
+      tipTrim.position.set(sd * 3.35, 0.5, 0.45); g.add(tipTrim);
+      const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.55, 6), metalM);
+      strut.position.set(sd * 1.15, 0.1, 0.4); strut.rotation.z = sd * 0.72; g.add(strut);
+    });
+
+    // Tail: vertical fin and horizontal stabilizer
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.0, 0.85), skinM);
+    fin.position.set(0, 0.58, -1.75); g.add(fin);
+    const finTip = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.34, 0.5), trimM);
+    finTip.position.set(0, 1.0, -1.9); g.add(finTip);
+    const stab = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.09, 0.62), skinM);
+    stab.position.set(0, 0.06, -1.85); g.add(stab);
+
+    // Fixed tricycle gear
+    [[-0.78, -0.42, 0.2], [0.78, -0.42, 0.2], [0, -0.4, 1.6]].forEach(([x, y, z]) => {
+      const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.42, 6), metalM);
+      strut.position.set(x, y, z); g.add(strut);
+      const tyre = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.09, 12), lambert("#1a1c1f"));
+      tyre.rotation.z = Math.PI / 2; tyre.position.set(x, y - 0.22, z); g.add(tyre);
+    });
+
+    // Propeller: a hub plus two thin blades, spun fast enough to blur into a disc
+    const prop = new THREE.Group(); prop.position.z = 2.72; g.add(prop);
+    const hub = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.3, 10), trimM); hub.rotation.x = Math.PI / 2; prop.add(hub);
+    [0, Math.PI / 2].forEach((a) => {
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.11, 0.03), lambert("#2a2d31"));
+      blade.rotation.z = a; prop.add(blade);
+    });
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(1.05, 20), new THREE.MeshBasicMaterial({ color: "#cfd6dc", transparent: true, opacity: 0.1, depthWrite: false, side: THREE.DoubleSide }));
+    disc.position.z = 0.04; prop.add(disc);
+
+    // Navigation lights: red port, green starboard, white strobe on the fin
+    const navR = glow("#ff4a3a", 0.5, 0.75); navR.position.set(-3.6, 0.52, 0.45); g.add(navR);
+    const navG = glow("#4aff82", 0.5, 0.75); navG.position.set(3.6, 0.52, 0.45); g.add(navG);
+    const strobe = glow("#ffffff", 0.7, 0); strobe.position.set(0, 1.18, -1.9); g.add(strobe);
+    // Landing light, only worth running after dark
+    const land = glow("#fff1c8", 1.4, 0); land.position.set(0, 0.3, 2.6); g.add(land);
+    nightHooks.push((n) => { land.material.opacity = n * 0.8; });
+
+    g.scale.setScalar(0.85);
+    g.position.set(-58, 26, -14);
+
+    // Same orbit-around-the-active-stop motion the scene used before
+    const center = new THREE.Vector3(-30, 0, 0), centerGoal = new THREE.Vector3(), tmp = new THREE.Vector3();
+    const path = (t, out) => { const a = t * 0.16; return out.set(center.x + Math.sin(a) * 26, center.y + 20 + Math.sin(a * 2 + 1) * 3 + Math.sin(a * 0.7) * 2, center.z + Math.sin(a * 2) * 13); };
+    const prev = new THREE.Vector3().copy(g.position), nextP = new THREE.Vector3();
+    let bank = 0;
+    extras.push({ update(t, dt) {
+      const c = current === LAST ? CITADEL : anchors[current].p;
+      centerGoal.set(c.x - 4, current === LAST ? CITADEL.y + 10 : 0, c.z - 6);
+      center.lerp(centerGoal, Math.min(1, dt * 0.25));
+      prev.copy(g.position);
+      path(t, g.position);
+      g.lookAt(path(t + 0.05, tmp));
+      // Bank into the turn: compare this heading with the last one
+      nextP.copy(tmp);
+      const hNow = Math.atan2(nextP.x - g.position.x, nextP.z - g.position.z);
+      const hPrev = Math.atan2(g.position.x - prev.x, g.position.z - prev.z);
+      let d = hNow - hPrev; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2;
+      bank += (Math.max(-0.6, Math.min(0.6, d * 6)) - bank) * Math.min(1, dt * 2);
+      g.rotateZ(bank);
+      prop.rotation.z += dt * 46;
+      strobe.material.opacity = (t % 1.3) < 0.09 ? 0.95 : 0;
+    } });
+  })();
+
+  // ---------- Your Jeep (a human driver; an autopilot halo appears as autonomy grows) ----------
+  function makeCar() {
+    const g = new THREE.Group();
+    const blue = lambert("#1f45b8"), black = lambert("#16181b"), dark = lambert("#2a2d31"), tyre = lambert("#141414");
+    const glass = new THREE.MeshLambertMaterial({ color: "#2b3946", transparent: true, opacity: 0.5 });
+    const lampM = new THREE.MeshBasicMaterial({ color: "#fff3c4" }), tailM = new THREE.MeshBasicMaterial({ color: "#e0352b" });
+    const body = new THREE.Group(); g.add(body);
+    const tub = new THREE.Mesh(new THREE.BoxGeometry(1.95, 0.5, 0.92), blue); tub.position.y = 0.66; body.add(tub);
+    const hood = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.1, 0.9), blue); hood.position.set(0.63, 0.94, 0); hood.rotation.z = -0.06; body.add(hood);
+    const grille = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.9), blue); grille.position.set(0.97, 0.72, 0); body.add(grille);
+    for (let k = 0; k < 7; k++) { const slot = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.24, 0.045), black); slot.position.set(1.005, 0.74, -0.21 + k * 0.07); body.add(slot); }
+    [-0.33, 0.33].forEach((z) => {
+      const hl = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.05, 16), lampM); hl.rotation.z = Math.PI / 2; hl.position.set(1.0, 0.76, z); body.add(hl);
+      const tl = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.16, 0.08), tailM); tl.position.set(-0.985, 0.74, z * 1.2); body.add(tl);
+    });
+    const wsh = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.42, 0.86), glass); wsh.position.set(0.28, 1.12, 0); wsh.rotation.z = 0.12; body.add(wsh);
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.88), glass); cabin.position.set(-0.36, 1.12, 0); body.add(cabin);
+    const softTop = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.09, 0.95), black); softTop.position.set(-0.34, 1.36, 0); body.add(softTop);
+    const rearTop = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.42, 0.94), black); rearTop.position.set(-0.96, 1.13, 0); body.add(rearTop);
+    [-0.45, 0.45].forEach((z) => { [0.24, -0.25].forEach((x) => { const pil = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.04), black); pil.position.set(x, 1.12, z); body.add(pil); }); });
+    const bumpF = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 1.04), black); bumpF.position.set(1.02, 0.42, 0); body.add(bumpF);
+    const bumpR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.16, 1.0), black); bumpR.position.set(-1.0, 0.42, 0); body.add(bumpR);
+    const spare = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.27, 0.18, 18), tyre); spare.rotation.z = Math.PI / 2; spare.position.set(-1.1, 0.92, 0); body.add(spare);
+    const spareHub = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.2, 6), dark); spareHub.rotation.z = Math.PI / 2; spareHub.position.copy(spare.position); body.add(spareHub);
+    // Tunisian plate: black ground, white text, "تونس" between the serial and the series,
+    // with the requested "DR. JIRA" vanity text standing in for the serial. Front and back.
+    const pc = document.createElement("canvas"); pc.width = 512; pc.height = 256; const px = pc.getContext("2d");
+    px.fillStyle = "#111214"; rr(px, 4, 4, 504, 248, 22); px.fill();
+    px.strokeStyle = "#f2efe6"; px.lineWidth = 7; rr(px, 14, 14, 484, 228, 16); px.stroke();
+    px.fillStyle = "#f2efe6"; px.textAlign = "center"; px.textBaseline = "middle";
+    px.font = "900 92px Archivo, Arial, sans-serif"; px.fillText("DR. JIRA", 256, 112);
+    // تونس — "Tunisia" — on the plate the way the real series carries it
+    px.font = "700 46px 'Segoe UI', 'Noto Naskh Arabic', Arial, sans-serif"; px.fillText("تونس", 256, 186);
+    px.font = "600 22px 'IBM Plex Mono', monospace"; px.textAlign = "left"; px.fillText("TN", 40, 186);
+    px.textAlign = "right"; px.fillText("GTRI", 472, 186);
+    const plateTex = new THREE.CanvasTexture(pc); plateTex.anisotropy = 8;
+    const plateMat = new THREE.MeshBasicMaterial({ map: plateTex, side: THREE.DoubleSide });
+    const rearPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.23), plateMat); rearPlate.rotation.y = -Math.PI / 2; rearPlate.position.set(-1.07, 0.6, 0); body.add(rearPlate);
+    const frontPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.21), plateMat); frontPlate.rotation.y = Math.PI / 2; frontPlate.position.set(1.1, 0.42, 0); body.add(frontPlate);
+    g.userData.plateTex = plateTex; g.userData.plateCanvas = pc;
+    const driver = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), greenMat); driver.position.set(0.0, 1.12, 0.2); body.add(driver);
+    const wheels = [];
+    [[0.62, 0.47], [0.62, -0.47], [-0.62, 0.47], [-0.62, -0.47]].forEach(([x, z]) => {
+      const flare = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.07, 0.2), dark); flare.position.set(x, 0.8, z * 1.06); body.add(flare);
+      const hub = new THREE.Group(); hub.position.set(x, 0.29, z);
+      const w = new THREE.Mesh(new THREE.CylinderGeometry(0.29, 0.29, 0.22, 18), tyre); w.rotation.x = Math.PI / 2; hub.add(w);
+      const rimm = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.235, 6), black); rimm.rotation.x = Math.PI / 2; hub.add(rimm);
+      g.add(hub); wheels.push(hub);
+    });
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(0.45, 0.05, 8, 32), new THREE.MeshBasicMaterial({ color: "#ffc44d", transparent: true, opacity: 0 }));
+    halo.rotation.x = Math.PI / 2; halo.position.set(-0.3, 1.78, 0); g.add(halo);
+    const hgl = glow("#ffbf4a", 1.6, 0); hgl.position.copy(halo.position); g.add(hgl);
+    const beamsGlow = glow("#fff3c4", 1.4, 0.5); beamsGlow.position.set(1.12, 0.76, 0); g.add(beamsGlow);
+    g.userData = { wheels, halo, hgl, body, plateTex };
+    g.rotation.order = "YZX";
+    return g;
+  }
+  const car = makeCar(); scene.add(car);
+  if (document.fonts) document.fonts.ready.then(() => { const old = car.userData.plateTex; const fresh = makeCar().userData.plateTex; old.image = fresh.image; old.needsUpdate = true; });
+
+  // ---------- Night: stars, headlights and bats ----------
+  const STARN = 1400, starGeo = new THREE.BufferGeometry(), starPos = new Float32Array(STARN * 3);
+  for (let k = 0; k < STARN; k++) {
+    const th = rand() * Math.PI * 2, y = 0.04 + rand() * 0.96, r = Math.sqrt(1 - y * y);
+    starPos.set([Math.cos(th) * r * 440, y * 440, Math.sin(th) * r * 440], k * 3);
+  }
+  starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
+  const starMat = new THREE.PointsMaterial({ size: 2.4, map: glowTex, color: "#e8eeff", transparent: true, opacity: 0, depthWrite: false, fog: false });
+  const stars = new THREE.Points(starGeo, starMat); scene.add(stars);
+
+  const headlight = new THREE.SpotLight("#fff1c8", 0, 45, 0.5, 0.6, 1); headlight.position.set(1.05, 0.8, 0); car.add(headlight);
+  headlight.target.position.set(12, -1.2, 0); car.add(headlight.target);
+  nightHooks.push((n) => { headlight.intensity = n * 2.4; });
+
+  // Bats: a small colony fluttering around every stop
+  function makeBat() {
+    const g = new THREE.Group(), dark = lambert("#1d1a24"), memM = new THREE.MeshLambertMaterial({ color: "#2e2636", side: THREE.DoubleSide });
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 6), dark); b.scale.set(1.3, 0.85, 0.85); g.add(b);
+    const h = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 6), dark); h.position.set(0.18, 0.04, 0); g.add(h);
+    [-0.05, 0.05].forEach((z) => { const e = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.11, 4), dark); e.position.set(0.18, 0.15, z); g.add(e); });
+    const eyeM = new THREE.MeshBasicMaterial({ color: "#ff5a3a" });
+    [-0.04, 0.04].forEach((z) => { const e = new THREE.Mesh(new THREE.SphereGeometry(0.016, 6, 4), eyeM); e.position.set(0.26, 0.06, z); g.add(e); });
+    const P = [[0.12, 0.02], [0.06, 0.35], [0.02, 0.72], [-0.1, 0.56], [-0.06, 0.44], [-0.18, 0.34], [-0.12, 0.2], [-0.18, 0.04]];
+    const pos = []; for (let i = 0; i < P.length - 1; i++) pos.push(-0.02, 0, 0.01, P[i][0], 0, P[i][1], P[i + 1][0], 0, P[i + 1][1]);
+    const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); wg.computeVertexNormals();
+    const mk = (sz) => { const pv = new THREE.Group(); pv.add(new THREE.Mesh(wg, memM)); pv.scale.z = sz; g.add(pv); return pv; };
+    return { g, l: mk(1), r: mk(-1) };
+  }
+  const bats = [];
+  [0, 1, 2, 3, 4, 5].map((i) => anchors[i].p.clone()).concat([CITADEL.clone()]).forEach((c) => {
+    for (let k = 0; k < 4; k++) {
+      const b = makeBat(); b.g.visible = false; scene.add(b.g);
+      const ph = rand() * 6, rx = 5 + rand() * 7, rz = 4 + rand() * 6, h = c.y + 5 + rand() * 5, sp = 0.5 + rand() * 0.4;
+      bats.push({ g: b.g, l: b.l, r: b.r, ph, size: 1.5 + rand() * 0.6,
+        path: (t, out) => { const a = t * sp + ph; return out.set(c.x + Math.sin(a * 1.3) * rx + Math.sin(t * 3.1 + ph) * 1.1, h + Math.sin(t * 2.3 + ph) * 1.4 + Math.sin(a * 2.1) * 1.6, c.z + Math.cos(a) * rz + Math.cos(t * 2.7 + ph) * 1.1); } });
+    }
+  });
+
+
+  const tA = new THREE.Vector3(), tB = new THREE.Vector3();
+  function updateNight(dt, t) {
+    const nightVis = smooth(0.35, 0.65, nf), dayVis = 1 - nightVis;
+    birdFlock.forEach((b) => { b.g.visible = dayVis > 0.02; b.g.scale.setScalar(b.g.userData.base * Math.max(dayVis, 0.0001)); });
+    bats.forEach((b) => {
+      b.g.visible = nightVis > 0.02; if (!b.g.visible) return;
+      const p = b.path(t, tA), q = b.path(t + 0.04, tB);
+      b.g.position.copy(p);
+      const dx = q.x - p.x, dz = q.z - p.z, dy = q.y - p.y;
+      b.g.rotation.set(0, Math.atan2(-dz, dx), Math.atan2(dy, Math.hypot(dx, dz)) * 0.6, "YZX");
+      b.g.scale.setScalar(b.size * nightVis);
+      const f = Math.sin(t * 22 + b.ph) * 0.9; b.l.rotation.x = -f; b.r.rotation.x = f;
+    });
+    nightHooks.forEach((h) => h(nf));
+  }
+  let carT = STOPS[0].t, carGoal = carT, carSpeed = 0, travelSpan = 0.0001;
+  function carPose(t) {
+    const p = curve.getPointAt(t), tan = curve.getTangentAt(t);
+    const side = new THREE.Vector3().crossVectors(tan, up).normalize().multiplyScalar(0.85);
+    return { pos: p.clone().add(side), tan };
+  }
+  function placeCar() {
+    const { pos, tan } = carPose(carT);
+    car.position.copy(pos); car.rotation.y = Math.atan2(-tan.z, tan.x); car.rotation.z = Math.asin(Math.max(-1, Math.min(1, tan.y)));
+  }
+  placeCar();
+
+  // Follower drones (agents) that join the trip as autonomy grows
+  const followers = [];
+  for (let k = 0; k < Math.max(...DRONES_AT.slice(0, LAST)); k++) { const d = makeDrone(0.9); d.visible = false; d.userData.s = 0; scene.add(d); followers.push(d); }
+
+  // ---------- Bullet beacon over the active landmark ----------
+  let beaconSprite = null, beaconAge = 0;
+  const bursts = [];
+  for (let k = 0; k < 40; k++) { const b = glow("#ffd27a", 0.5, 0); b.visible = false; scene.add(b); bursts.push({ b, v: new THREE.Vector3(), life: 0 }); }
+  function burst(at, col) {
+    bursts.forEach((q) => { q.b.visible = true; q.b.position.copy(at); q.b.material.color.set(col); q.v.set(rand() - 0.5, rand() * 0.6 + 0.1, rand() - 0.5).normalize().multiplyScalar(4 + rand() * 4); q.life = 1; });
+  }
+  function beaconAnchor(i) {
+    const lm = landmarks[i];
+    const base = i === AGENT ? lm.g.position : (i === LAST ? CITADEL : anchors[i].mark);
+    return new THREE.Vector3(base.x, base.y + (lm.top || 7) + 1.6, base.z);
+  }
+  function setBeacon(text, i) {
+    if (beaconSprite) { scene.remove(beaconSprite); beaconSprite.material.map.dispose(); beaconSprite.material.dispose(); }
+    beaconSprite = label(text, { h: i === LAST ? 1.6 : 1.05, accent: "#f2b33d", font: "600 50px 'IBM Plex Sans', Arial, sans-serif", bg: "rgba(14,20,18,0.9)" });
+    beaconSprite.position.copy(beaconAnchor(i)); beaconSprite.userData.base = beaconSprite.position.y; beaconSprite.userData.sx = beaconSprite.scale.x; beaconSprite.userData.sy = beaconSprite.scale.y;
+    beaconSprite.scale.set(0.001, 0.001, 1); scene.add(beaconSprite); beaconAge = 0;
+    burst(beaconSprite.position, "#ffd27a");
+  }
+
+  // ---------- Time of day ----------
+  const TOD = [
+    { top: "#5d9fd6", hor: "#d3e8ee", sun: "#fff6e0", el: 0.85, hemi: 0.95, dir: 0.85, tint: "#ffffff", cloud: "#000000" },
+    { top: "#4c86c4", hor: "#f2dcae", sun: "#ffdc98", el: 0.4, hemi: 0.85, dir: 0.8, tint: "#fff3df", cloud: "#2a1a05" },
+    { top: "#2e2c62", hor: "#ff9a62", sun: "#ff8a45", el: 0.05, hemi: 0.62, dir: 0.7, tint: "#ffd2b0", cloud: "#5a2410" },
+  ];
+  let tod = 0, todGoal = 0, nf = 0.5;
+  const cA = new THREE.Color(), cB = new THREE.Color();
+  function lerpHex(a, b, f, out) { return out.copy(cA.set(a)).lerp(cB.set(b), f); }
+  const NIGHT = { top: "#050918", hor: "#18223f", moon: "#cdd8ff", tint: "#6c7aa6", cloud: "#05070f" };
+  const cTmp = new THREE.Color();
+  function applyTOD() {
+    const x = tod * 2, k = Math.min(1, Math.floor(x)), f = x - k, a = TOD[k], b = TOD[Math.min(2, k + 1)];
+    const dark = smooth(0.15, 0.85, nf);
+    lerpHex(a.top, b.top, f, skyU.top.value).lerp(cTmp.set(NIGHT.top), dark);
+    lerpHex(a.hor, b.hor, f, skyU.horizon.value).lerp(cTmp.set(NIGHT.hor), dark);
+    const dayEl = a.el + (b.el - a.el) * f;
+    let el, az;
+    // First half of the change: the sun sinks below the horizon. Second half: the moon rises (and the reverse at dawn).
+    if (nf < 0.5) { const q = smooth(0, 0.5, nf); el = dayEl + (-0.22 - dayEl) * q; az = -0.35; lerpHex(a.sun, b.sun, f, skyU.sunCol.value).lerp(cTmp.set("#ff5a20"), q * 0.8); }
+    else { const q = smooth(0.5, 1, nf); el = -0.22 + 0.84 * q; az = 0.75; skyU.sunCol.value.set(NIGHT.moon).multiplyScalar(0.55 + 0.25 * q); }
+    skyU.sunDir.value.set(Math.cos(el) * Math.cos(az), Math.sin(el) + 0.02, Math.cos(el) * Math.sin(az)).normalize();
+    sun.position.copy(skyU.sunDir.value).multiplyScalar(100); sun.color.copy(skyU.sunCol.value);
+    const above = smooth(-0.12, 0.12, el), dayDir = a.dir + (b.dir - a.dir) * f;
+    sun.intensity = nf < 0.5 ? dayDir * above : 0.42 * above;
+    hemi.intensity = (a.hemi + (b.hemi - a.hemi) * f) * (1 - dark) + 0.32 * dark;
+    hemi.color.copy(skyU.horizon.value).lerp(cB.set(nf > 0.5 ? "#8fa2d8" : "#ffffff"), 0.5);
+    scene.fog.color.copy(skyU.horizon.value); seaU.fogColor.value.copy(skyU.horizon.value);
+    lerpHex(a.tint, b.tint, f, groundMat.color).lerp(cTmp.set(NIGHT.tint), dark); floraTinted.forEach((m) => m.material.color.copy(groundMat.color));
+    lerpHex(a.cloud, b.cloud, f, cloudMat.emissive).lerp(cTmp.set(NIGHT.cloud), dark);
+    cloudMat.color.set("#ffffff").lerp(cTmp.set("#3a4566"), dark);
+    seaU.deep.value.set("#0a3f8a").lerp(cTmp.set("#04101f"), dark); seaU.shallow.value.set("#27a8c4").lerp(cTmp.set("#0b2b3c"), dark);
+    dustMat.opacity = Math.max(0.35 + tod * 0.45, dark * 0.95); dustMat.color.set("#fff2c8").lerp(cTmp.set("#d8ff7a"), dark); dustMat.size = 0.18 + dark * 0.14;
+    starMat.opacity = smooth(0.45, 1, nf);
+  }
+
+  // ---------- Camera director ----------
+  let mode = "frame", driving = false;
+  const goalTarget = new THREE.Vector3(), goalCam = new THREE.Vector3();
+  function frameStop(i) {
+    if (i === LAST) { goalTarget.set(68, 15, -8); goalCam.set(30, 27, 40); return; }
+    const a = anchors[i], lm = landmarks[i];
+    const focus = i === AGENT ? lm.g.position.clone() : a.mark.clone();
+    const mid = focus.clone().lerp(car.position, 0.4);
+    goalTarget.set(mid.x, (lm.top || 7) * 0.45, mid.z);
+    goalCam.copy(mid).addScaledVector(a.side, (i === KANBAN ? 19 : 13) * a.sgn).addScaledVector(a.tan, -9); goalCam.y = (lm.top || 7) * 0.9 + 4;
+    // Stops 0 and 1 are on the Gulf of Tunis: stand the camera inland looking back over the
+    // landmark so the Mediterranean stays in frame behind it.
+    if (i <= 1) {
+      goalCam.set(mid.x + 20, 9, mid.z + 16);
+      goalTarget.set(mid.x - 10, 2.5, mid.z);
+    }
+  }
+  function chase() {
+    const { pos, tan } = carPose(carT);
+    goalTarget.copy(pos).addScaledVector(tan, 7); goalTarget.y = pos.y + 1.2;
+    goalCam.copy(pos).addScaledVector(tan, -9).add(new THREE.Vector3(0, 5.5, 0));
+    const side = new THREE.Vector3().crossVectors(tan, up).normalize(); goalCam.addScaledVector(side, 3);
+  }
+  let pendingBeacon = null;
+  scene3D.goTo = (i) => {
+    carGoal = STOPS[i].t;
+    travelSpan = Math.max(0.0001, Math.abs(carGoal - carT));
+    todGoal = i / LAST;
+    pendingBeacon = i;
+    signs.forEach((sp, j) => { if (!sp) return; sp.material.map.dispose(); sp.material.map = signTexture(STOPS[j], j === i); sp.material.needsUpdate = true; });
+    $("mOverview").setAttribute("aria-pressed", "false");
+    if (reduceMotion) { carT = carGoal; placeCar(); driving = false; arrive(); frameStop(i); controls.target.copy(goalTarget); camera.position.copy(goalCam); mode = "frame"; }
+    else if (travelSpan < 0.0005 && mode === "intro") { carT = carGoal; placeCar(); driving = false; arrive(); }
+    else if (travelSpan < 0.0005) { carT = carGoal; placeCar(); driving = false; arrive(); frameStop(i); mode = "frame"; }
+    else { driving = true; mode = "chase"; cardTravel(true); }
+  };
+  scene3D.beacon = (text, i) => setBeacon(text, i);
+  scene3D.leaveIntro = () => { if (mode === "intro") { mode = "frame"; frameStop(current); } };
+  scene3D.overview = () => {
+    // Wide enough to take in the Gulf of Tunis, the tree belt and the Orbata massif
+    mode = "frame"; goalTarget.set(10, 0, -6); goalCam.set(0, 118, 126);
+    $("mOverview").setAttribute("aria-pressed", "true");
+  };
+  function arrive() {
+    cardTravel(false);
+    if (current >= TOOLS) revealT = Math.max(revealT, STOPS[current].t + 0.004);
+    if (pendingBeacon !== null) { setBeacon(STOPS[pendingBeacon].bullets[bulletIdx], pendingBeacon); pendingBeacon = null; }
+  }
+  controls.addEventListener("start", () => { mode = "free"; $("mOverview").setAttribute("aria-pressed", "false"); });
+
+  // Picking signs and landmarks
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  const pickables = []; signs.forEach((s) => s && pickables.push(s));
+  landmarks.forEach((lm, i) => lm.g.traverse((o) => { if (o.isMesh) { o.userData.stop = i; pickables.push(o); } }));
+  let down = null;
+  canvas.addEventListener("pointerdown", (e) => { down = [e.clientX, e.clientY]; });
+  canvas.addEventListener("pointerup", (e) => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(pickables, false)[0];
+    if (!hit) return;
+    const i = hit.object.userData.i ?? hit.object.userData.stop;
+    if (i !== undefined) select(i);
+  });
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 640 ? 62 : 45; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+
+  // Opening shot
+  // Opening shot: low behind the Jeep, looking at the "DR. JIRA" tag, with a slow push-in
+  {
+    const { pos, tan } = carPose(carT);
+    const side = new THREE.Vector3().crossVectors(tan, up).normalize();
+    goalTarget.copy(pos).addScaledVector(tan, -1.07); goalTarget.y = pos.y + 0.62;
+    goalCam.copy(pos).addScaledVector(tan, -3.1).addScaledVector(side, 0.25); goalCam.y = pos.y + 0.8;
+    camera.position.copy(pos).addScaledVector(tan, -7.5).addScaledVector(side, 1.2); camera.position.y = pos.y + 1.9;
+    controls.target.copy(goalTarget);
+    mode = "intro";
+    if (reduceMotion) camera.position.copy(goalCam);
+  }
+  applyTOD();
+  if (document.fonts) document.fonts.ready.then(() => signs.forEach((sp, j) => { if (!sp) return; sp.material.map.dispose(); sp.material.map = signTexture(STOPS[j], j === current); sp.material.needsUpdate = true; }));
+
+  const clock = new THREE.Clock(); let time = 0, running = true;
+  document.addEventListener("visibilitychange", () => { running = !document.hidden; clock.getDelta(); });
+  const routeLen = curve.getLength();
+  renderer.setAnimationLoop(() => {
+    if (!running) return;
+    const dt = Math.min(clock.getDelta(), 0.1); time += dt;
+    const amb = reduceMotion ? 0.25 : 1;
+
+    // Drive the car toward its goal stop
+    if (driving) {
+      const diff = carGoal - carT, dir = Math.sign(diff);
+      const maxV = Math.max(0.03, travelSpan / 3.2);
+      const want = Math.min(maxV, Math.abs(diff) * 2.4 + 0.004);
+      carSpeed += (want - carSpeed) * Math.min(1, dt * 3);
+      const step = Math.min(Math.abs(diff), carSpeed * dt);
+      carT += dir * step;
+      car.userData.wheels.forEach((w) => { w.rotation.z -= (step * routeLen) / 0.29 * dir; });
+      placeCar(); if (mode === "chase") chase();
+      if (current >= TOOLS) revealT = Math.max(revealT, carT);
+      if (Math.abs(carGoal - carT) < 0.0004) { carT = carGoal; carSpeed = 0; placeCar(); driving = false; if (mode === "chase") { mode = "frame"; frameStop(current); } arrive(); }
+    }
+    if (mode !== "free") {
+      const k = mode === "chase" ? 0.08 : mode === "intro" ? 0.012 : 0.04;
+      controls.target.lerp(goalTarget, k); camera.position.lerp(goalCam, k);
+      if (mode === "frame" && !reduceMotion) { camera.position.x += Math.sin(time * 0.25) * 0.01; camera.position.y += Math.sin(time * 0.35) * 0.006; }
+    }
+    car.userData.body.position.y = Math.sin(time * 9) * 0.008 * amb;
+
+    // Autonomy: halo over the car and follower drones
+    const autonomy = Math.min(1, tod * 1.0);
+    car.userData.halo.material.opacity += (((current >= TOOLS) ? 0.9 : 0) - car.userData.halo.material.opacity) * dt * 2;
+    car.userData.hgl.material.opacity = car.userData.halo.material.opacity * 0.6;
+    car.userData.halo.rotation.z = time * 2;
+    const nFollow = current === LAST ? 0 : DRONES_AT[current];
+    followers.forEach((d, k) => {
+      const target = k < nFollow ? 1 : 0; d.userData.s += (target - d.userData.s) * Math.min(1, dt * 2.5);
+      d.visible = d.userData.s > 0.02; if (!d.visible) return;
+      const a = time * 0.8 + k * (Math.PI * 2 / Math.max(1, nFollow));
+      const tgt = car.position.clone().add(new THREE.Vector3(Math.cos(a) * 2.2, 2.4 + Math.sin(time * 2 + k) * 0.3, Math.sin(a) * 2.2));
+      d.position.lerp(tgt, Math.min(1, dt * 4)); d.scale.setScalar(0.9 * d.userData.s);
+      d.userData.rotors.forEach((r) => r.rotation.y = time * 40);
+    });
+    destDrones.forEach((d, k) => {
+      d.visible = current === LAST || mode === "free" || tod > 0.95;
+      const a = time * (0.3 + (k % 3) * 0.08) + k * 0.7, rad = 9 + (k % 4) * 2.5;
+      d.position.set(CITADEL.x + Math.cos(a) * rad, CITADEL.y + 6 + (k % 5) * 2 + Math.sin(time + k) * 0.6, CITADEL.z + Math.sin(a) * rad);
+      d.rotation.y = -a; d.userData.rotors.forEach((r) => r.rotation.y = time * 40);
+    });
+
+    updateRails(dt);
+    tod += (todGoal - tod) * Math.min(1, dt * 0.9);
+    nf += Math.sign(nightGoal - nf) * Math.min(Math.abs(nightGoal - nf), dt * 0.22);
+    applyTOD();
+    seaU.time.value = time * amb;
+    landmarks.forEach((lm, i) => lm.update(time * amb, i === current, dt));
+    extras.forEach((x) => x.update(time * amb, dt));
+    clouds.forEach((c) => { c.g.position.x += c.v * dt * amb; if (c.g.position.x > 170) c.g.position.x = -170; });
+    updateBirds(time * amb);
+    updateNight(dt, time * amb);
+    for (let k = 0; k < DUST; k++) { const d = dustBase[k]; dustPos[k * 3] = d[0] + Math.sin(time * 0.3 + d[3]) * 1.2; dustPos[k * 3 + 1] = d[1] + Math.sin(time * 0.5 + d[3] * 2) * 0.6; dustPos[k * 3 + 2] = d[2] + Math.cos(time * 0.27 + d[3]) * 1.2; }
+    dustGeo.attributes.position.needsUpdate = true;
+
+    if (beaconSprite) {
+      beaconAge += dt;
+      const e = Math.min(1, beaconAge / 0.6), over = 1 + Math.sin(e * Math.PI) * 0.12;
+      const s = reduceMotion ? 1 : (1 - Math.pow(1 - e, 3)) * over;
+      beaconSprite.scale.set(beaconSprite.userData.sx * s, beaconSprite.userData.sy * s, 1);
+      beaconSprite.position.y = beaconSprite.userData.base + Math.sin(time * 1.6) * 0.15;
+    }
+    bursts.forEach((q) => { if (q.life <= 0) return; q.life -= dt * 1.4; q.b.position.addScaledVector(q.v, dt); q.v.multiplyScalar(0.94); q.b.material.opacity = Math.max(0, q.life); if (q.life <= 0) q.b.visible = false; });
+
+    sky.position.copy(camera.position); stars.position.copy(camera.position);
+    controls.update();
+    renderer.render(scene, camera);
+  });
+}
+
+try { initScene(); }
+catch (err) {
+  const d = document.createElement("div"); d.className = "err";
+  d.textContent = "The 3D road needs WebGL, which this browser isn't providing. The stop cards still work with the arrow keys.";
+  document.getElementById("app").appendChild(d);
+}
+select(0);
+</script>
+
+</body></html>
