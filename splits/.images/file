@@ -1,0 +1,98 @@
+import groovy.transform.BaseScript
+import com.onresolve.jira.groovy.user.FieldBehaviours
+import com.atlassian.jira.component.ComponentAccessor
+
+@BaseScript FieldBehaviours fieldBehaviours
+
+log.warn("=== Cascading select field script started ===")
+
+Map<String, Map<String, List<String>>> hierarchy = [
+    "ELSYS": [
+        "AES"     : ["zAMLB", "APEB", "DO", "zEDAB", "EPTB", "EWSDB", "EFIB", "zFDB", "zHDB", "MEPB", "zMSEB", "OSB", "OSDB", "zRSAB", "zSDAB", "zSDB"],
+        "AHG"     : ["DO", "FTEB", "FTOB", "MAFB", "MDEB", "OPS", "SROB", "ASEB"],
+        "ELSYSDO" : ["CIR", "DIR", "QUA"],
+        "DO"      : ["BD", "DIR", "QUA"],
+        "ESL"     : ["ASEB", "CEWB", "ESEB", "LSEB", "SEAB", "TSIB", "DO"],
+        "ISS"     : ["AAAB", "ESAB", "SDAB", "SETI", "SOL", "STAR", "TITAN", "DO"],
+        "zPAX"    : ["zDO"],
+        "SER"     : ["ADSB", "DETE", "DO", "DSAA", "EOSA", "MAD", "MBAB"],
+        "TEN"     : ["CTCB", "DO", "EWTTB", "IDAB", "OTSB", "PAX", "RTHB", "RTSB", "RTSEB", "SSPPB", "TAB", "TSEB"]
+    ],
+    "ASL": [
+        "ASLDO"   : ["DIR", "DO"],
+        "AMDSD"   : ["DSED", "DAB", "C4L", "SDB", "DO"],
+        "ASDD"    : ["CCAB", "OSAB", "DEB", "MAB", "DO"],
+        "SID"     : ["IESB", "SIEB", "LTSB", "EOSSB", "FSB", "DO"],
+        "ATTD"    : ["ASEB", "ASB", "FTEB", "DO"],
+        "HCED"    : ["AHIB", "HPB", "HSEB", "DO"],
+        "PMQTTD"  : ["PMB", "STEB", "QCTB", "DO"]
+    ]
+]
+
+def lab         = getFieldByName("Lab")
+def division    = getFieldByName("Division - Branch")
+String selectedLab = lab.getValue() as String
+boolean isEdit  = underlyingIssue != null
+
+// ---- read persisted cascading value on edit ----
+String currentParent = null
+String currentChild  = null
+
+if (isEdit) {
+    def cfm        = ComponentAccessor.customFieldManager
+    def divisionCf = cfm.getCustomFieldObjectsByName("Division - Branch")?.find { true }
+    def raw        = underlyingIssue.getCustomFieldValue(divisionCf)
+
+    if (raw instanceof Map) {
+        currentParent = (raw as Map)[null]?.toString()
+        currentChild  = (raw as Map)["1"]?.toString()
+    }
+    log.warn("EDIT: persisted value parent='${currentParent}' child='${currentChild}'")
+}
+
+log.debug("Selected Lab: ${selectedLab}, isEdit: ${isEdit}")
+
+if (selectedLab && hierarchy.containsKey(selectedLab)) {
+
+    // nested map, parents sorted case-insensitively, insertion order preserved
+    Map<String, List<String>> options = new LinkedHashMap<String, List<String>>()
+    hierarchy[selectedLab]
+        .sort { a, b -> a.key.compareToIgnoreCase(b.key) }
+        .each { k, v -> options[k as String] = v as List<String> }
+
+    division.setFieldOptions(options)
+
+    if (isEdit && currentParent && options.containsKey(currentParent)) {
+        List<String> childOptions = options[currentParent] as List<String>
+
+        if (currentChild && childOptions.contains(currentChild)) {
+            division.setFormValue([currentParent, currentChild])
+            log.warn("EDIT: Preserved '${currentParent} / ${currentChild}'")
+        } else {
+            division.setFormValue([currentParent, null])
+            log.warn("EDIT: Preserved parent '${currentParent}', child '${currentChild}' not valid")
+        }
+        division.setDescription("Options limited to Lab: ${selectedLab}")
+
+    } else if (isEdit) {
+        division.setFormValue([null, null])
+        division.setDescription("Previous value is not valid for Lab ${selectedLab} — please reselect")
+        log.warn("EDIT: '${currentParent}' invalid for lab '${selectedLab}'")
+
+    } else {
+        division.setFormValue([null, null])
+        division.setDescription("Options limited to Lab: ${selectedLab}")
+        log.warn("CREATE: Division cleared, awaiting user selection")
+    }
+
+    log.warn("Set ${options.size()} division options for lab: ${selectedLab}")
+
+} else {
+    log.debug("Lab '${selectedLab}' not found in hierarchy or is null")
+    division.setFieldOptions([:])
+    division.setFormValue([null, null])
+    division.setDescription("Must select Lab first")
+}
+
+log.warn("===Lab behaviour complete ===")
+
